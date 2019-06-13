@@ -24,19 +24,21 @@ from pattern.en import wordlist
 from pattern.en import wordnet
 import random
 
-while (input()==''):
-	word = random.choice(wordlist.PROFANITY)
-	print()
-	print('--------------')
-	print ('Palabra:',word)
-	s = wordnet.synsets(word)
-	print()
-	print()
-	print ('sets:', s)
-	for i in range(len(s)):
-		print()
-		print ('Definition',s[i],':', s[i].gloss)
-		print('synonims: ',s[i].synonyms)
+# ~ while (input()==''):
+	# ~ word = random.choice(wordlist.PROFANITY)
+	# ~ print()
+	# ~ print('--------------')
+	# ~ print ('Palabra:',word)
+	# ~ s = wordnet.synsets(word)
+	# ~ print()
+	# ~ print()
+	# ~ print ('sets:', s)
+	# ~ for i in range(len(s)):
+		# ~ print()
+		# ~ print ('Definition',s[i],':', s[i].gloss)
+		# ~ print('synonims: ',s[i].synonyms)
 
 import pattern.es
 print (dir(pattern.es))
+
+
