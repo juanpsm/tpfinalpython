@@ -74,8 +74,22 @@ def config():
 	with open(archivo, "w") as f:
 		json.dump(archiv,f, sort_keys=True, indent=4)
 	return verbos,adjetivos,sustantivos
-
-verbos,adjetivos,sustantivos = config()
+def cantidad_pal(verbos,adjetivos,sustantivos):
+			total= 0
+			cantv = 0
+			cantadj = 0
+			cantsust = 0
+			for x in verbos:
+				total = total +1
+				cantv = cantv + 1
+			for x in adjetivos:
+					total = total +1
+					cantadj = cantadj + 1
+			for x in sustantivos:
+				total = total +1
+				cantsust = cantsust + 1
+			return cantv,cantadj,cantsust,total	
+verbos,adjetivos,sustantivos,values = config()	
 
 fila=[str(i) for i in range(ANCHO)]
 #print(fila)
@@ -90,6 +104,35 @@ layout = [
 		for j in range(ALTO)
 		 ]
 layout.append([sg.Button('Cerrar')])
+
+def ayuda(layout,values):
+	cantv,cantadj,cantsust,total= cantidad_pal(verbos,adjetivos,sustantivos)
+	if values['sin ayuda'] == True:
+		column1 = [
+				[sg.T('Total de palabras a buscar palabras a buscar: ' + str(total), justification='center')],
+				[sg.T('Verbos: '+ str(cantv)),
+				sg.T('Adjetivos: '+ str(cantadj)),
+				sg.T('Sustantivos: '+ str(cantsust))]
+				]
+		layout.append(([sg.Column(column1, background_color='#77BA99')]))		
+	elif values[' definiciones'] == True:
+		column1 = [
+			[sg.Text('ayuda: palabras a buscar. ', background_color='#77BA99', justification='center')],
+            [sg.T(verbos[j])for j in range(cantv)],
+            [sg.T(adjetivos[j])for j in range(cantadj)],
+            [sg.T(sustantivos[j])for j in range(cantsust)]
+            ]
+		layout.append(([sg.Column(column1, background_color='#F7F3EC')]))    
+	elif values['mostrar palabras'] == True:
+		column1 = [
+			[sg.Text('ayuda: palabras a buscar. ', background_color='#77BA99', justification='center')],
+            [sg.T(verbos[j])for j in range(cantv)],
+            [sg.T(adjetivos[j])for j in range(cantadj)],
+            [sg.T(sustantivos[j])for j in range(cantsust)]
+            ]
+		layout.append(([sg.Column(column1, background_color='#F7F3EC')]))
+ayuda(layout,values)
+
 window = sg.Window('TEMP GUI').Layout(layout)
 window.Finalize()
 
@@ -116,7 +159,7 @@ def agregar(palabra,fila,columna):
 	for j in palabra:
 			pas = str(fila)+'_'+str(columna)
 			sg.Popup(pas)
-			window.FindElement(str(fila)+'_'+str(columna)).Update(j)
+			window.FindElement(str(fila)+'_'+str(columna)).Update(j.upper())
 			columna = columna +1
 def palabras(verbos):
 	for x in verbos:
