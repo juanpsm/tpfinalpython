@@ -29,9 +29,10 @@ palabras_docente = {'careta':{'tipo':'adj','def':''},'sucio':{'tipo':'adj','def'
 					'rayuela':{'tipo':'sus','def':''},'perro':{'tipo':'sus','def':''},'gato':{'tipo':'sus','def':''}}
 
 palabras = list(palabras_docente.keys())
+#ANCHO = max(len(max(palabras, key=len)),2*len(palabras))
 ANCHO = len(max(palabras, key=len))
 ALTO = ANCHO
-
+print('ANCHO:',ANCHO,'Alto:',ALTO)
 matriz = grilla.crear_grilla(palabras)
 print('0 1 =',matriz.celdas[0][1])
 
@@ -40,11 +41,11 @@ print('0 1 =',matriz.celdas[0][1])
 		# ~ for j in range(ALTO)
 # ~ ]
 
-print('++++MATRIZ++++',matriz)
+grilla.print_resultado(matriz)
 sopa_layout = [
 			[sg.Button(matriz.celdas[j][i]['letra'],
-			 size=(4,2),
-			 pad=(5,5),
+			 size=(1,1),
+			 pad=(0,0),
 			 font=fuente,
 			 key = str(j)+'_'+str(i)) for i in range(ANCHO)]
 		for j in range(ALTO)

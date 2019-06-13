@@ -9,7 +9,7 @@
 # ~ print(word)
 # ~ print(another_word)
 
-# ~ from pattern.web import Wikipedia, SEARCH
+from pattern.web import Wikipedia, SEARCH, Wiktionary
 
 # ~ engine = Wikipedia(license=None, throttle=5.0, language=None)
 # ~ engine.search("dodo",
@@ -19,14 +19,14 @@
   # ~ cached = True)			# Cache locally?
 
 # ~ from pattern.web import Bing, SEARCH, plaintext
- 
+
 # ~ engine = Bing(license=None) # Enter your license key.
 # ~ for i in range(1,5):
    # ~ for result in engine.search('holy handgrenade', type=SEARCH, start=i):
 	   # ~ print(repr(plaintext(result.text)))
 	   # ~ print()
 engine = Wiktionary(license=None, throttle=1.0, language="es") # Enter your license key.
-sch=engine.search('correr')
+sch=engine.search('violin')
 print('\n obj:',sch)
 print('\n dir:',dir(sch))
 if sch != None:
@@ -45,4 +45,3 @@ if sch != None:
    # ~ print ('\n text', result)
    # ~ print('\n result',result)
    # ~ print(dir(result))
-   

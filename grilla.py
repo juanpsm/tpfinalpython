@@ -8,9 +8,10 @@ palabras_docente = {'careta':{'tipo':'adj','def':''},'sucio':{'tipo':'adj','def'
 
 palabras = list(palabras_docente.keys())
 print (max(palabras, key=len))
-#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
-dirs = [[1,0]]
-n_filas =  max(len(max(palabras, key=len)),2*len(palabras))
+dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+#dirs = [[1,0]]
+#n_filas =  max(len(max(palabras, key=len)),2*len(palabras))
+n_filas = len(max(palabras, key=len))
 n_columnas = n_filas
 tam_grilla = n_filas * n_columnas
 min_pal = len(palabras)
@@ -156,7 +157,7 @@ def crear_grilla(palabras):
 		nun_intentos += 1
 		shuffle(palabras)
 		print('pal shufle',palabras)
-		
+
 		grilla = Grilla()
 
 		celdas_llenas = 0

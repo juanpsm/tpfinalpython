@@ -1,7 +1,7 @@
 from pattern.es import verbs, conjugate, INFINITIVE, parse, parsetree,tokenize,tag
 from pattern.search import search
 
-string='baba'
+string='gchfdchgdhg'
 
 tokenize(string, punctuation=".,;:!?()[]{}`''\"@#$^&*+-|=~_", replace={})
 bb = tag(string, tokenize=True, encoding='utf-8')[0][1]
@@ -17,28 +17,26 @@ print()
 print()
 
 from pattern.en import wordlist
- 
+
 #print(wordlist.PROFANITY)
 
 
 from pattern.en import wordnet
 import random
 
-# ~ while (input()==''):
-	# ~ word = random.choice(wordlist.PROFANITY)
-	# ~ print()
-	# ~ print('--------------')
-	# ~ print ('Palabra:',word)
-	# ~ s = wordnet.synsets(word)
-	# ~ print()
-	# ~ print()
-	# ~ print ('sets:', s)
-	# ~ for i in range(len(s)):
-		# ~ print()
-		# ~ print ('Definition',s[i],':', s[i].gloss)
-		# ~ print('synonims: ',s[i].synonyms)
+while (input()==''):
+	word = random.choice(wordlist.PROFANITY)
+	print()
+	print('--------------')
+	print ('Palabra:',word)
+	s = wordnet.synsets(word)
+	print()
+	print()
+	print ('sets:', s)
+	for i in range(len(s)):
+		print()
+		print ('Definition',s[i],':', s[i].gloss)
+		print('synonims: ',s[i].synonyms)
 
-import pattern.es
-print (dir(pattern.es))
-
-
+#import pattern.es
+#print (dir(pattern.es))
