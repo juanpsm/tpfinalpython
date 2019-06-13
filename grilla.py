@@ -6,12 +6,14 @@ palabras_docente = {'careta':{'tipo':'adj','def':''},'sucio':{'tipo':'adj','def'
 					'correr':{'tipo':'verb','def':''},'economizar':{'tipo':'verb','def':''},'cancherear':{'tipo':'verb','def':''},
 					'rayuela':{'tipo':'sus','def':''},'perro':{'tipo':'sus','def':''},'gato':{'tipo':'sus','def':''}}
 
-
-dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
-n_filas = 10
-n_columnas = 10
+palabras = list(palabras_docente.keys())
+print (max(palabras, key=len))
+#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+dirs = [[1,0]]
+n_filas =  max(len(max(palabras, key=len)),2*len(palabras))
+n_columnas = n_filas
 tam_grilla = n_filas * n_columnas
-min_pal = 25
+min_pal = len(palabras)
 char_vacío = '*'
 
 
@@ -96,7 +98,7 @@ def probar_pos(grilla, pal, direccion, pos):
 
 	letras_puestas = largo_pal - superp
 	if letras_puestas > 0:
-		#print("{0:<10} ({1},{2})({3},{4})".format(pal, c, f, c_, f_))
+		print('solucion ->',"{0:<10} ({1},{2})({3},{4})".format(pal, c, f, c_, f_))
 		grilla.soluciones.append("{0:<10} ({1},{2})({3},{4})".format(pal, c, f, c_, f_))
 
 	return letras_puestas
@@ -105,7 +107,7 @@ def probar_pos(grilla, pal, direccion, pos):
 def probar_palabra(grilla, pal):
 	rand_dir = randint(0, len(dirs))
 	rand_pos = randint(0, tam_grilla)
-
+	print('probar en :','dir',rand_dir,'pos',rand_pos)
 	for d in range(0, len(dirs)):
 		d = (d + rand_dir) % len(dirs)
 
@@ -114,6 +116,7 @@ def probar_palabra(grilla, pal):
 
 			letras_puestas = probar_pos(grilla, pal, d, pos)
 			if letras_puestas > 0:
+				print('letraspuestas:',letras_puestas)
 				return letras_puestas
 
 	return 0
@@ -147,27 +150,26 @@ def crear_grilla_llena(palabras, msg = ''):
 def crear_grilla(palabras):
 	grilla = None
 	nun_intentos = 0
-	print(max(palabras))
-	global n_filas
-	n_filas = len(max(palabras))
-	# n_columnas = max(palabras)
-	# tam_grilla = n_filas * n_columnas
 
+	print(n_filas,n_columnas,tam_grilla,min_pal)
 	while nun_intentos < 100:
 		nun_intentos += 1
 		shuffle(palabras)
-
+		print('pal shufle',palabras)
+		
 		grilla = Grilla()
 
 		celdas_llenas = 0
 		for pal in palabras:
-			#print('probar_palabra',pal)
+			print('probar_palabra',pal)
 			celdas_llenas += probar_palabra(grilla, pal)
-			if len(grilla.soluciones) == len(palabras):
-				grilla.n_intentos = nun_intentos
-				return grilla
-			else:
-				break # grid is full but we didn't pack enough words, start over
+			print ('len sol >>>>>>>>>>>>>>',len(grilla.soluciones))
+		if len(grilla.soluciones) == len(palabras):
+			grilla.n_intentos = nun_intentos
+			return grilla
+		else:
+			print('full')
+			break # grid is full but we didn't pack enough words, start over
 
 	return grilla
 
@@ -182,7 +184,7 @@ def print_resultado(grilla):
 	print("Intentos: {0}".format(grilla.n_intentos))
 	print("Nummero de palabras: {0}".format(size))
 
-	print("\n     0  1  2  3  4  5  6  7  8  9\n")
+	print("\n      0  1  2  3  4  5  6  7  8  9\n")
 	for r in range(0, n_filas):
 		print(" {0}   ".format(r), end='')
 		for c in range(0, n_columnas):
@@ -200,4 +202,5 @@ def print_resultado(grilla):
 if __name__ == "__main__":
 	# print_resultado(crear_grilla_llena(leer_palabras("unixdict.txt"),'el pequeño saltamontes'))
 	palabras = list(palabras_docente.keys())
+	print(palabras)
 	print_resultado(crear_grilla(palabras))

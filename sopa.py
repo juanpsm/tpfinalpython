@@ -6,9 +6,9 @@ color_celda_marcada = ('#EFF0D1','#D33F49') #blanco y rojo
 color_marca = {'adj':('#262730','purple1'), 'verb':('#262730','green3'), 'sust':('#262730','yellow2')}
 color_celda_default = ('#262730','#77BA99') #negro y verde
 
+import grilla
 
-ANCHO = 7
-ALTO = 8
+
 
 sg.SetOptions(
 background_color='#EFF0D1',
@@ -21,16 +21,28 @@ button_color=color_celda_default
 )
 FUENTES=['Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica']
 fuente = FUENTES[3]
-fila=[str(i) for i in range(ANCHO)]
-#print(fila)
-matriz=[
-		[{'key':str(j)+'_'+str(i),'marcada':False,'letra':random.choice(string.ascii_uppercase)} for i in range(ANCHO)]
-		for j in range(ALTO)
-]
-matriz.append('end')
-print(matriz)
+
+
+
+palabras_docente = {'careta':{'tipo':'adj','def':''},'sucio':{'tipo':'adj','def':''},'apestoso':{'tipo':'adj','def':''},
+					'correr':{'tipo':'verb','def':''},'economizar':{'tipo':'verb','def':''},'cancherear':{'tipo':'verb','def':''},
+					'rayuela':{'tipo':'sus','def':''},'perro':{'tipo':'sus','def':''},'gato':{'tipo':'sus','def':''}}
+
+palabras = list(palabras_docente.keys())
+ANCHO = len(max(palabras, key=len))
+ALTO = ANCHO
+
+matriz = grilla.crear_grilla(palabras)
+print('0 1 =',matriz.celdas[0][1])
+
+# ~ matriz=[
+		# ~ [{'key':str(j)+'_'+str(i),'marcada':False,'letra':g.celdas[i][j]} for i in range(ANCHO)]
+		# ~ for j in range(ALTO)
+# ~ ]
+
+print('++++MATRIZ++++',matriz)
 sopa_layout = [
-			[sg.Button(matriz[j][i]['letra'],
+			[sg.Button(matriz.celdas[j][i]['letra'],
 			 size=(4,2),
 			 pad=(5,5),
 			 font=fuente,
@@ -71,14 +83,14 @@ while True:				 # Event Loop
 	# ~ if any([event in matriz[j] for j in range(ALTO)]):
 	for i in range(ANCHO):
 		for j in range(ALTO):
-			if (matriz[j][i]['key'] == event ):
-				if matriz[j][i]['marcada']:
-					matriz[j][i]['marcada'] = False
+			if (matriz.celdas[j][i]['key'] == event ):
+				if matriz.celdas[j][i]['marcada']:
+					matriz.celdas[j][i]['marcada'] = False
 					color_celda=color_celda_default
 				else:
-					matriz[j][i]['marcada'] = True
+					matriz.celdas[j][i]['marcada'] = True
 					color_celda = color_celda_marcada
-				#print(matriz)
+				#print(matriz.celdas)
 				window.FindElement(event).Update(button_color = color_celda)
 	window.Refresh()
 
