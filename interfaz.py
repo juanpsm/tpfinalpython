@@ -154,6 +154,15 @@ while True:                 # Event Loop
 				#print(matriz)
 				window.FindElement(event).Update(button_color = color_celda)
 	window.Refresh()
+def esp_libre(palabra, fila, columna):
+	marcada = 0
+	for x in palabra:
+		if matriz[fila][columna]['marcada'] == True:
+			marcada = marcada +1
+	if marcada > 0:			
+		return False
+	else: 
+		return True		
 def agregar(palabra,fila,columna):
 	print(palabra)
 	for j in palabra:
@@ -163,11 +172,28 @@ def agregar(palabra,fila,columna):
 			columna = columna +1
 def palabras(verbos):
 	for x in verbos:
-		posicion_inicial = random.randint(0,ALTO)
+		alto = ALTO-1
+		posicion_inicial = random.randint(0,alto)
 		rango = ANCHO-len(x)
+		print('ancho'+str(ANCHO))
+		print('tam_pal:' + str(len(x)))
+		print(rango)
 		posicion_inicial = ANCHO-len(x)
 		columna = random.randint(0,rango)
-		agregar(x,posicion_inicial,columna)
+		marcadas = esp_libre(x,posicion_inicial,columna)
+		#marcadas vuelve con false o true, si alguna casilla en la key'marcado'  == true entonces se devuelve false y significa que en esa fila no se puede trabajar.
+		sg.Popup(marcadas)
+		print(columna)
+		acceso = 0
+		while marcadas == False:
+			#si marcadas es false buscamos otra fila para trabajar y preguntamos si en esta si se puede agregar la palabra.
+			posicion_inicial = random.randint(0,alto)
+			marcadas = esp_libre(x,posicion_inicial,columna)
+			#sg.Popup(marcadas) es variable para control. para saber que devuelve la func y si hace otro acceso a la misma o no. 
+			sg.Popup(marcadas)
+			acceso = acceso+1
+			print('accesos' + str(acceso))
+		agregar(x,posicion_inicial,columna) 
 sg.Popup('inicio de proceso')
 palabras(verbos)
 print('layout')
