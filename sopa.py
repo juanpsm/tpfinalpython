@@ -3,7 +3,9 @@ import random
 import string
 
 color_celda_marcada = ('#EFF0D1','#D33F49') #blanco y rojo
-color_marca = {'adj':('#262730','purple1'), 'verb':('#262730','green3'), 'sust':('#262730','yellow2')}
+color_marca = {None:('#EFF0D1','#D33F49'),
+				'adj':('#262730','purple1'), 'verb':('#262730','green3'), 'sust':('#262730','yellow2'),
+				'MIXTO':('#262730','#3e8271')}
 color_celda_default = ('#262730','#77BA99') #negro y verde
 
 import grilla
@@ -26,7 +28,7 @@ fuente = FUENTES[3]
 
 palabras_docente = {'careta':{'tipo':'adj','def':''},'sucio':{'tipo':'adj','def':''},'apestoso':{'tipo':'adj','def':''},
 					'correr':{'tipo':'verb','def':''},'economizar':{'tipo':'verb','def':''},'cancherear':{'tipo':'verb','def':''},
-					'rayuela':{'tipo':'sus','def':''},'perro':{'tipo':'sus','def':''},'gato':{'tipo':'sus','def':''}}
+					'rayuela':{'tipo':'sust','def':''},'perro':{'tipo':'sust','def':''},'gato':{'tipo':'sust','def':''}}
 
 palabras = list(palabras_docente.keys())
 #ANCHO = max(len(max(palabras, key=len)),2*len(palabras))
@@ -52,7 +54,7 @@ sopa_layout = [
 		 ]
 		 # ~ ,sg.Button('Verb',button_color='green3'),sg.Button('Sust',button_color='yellow2')
 		 # ~ flat, groove, raised, ridge, solid, or sunken
-size_pincel=(7, 1)
+size_pincel=(8, 1)
 pincel_layout = [
 			[sg.Text('Adj', size=size_pincel, auto_size_text=False, enable_events=True,
 			 relief='raised', text_color=color_marca['adj'][0], background_color=color_marca['adj'][1], justification='center', key='adj', tooltip='Elegir para marcar Adjetivos'),
@@ -87,12 +89,31 @@ while True:				 # Event Loop
 			if (matriz.celdas[j][i]['key'] == event ):
 				if matriz.celdas[j][i]['marcada']:
 					matriz.celdas[j][i]['marcada'] = False
-					color_celda=color_celda_default
+					color_celda = color_celda_default
 				else:
 					matriz.celdas[j][i]['marcada'] = True
 					color_celda = color_celda_marcada
 				#print(matriz.celdas)
+				matriz.celdas[j][i]['color'] = color_celda
 				window.FindElement(event).Update(button_color = color_celda)
+	for i in range(ANCHO):
+		for j in range(ALTO):
+			if matriz.celdas[j][i]['marcada']:
+				# ~ print(str(j)+'_'+str(i), end=' > ')
+				# ~ print(matriz.celdas[j][i]['color'])
+				
+				# ~ print(matriz.celdas[j][i]['tipo'])
+				if color_marca[matriz.celdas[j][i]['tipo']] == 'MIXTO':
+					window.FindElement(event).Update(button_color = color_marca['MIXTO'])
+				if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]:
+					print(str(j)+'_'+str(i), end=' > ')
+					print(matriz.celdas[j][i]['tipo'])
+					ganaste = True
+				# ~ print(window.FindElement(str(j)+'_'+str(i)).ButtonColor)
+				# ~ print(dir(window.FindElement(str(j)+'_'+str(i))))
+				
+	if ganaste: sg.Popup('GANASTE')
+	print()
 	window.Refresh()
 
 window.Close()

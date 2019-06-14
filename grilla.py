@@ -4,24 +4,24 @@ from random import shuffle, randint
 vector_config = {'mayus':False}
 palabras_docente = {'careta':{'tipo':'adj','def':''},'sucio':{'tipo':'adj','def':''},'apestoso':{'tipo':'adj','def':''},
 					'correr':{'tipo':'verb','def':''},'economizar':{'tipo':'verb','def':''},'cancherear':{'tipo':'verb','def':''},
-					'rayuela':{'tipo':'sus','def':''},'perro':{'tipo':'sus','def':''},'gato':{'tipo':'sus','def':''}}
-
+					'rayuela':{'tipo':'sust','def':''},'perro':{'tipo':'sust','def':''},'gato':{'tipo':'sust','def':''}}
+#fdsf
 palabras = list(palabras_docente.keys())
 print (max(palabras, key=len))
-dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
-#dirs = [[1,0]]
+#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+dirs = [[1,0],[0,1]]
 #n_filas =  max(len(max(palabras, key=len)),2*len(palabras))
 n_filas = len(max(palabras, key=len))
 n_columnas = n_filas
 tam_grilla = n_filas * n_columnas
 min_pal = len(palabras)
-char_vacío = '*'
+char_vacío = ' '
 
 
 class Grilla:
 	def __init__(self):
 		self.n_intentos = 0
-		self.celdas = [[{'key':str(j)+'_'+str(i),'tipo': None, 'marcada':False, 'letra':char_vacío} for i in range(n_columnas)] for j in range(n_filas)]
+		self.celdas = [[{'key':str(j)+'_'+str(i),'tipo': None, 'marcada':False,'color':None, 'letra':char_vacío} for i in range(n_columnas)] for j in range(n_filas)]
 		self.soluciones = []
 
 def clasificar_palabra(pal):
@@ -86,10 +86,12 @@ def probar_pos(grilla, pal, direccion, pos):
 	while i < largo_pal:
 		if grilla.celdas[f_][c_]['letra'] == pal[i]:
 			superp += 1  # cuento letras superpuestas
+			grilla.celdas[f_][c_]['tipo'] = 'MIXTO'
 		else:
 			grilla.celdas[f_][c_]['letra'] = pal[i]
-		grilla.celdas[f_][c_]['marcada'] = True
-		grilla.celdas[f_][c_]['tipo'] = clasificar_palabra(pal)
+			grilla.celdas[f_][c_]['tipo'] = clasificar_palabra(pal)
+		#grilla.celdas[f_][c_]['marcada'] = True
+		
 
 		if i < largo_pal - 1:
 			c_ += dirs[direccion][0]
