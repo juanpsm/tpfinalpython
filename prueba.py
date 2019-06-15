@@ -106,13 +106,15 @@ while True:				 # Event Loop
 					if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]:
 						print(str(j)+'_'+str(i), end=' > ')
 						print(matriz.celdas[j][i]['tipo'])
-					elif matriz.celdas[j][i]['tipo'] == 'MIXTO':
+					elif matriz.celdas[j][i]['tipo'] == 'MIXTO' and matriz.celdas[j][i]['totalmarcas'] == 0:
 						print('es mixto')
 						palwin.append(matriz.celdas[j][i]['letra'])
 						palwin.append(matriz.celdas[j][i]['letra'])
+						matriz.celdas[j][i]['totalmarcas'] += 1
 						window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['MIXTO'])
-					elif matriz.celdas[j][i]['tipo'] in ('adj','sust','verb'):
+					elif matriz.celdas[j][i]['tipo'] in ('adj','sust','verb')and matriz.celdas[j][i]['totalmarcas'] == 0:
 						palwin.append(matriz.celdas[j][i]['letra'])
+						matriz.celdas[j][i]['totalmarcas'] += 1
 					print('una letra mas')
 				#print(matriz.celdas)
 	for i in range(ANCHO):
