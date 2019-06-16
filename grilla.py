@@ -21,7 +21,7 @@ char_vacío = ' '
 class Grilla:
 	def __init__(self):
 		self.n_intentos = 0
-		self.celdas = [[{'key':str(j)+'_'+str(i),'tipo': None, 'marcada':False,'color':None, 'letra':char_vacío} for i in range(n_columnas)] for j in range(n_filas)]
+		self.celdas = [[{'key':str(j)+'_'+str(i),'tipo': None, 'marcada':False,'color':None, 'letra':char_vacío, 'totalmarcas' : 0} for i in range(n_columnas)] for j in range(n_filas)]
 		self.soluciones = []
 
 def clasificar_palabra(pal):
