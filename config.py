@@ -56,11 +56,7 @@ layout = [
 			[sg.Radio('Horizontal', "RADIOH",default = True, key='hor', size=(10,1)),
 			 sg.Radio('Vertical', "RADIOH", key='ver'), sg.Radio('Mixto', "RADIOH", key='mix')],
 			
-			[sg.Text('Cantidad de Palabras')],
-			[sg.Text('Adjetivo'),sg.Input(do_not_clear=True, key='_CANT_ADJ_')],
-			[sg.Text('Verbo'),sg.Input(do_not_clear=True, key='_CANT_VER_')],
-			[sg.Text('Sustantivo'),sg.Input(do_not_clear=True, key='_CANT_SUS_')],
-			
+				
 			[sg.Text('Mayus')],
 			[sg.Radio('Mayúscula', "RADIOn",default = True, key='mayus', size=(10,1)),
 			 sg.Radio('Minúscula', "RADIOn", key='minus')],
