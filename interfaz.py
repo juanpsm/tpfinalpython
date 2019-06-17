@@ -11,35 +11,34 @@ ANCHO = 7
 ALTO = 8
 
 sg.SetOptions(
-background_color='#EFF0D1',
-text_element_background_color='#EFF0D1',
-element_background_color='#EFF0D1',
-scrollbar_color=None,
-input_elements_background_color='#D7C0D0', #lila
-progress_meter_color = ('green', 'blue'),
-button_color=color_celda_default
+	background_color='#EFF0D1',
+	text_element_background_color='#EFF0D1',
+	element_background_color='#EFF0D1',
+	scrollbar_color=None,
+	input_elements_background_color='#D7C0D0', #lila
+	progress_meter_color = ('green', 'blue'),
+	button_color=color_celda_default
 )
 
 def config():
 	layout = [[ sg.T('menu configuracion:')],
-	[sg.Frame ( layout = [
+				[sg.Frame ( layout = [
+									[sg.Radio('Sin ayuda', 'Radio2'),
+										sg.Radio('definiciones','Radio2'),
+										sg.Radio('solo palabras','Radio2')]],
+				title='ayudas', relief=sg.RELIEF_SUNKEN)],
 
-	[sg.Radio('Sin ayuda', 'Radio2'),
-	sg.Radio('definiciones','Radio2'),
-	sg.Radio('solo palabras','Radio2')]],
-	title='ayudas', relief=sg.RELIEF_SUNKEN)],
+				[sg.Frame (layout = [
+									[sg.Radio('verbo', "RADIO1",default = True,key = 'verbo'),
+										sg.Radio('sustantivo', 'RADIO1',key = 'sustantivo'),
+										sg.Radio('adjetivo', 'RADIO1',key = 'adjetivo')],
 
-	[sg.Frame (layout = [
-
-	[sg.Radio('verbo', "RADIO1",default = True,key = 'verbo'),
-	sg.Radio('sustantivo', 'RADIO1',key = 'sustantivo'),
-	sg.Radio('adjetivo', 'RADIO1',key = 'adjetivo')],
-
-	[sg.InputText((),key = 'input')],
-	[sg.ReadButton('boton')]],
-	title = 'tipo de palabra')],
-	[sg.ReadButton('terminar')]
+									[sg.InputText((),key = 'input')],
+									[sg.ReadButton('boton')]],
+				title = 'tipo de palabra')],
+				[sg.ReadButton('terminar')]
 	]
+	
 	window = sg.Window('ventana').Layout(layout)
 	verbos = []
 	sustantivos = []
@@ -74,6 +73,8 @@ def config():
 	with open(archivo, "w") as f:
 		json.dump(archiv,f, sort_keys=True, indent=4)
 	return verbos,adjetivos,sustantivos
+
+
 def cantidad_pal(verbos,adjetivos,sustantivos):
 			total= 0
 			cantv = 0
@@ -90,20 +91,6 @@ def cantidad_pal(verbos,adjetivos,sustantivos):
 				cantsust = cantsust + 1
 			return cantv,cantadj,cantsust,total	
 verbos,adjetivos,sustantivos,values = config()	
-
-fila=[str(i) for i in range(ANCHO)]
-#print(fila)
-matriz=[
-		[{'key':str(j)+'_'+str(i),'marcada':False,'letra': random.choice(string.ascii_uppercase) }for i in range(ANCHO)]
-		for j in range(ALTO)
-]
-matriz.append('end')
-print(matriz)
-layout = [
-			[sg.Button(matriz[j][i]['letra'], size=(4,2), pad=(5,5), key = str(j)+'_'+str(i)) for i in range(ANCHO)]
-		for j in range(ALTO)
-		 ]
-layout.append([sg.Button('Cerrar')])
 
 def ayuda(layout,values):
 	cantv,cantadj,cantsust,total= cantidad_pal(verbos,adjetivos,sustantivos)
@@ -131,6 +118,20 @@ def ayuda(layout,values):
             [sg.T(sustantivos[j])for j in range(cantsust)]
             ]
 		layout.append(([sg.Column(column1, background_color='#F7F3EC')]))
+
+matriz=[
+		[{'key':str(j)+'_'+str(i),'marcada':False,'letra': random.choice(string.ascii_uppercase) }for i in range(ANCHO)]
+		for j in range(ALTO)
+]
+
+print(matriz)
+
+layout = [
+			[sg.Button(matriz[j][i]['letra'], size=(4,2), pad=(5,5), key = str(j)+'_'+str(i)) for i in range(ANCHO)]
+		for j in range(ALTO)
+		 ]
+layout.append([sg.Button('Cerrar')])
+
 ayuda(layout,values)
 
 window = sg.Window('TEMP GUI').Layout(layout)
@@ -154,6 +155,7 @@ while True:                 # Event Loop
 				#print(matriz)
 				window.FindElement(event).Update(button_color = color_celda)
 	window.Refresh()
+	
 def esp_libre(palabra, fila, columna):
 	marcada = 0
 	for x in palabra:
@@ -194,6 +196,7 @@ def palabras(verbos):
 			acceso = acceso+1
 			print('accesos' + str(acceso))
 		agregar(x,posicion_inicial,columna) 
+
 sg.Popup('inicio de proceso')
 palabras(verbos)
 print('layout')

@@ -104,26 +104,26 @@ while True:				 # Event Loop
 			if matriz.celdas[j][i]['tipo'] != None:
 				if matriz.celdas[j][i]['tipo'] == 'MIXTO':
 					if not(matriz.celdas[j][i]['marcada']):
-						print('Marcar',str(j)+'_'+str(i),'con cualquier color', end=' > ')
-						print('win =',win,'lo pongo en',end=' ')
+						##print('Marcar',str(j)+'_'+str(i),'con cualquier color', end=' > ')
+						#print('win =',win,'lo pongo en',end=' ')
 						win *= False
-						print(win)
+						#print(win)
 					else:
 						win *= True
 				else:
 					if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]:
-						print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'], end=' > ')
-						print('win =',win,'lo pongo en',end=' ')
+						#print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'], end=' > ')
+						#print('win =',win,'lo pongo en',end=' ')
 						win *= False
-						print(win)
+						#print(win)
 					else:
 						win *= True
 			else:
 				if (matriz.celdas[j][i]['marcada']):
-					print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo', end=' > ')
-					print('win =',win,'lo pongo en',end=' ')
+					#print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo', end=' > ')
+					#print('win =',win,'lo pongo en',end=' ')
 					win *= False
-					print(win)
+					#print(win)
 				else:
 					win *= True
 
