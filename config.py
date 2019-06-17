@@ -70,33 +70,34 @@ layout = [
 			[sg.Text('Oficina')],
 			[sg.Button('Aceptar', key='_ACEPTAR_'),sg.Button('Cerrar')]
 			]
-window = sg.Window('CONFIG GUI').Layout(layout)
+window = sg.Window('CONFIGURACION').Layout(layout)
 window.Finalize()
 
-config={}
-palabras={}
-while True:                 # Event Loop  
-	event, values = window.Read()  
-	#print(event, val)
-	if event is None or event == 'Cerrar':  
-		break
-	if event == '_ADD_':
-		print('values',values)
-		cat={'esAdj':values['esAdj'],'esVer':values['esVer'],'esSus':values['esSus']}
-		analizarpalabra(values['_IN_'],cat)
-		palabras[values['_IN_']]={'tipo': 'adj' if values['esAdj']==True else 'verb' if values['esVer']==True else 'sust', 'def':''}
-		#print(palabras)
-	if event == '_ACEPTAR_':
-		config['palabras']=palabras	
-		config['ayuda']= "sin ayuda" if values['sin']==True else "definiciones" if values['defin']==True else "palabras" 
-		config['orientacion'] = "horizontal" if values['hor']==True else "vertical" if values['ver']==True else "mixto"
-		config['mayuscula'] = True if values['mayus']==True else False
-		config['fuente'] = values['_FONT_']
-		for key in config:
-			print(key, '=',config[key])
-		break	
-window.Close()
-with open('configuracion.json', 'w') as f:
-	json.dump(config, f)
-
+def configurar():
+	config={}
+	palabras={}
+	while True:                 # Event Loop  
+		event, values = window.Read()  
+		#print(event, val)
+		if event is None or event == 'Cerrar':  
+			break
+		if event == '_ADD_':
+			print('values',values)
+			cat={'esAdj':values['esAdj'],'esVer':values['esVer'],'esSus':values['esSus']}
+			analizarpalabra(values['_IN_'],cat)
+			palabras[values['_IN_']]={'tipo': 'adj' if values['esAdj']==True else 'verb' if values['esVer']==True else 'sust', 'def':''}
+			#print(palabras)
+		if event == '_ACEPTAR_':
+			config['palabras']=palabras	
+			config['ayuda']= "sin ayuda" if values['sin']==True else "definiciones" if values['defin']==True else "palabras" 
+			config['orientacion'] = "horizontal" if values['hor']==True else "vertical" if values['ver']==True else "mixto"
+			config['mayuscula'] = True if values['mayus']==True else False
+			config['fuente'] = values['_FONT_']
+			for key in config:
+				print(key, '=',config[key])
+			break	
+		window.Close()
+	with open('configuracion.json', 'w') as f:
+		json.dump(config, f)
+configurar()
 
