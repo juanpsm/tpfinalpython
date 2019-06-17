@@ -34,6 +34,7 @@ palabras = list(palabras_docente.keys())
 #ANCHO = max(len(max(palabras, key=len)),2*len(palabras))
 ANCHO = len(max(palabras, key=len))
 ALTO = ANCHO
+
 print('ANCHO:',ANCHO,'Alto:',ALTO)
 matriz = grilla.crear_grilla(palabras)
 print('0 1 =',matriz.celdas[0][1])
@@ -46,7 +47,7 @@ print('0 1 =',matriz.celdas[0][1])
 grilla.print_resultado(matriz)
 sopa_layout = [
 			[sg.Button(matriz.celdas[j][i]['letra'],
-			 size=(1,1),
+			 size=(2,1),
 			 pad=(0,0),
 			 font=fuente,
 			 key = str(j)+'_'+str(i)) for i in range(ANCHO)]
@@ -96,24 +97,39 @@ while True:				 # Event Loop
 				#print(matriz.celdas)
 				matriz.celdas[j][i]['color'] = color_celda
 				window.FindElement(event).Update(button_color = color_celda)
+	win = True #despues lo voy a juntar con "and" asi que con que haya uno falso me lo vuelve todo falso
 	for i in range(ANCHO):
 		for j in range(ALTO):
-			if matriz.celdas[j][i]['marcada']:
-				# ~ print(str(j)+'_'+str(i), end=' > ')
-				# ~ print(matriz.celdas[j][i]['color'])
-				
-				# ~ print(matriz.celdas[j][i]['tipo'])
-				if color_marca[matriz.celdas[j][i]['tipo']] == 'MIXTO':
-					window.FindElement(event).Update(button_color = color_marca['MIXTO'])
-				if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]:
-					print(str(j)+'_'+str(i), end=' > ')
-					print(matriz.celdas[j][i]['tipo'])
-					ganaste = True
-				# ~ print(window.FindElement(str(j)+'_'+str(i)).ButtonColor)
-				# ~ print(dir(window.FindElement(str(j)+'_'+str(i))))
-				
-	if ganaste: sg.Popup('GANASTE')
-	print()
+			
+			if matriz.celdas[j][i]['tipo'] != None:
+				if matriz.celdas[j][i]['tipo'] == 'MIXTO':
+					if not(matriz.celdas[j][i]['marcada']):
+						print('Marcar',str(j)+'_'+str(i),'con cualquier color', end=' > ')
+						print('win =',win,'lo pongo en',end=' ')
+						win *= False
+						print(win)
+					else:
+						win *= True
+				else:
+					if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]:
+						print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'], end=' > ')
+						print('win =',win,'lo pongo en',end=' ')
+						win *= False
+						print(win)
+					else:
+						win *= True
+			else:
+				if (matriz.celdas[j][i]['marcada']):
+					print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo', end=' > ')
+					print('win =',win,'lo pongo en',end=' ')
+					win *= False
+					print(win)
+				else:
+					win *= True
+
+	print('\n WIN =',win)
+	if win: sg.Popup('GANASTE')
+	print('---------------------------------------')
 	window.Refresh()
 
 window.Close()
