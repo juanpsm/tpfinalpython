@@ -2,69 +2,89 @@ import PySimpleGUI as sg
 import random
 import string
 import json
-from pattern.web import Wiktionary
-from pattern.es import verbs, conjugate, INFINITIVE, parse, parsetree, tokenize,tag
-from pattern.search import search
 import os
+import datetime
+from wiktionary import buscar_en_wiktionary
+
+nombre_archivo_config = 'configuracion.json'
+nombre_archivo_reporte = 'reporte_de_errores.txt'
+
+def reporte(r,error):
+	hora = datetime.datetime.now()
+	hora = str(hora)[:-10]
+	
+	if error == 1:
+		texto = '''
+[{}]{}: Wiktionario la clasificó como "{}"y pattern como "{}".
+'''.format(hora,r['palabra'],r[clasificacion_wiktionario],r[clasificacion_pattern])
+	
+	elif error ==2:
+		texto = '''
+[{}] El termino "{}": no se encontró en ningun motor de busqueda.
+'''.format(hora,r['palabra'])
+
+	print('Error {}:{}'.format(error,texto))
+	
+	existe = os.path.isfile(nombre_archivo_reporte)
+	if existe:
+		f = open(nombre_archivo_reporte, 'a')
+	else:
+		f = open(nombre_archivo_reporte, 'w')
+		print('Se ha creado un reporte de errores en',nombre_archivo)
+	f.write(texto)
+	f.close()
+	
 
 def analizarpalabra(palabra,cat):
-	print(palabra)
-	print(cat)
-	engine = Wiktionary(license=None, throttle=1.0, language="es") # Enter your license key.
-	sch=engine.search(palabra)
+	#recibo categoria pero en la consigna no la piden, tengo que extraerla de los motores.
+	#Si funciona esto bien, si no nos queadremos con nuestro metodo de ponerla manualmente.
+	resultado = buscar_en_wiktionary(palabra)
+	# resultado tiene los campos:
+	# 'palabra' [str] la que busqué
+	# 'clasif_wik' [str] si se encontro en wiktionario
+	# 'clasif_patt' [str] si se encontro en pattern
+	# 'definicion' [str] si se encontro en wiktionario
+	# los campos que no se pudieron recuperar tendran None
+	if resultado['clasificacion_wiktionario'] != resultado['clasificacion_pattern']:
+		print('Reportando...')
+		reporte(resultado,1)
+		clasificacion_definitiva = resultado['clasificacion_wiktionario']
+		definicion = resultado['definicion']
+		if resultado['clasificacion_wiktionario'] == None: # y como son distintas se supone que pattern dio distinto de None
+			# aca el problema es que pattern siempre da NN por DEFECTO, pero bueno si seguimos la consigna..
+			clasificacion_definitiva = resultado['clasificacion_pattern']
+			definicion = input('No se encontro la palabra en Wiktionario.\nDefínala:\n')
+	elif resultado['clasificacion_pattern'] == None: # Las dos None
+		#esto nunca va a pasar por ahora
+		reporte(resultado,2)
+		#no incluir palabra
+		clasificacion_definitiva = '_no_aceptada_'
+		definicion = '_no_aceptada_'
+	definicion = 'Esto es una def de prueba, cuando ande quitar eta linea'###############################
+	return clasificacion_definitiva, definicion
 	
-	print('Wiktionary dice que')
-	if sch != None:
-		if('ES:Sustantivos' in sch.categories):
-			print('es sustantivo!')
-		if('ES:Adjetivos' in sch.categories):
-			print('es Adjetivo!')
-		if('ES:Verbos' in sch.categories):
-			print('es verbo!')
-	else:
-		print('no se encuentra en wiktionary')
-
-	print('Pattern.es dice que es')
-	#Common part-of-speech tags are NN (noun), VB (verb), JJ (adjective), RB (adverb) and IN (preposition).
-	tokenize(palabra, punctuation=".,;:!?()[]{}`''\"@#$^&*+-|=~_", replace={})
-	tipo = tag(palabra, tokenize=True, encoding='utf-8')[0][1]
-	print('Tipo:',tipo)
-	if tipo == 'NN':
-		print('SUSTANTIVO')
-	if tipo == 'VB':
-		print('Verbo')
-	if tipo == 'JJ':
-		print('ADJETIVO')
-	if tipo == 'RB':
-		print('Adverbio')
-	if tipo == 'IN':
-		print('Preposición')
-
-def configuracion():
-	config_dicc={}
-	
-
-	nombre_archivo = 'configuracion.json'
-	existe = os.path.isfile(nombre_archivo)
+def cargar_configuracion():
+	existe = os.path.isfile(nombre_archivo_config)
 	if existe:
-		with open(nombre_archivo, 'r') as f:
+		with open(nombre_archivo_config, 'r') as f:
 			config_dicc = json.load(f)
-		print('Configuracion guardada:')
-		print(json.dumps(config_dicc, sort_keys=True, indent=4))
+		# ~ print('Configuracion guardada:')
+		# ~ print(json.dumps(config_dicc, sort_keys=True, indent=4))
 		palabras_dicc = config_dicc['palabras']
 	else:
+		config_dicc = {}
 		config_dicc['palabras'] = []
 		palabras_dicc = {}
 		print('no existe archivo de configuracion')
 	palabras_lista = list(palabras_dicc.keys())
+	return config_dicc,palabras_dicc,palabras_lista
 	
-	# ------ Menu Definition ------ #      
-# ~ menu_def = [['&File', ['&Open', '!&Save', '---', 'Properties', 'E&xit'  ]],      
-            # ~ ['!&Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],      
-            # ~ ['&Help', '&About...'],]    
-	#layout = [[sg.Menu(menu_def)]]
+def configuracion():
+	config_dicc, palabras_dicc, palabras_lista = cargar_configuracion()
+	print (palabras_dicc)
+
 	menu = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
-	print(config_dicc['palabras'])
+	# print(config_dicc['palabras'])
 	layout = [
 			[sg.Text('Instrucciones de configuracion')],
 			[sg.Text('Palabra:')],
@@ -75,8 +95,12 @@ def configuracion():
 			[sg.Input(key='_IN_', do_not_clear=False)],
 			[sg.Button('Agregar', bind_return_key=True, key='_ADD_')],
 			
-			[sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(90,6),
+			[sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(40,6),
 									key='_LISTA_', tooltip=None, right_click_menu= menu, visible=True)],
+			[sg.Text('Cantidad de palabras con las que hacer la sopa :')],
+			[sg.Text('sust'),sg.Input(size = (2,1), key='_CANT_S_'),
+			 sg.Text('verb'),sg.Input(size = (2,1), key='_CANT_V_'),
+			 sg.Text('adj'),sg.Input(size = (2,1), key='_CANT_A_')],
 			
 			[sg.Text('Ayudas:')],
 			[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
@@ -89,46 +113,53 @@ def configuracion():
 			
 			[sg.Text('Mayus')],
 			[sg.Radio('Mayúscula', "RADIOn", key='mayus', size=(10,1)),
-			 sg.Radio('Minúscula', "RADIOn", key='minus')],
+			 sg.Radio('Minúscula', "RADIOn", default = True, key='minus')],
 			
 			[sg.Text('Fuente')],
 			[sg.InputCombo(('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'), key='_FONT_')],
 			
 			[sg.Text('Oficina')],
-			[sg.Button('Guardar configuracion', key='_ACEPTAR_', disabled = True),sg.Button('Cerrar')]
+			[sg.Button('Guardar configuracion', key='_ACEPTAR_', disabled = False),sg.Button('Cerrar')]
 			]
 	window = sg.Window('CONFIGURACION').Layout(layout)
 
-	print(config_dicc)
-
 	while True:                 # Event Loop  
+		
 		event, val = window.Read()  
-		print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
+		# ~ print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
 		# ~ print(window.FindElement('_LISTA_').GetListValues())
 		if event is None or event == 'Cerrar':  
 			break
+			
 		if event == '_ADD_':
+			palabra = val['_IN_']
 			categoria = 'adj' if val['_esAdj_'] else 'verb' if val['_esVer_'] else 'sust'
 			definicion = ''
-			#######################analizarpalabra(val['_IN_'],cat)
 			
-			palabras_dicc[ val['_IN_'] ] = {'tipo': categoria,
-										'def': definicion}
+			_, definicion = analizarpalabra(palabra,categoria) #tiro la categoria que me da a _ porque todavia no anda
 			
-			palabras_lista = window.FindElement('_LISTA_').GetListValues()
-			palabras_lista.append(val['_IN_'])
-
-			window.FindElement('_LISTA_').Update(values = palabras_lista)
-			
+			if palabra != '' and definicion != '_no_aceptada_': # no la agrego si es vacía o no tiene definicion
+				palabras_dicc[palabra] = {'tipo': categoria,'def': definicion}
+				palabras_lista = window.FindElement('_LISTA_').GetListValues()
+				palabras_lista.append(palabra)  #aca cargo y agrego a la lista, pordría agregar directamente porque ya defini la lista en la importacion.
+				window.FindElement('_LISTA_').Update(values = palabras_lista)
 		if event == 'Definicion::_MENU_':
-			print('def = ',val['_LISTA_'])
-			
+			try: # aca hay problemas cuando no hay nada seleccionado, se puede resolver seteando un valor por defecto, aunque eso traeria problemas la primera vez que se carga, se puede resolver con exepciones
+				texto = 'Definición de "'+val['_LISTA_'][0]+'":\n'
+				texto += 'La palabra es un '+palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
+				texto += palabras_dicc[ val['_LISTA_'][0] ]['def']
+				sg.Popup(texto)
+			except(KeyError):
+				print(val['_LISTA_'][0])
+			except(IndexError):
+				print(val['_LISTA_'])
 			
 		if event == 'Eliminar::_MENU_':
-			del palabras_dicc[val['_LISTA_'][0]]# El Listbox guarda en val una lista con un unico elemento que es el que esta seleccionado en ese momento.
-			palabras_lista = window.FindElement('_LISTA_').GetListValues()
-			palabras_lista.remove(val['_LISTA_'][0])
-			window.FindElement('_LISTA_').Update(values = palabras_lista)
+			if val['_LISTA_'] != []: # otra forma de resolver el tema de la listbox sin seleccionar
+				del palabras_dicc[val['_LISTA_'][0]]# El Listbox guarda en val una lista con un unico elemento que es el que esta seleccionado en ese momento.
+				palabras_lista = window.FindElement('_LISTA_').GetListValues()
+				palabras_lista.remove(val['_LISTA_'][0])
+				window.FindElement('_LISTA_').Update(values = palabras_lista)
 			
 		if event == '_ACEPTAR_':
 			config_dicc['palabras'] = palabras_dicc
@@ -139,39 +170,15 @@ def configuracion():
 			for key in config_dicc:
 				print(key, '=',config_dicc[key])
 			break
-	print(val['mayus'])
-	# ~ if ():
-		# ~ window.FindElement('_ACEPTAR_').Update(disabled = False)
+		if event == '_LISTA_':
+			print (val['_LISTA_'])
+		# ~ if event in ('mayus','minus'): #quizas sirve para no ingresar info erronea
+		# los radio si no tienen valor por defecto son False
+			# ~ print('mayus =', val['mayus'])
+			# ~ window.FindElement('_ACEPTAR_').Update(disabled = False)
 	window.Close()
-	with open(nombre_archivo, 'w') as f:
+	with open(nombre_archivo_config, 'w') as f:
 		json.dump(config_dicc, f)
-
-
-# ~ cantv,cantadj,cantsust,total= cantidad_pal(verbos,adjetivos,sustantivos)
-	# ~ if values['sin ayuda'] == True:
-		# ~ column1 = [
-				# ~ [sg.T('Total de palabras a buscar palabras a buscar: ' + str(total), justification='center')],
-				# ~ [sg.T('Verbos: '+ str(cantv)),
-				# ~ sg.T('Adjetivos: '+ str(cantadj)),
-				# ~ sg.T('Sustantivos: '+ str(cantsust))]
-				# ~ ]
-		# ~ layout.append(([sg.Column(column1, background_color='#77BA99')]))		
-	# ~ elif values[' definiciones'] == True:
-		# ~ column1 = [
-			# ~ [sg.Text('ayuda: palabras a buscar. ', background_color='#77BA99', justification='center')],
-            # ~ [sg.T(verbos[j])for j in range(cantv)],
-            # ~ [sg.T(adjetivos[j])for j in range(cantadj)],
-            # ~ [sg.T(sustantivos[j])for j in range(cantsust)]
-            # ~ ]
-		# ~ layout.append(([sg.Column(column1, background_color='#F7F3EC')]))    
-	# ~ elif values['mostrar palabras'] == True:
-		# ~ column1 = [
-			# ~ [sg.Text('ayuda: palabras a buscar. ', background_color='#77BA99', justification='center')],
-            # ~ [sg.T(verbos[j])for j in range(cantv)],
-            # ~ [sg.T(adjetivos[j])for j in range(cantadj)],
-            # ~ [sg.T(sustantivos[j])for j in range(cantsust)]
-            # ~ ]
-		# ~ layout.append(([sg.Column(column1, background_color='#F7F3EC')]))
 
 if __name__ == "__main__":
 	configuracion()

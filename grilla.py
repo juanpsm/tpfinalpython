@@ -1,17 +1,16 @@
 import re
 from random import shuffle, randint
+import config
 
-vector_config = {'mayus':False}
-palabras_docente = {'careta':{'tipo':'adj','def':''},'sucio':{'tipo':'adj','def':''},'apestoso':{'tipo':'adj','def':''},
-					'correr':{'tipo':'verb','def':''},'economizar':{'tipo':'verb','def':''},'cancherear':{'tipo':'verb','def':''},
-					'rayuela':{'tipo':'sust','def':''},'perro':{'tipo':'sust','def':''},'gato':{'tipo':'sust','def':''}}
-#fdsf
-palabras = list(palabras_docente.keys())
+
+config_dicc,palabras_docente,palabras = config.cargar_configuracion()
+
 print (max(palabras, key=len))
-#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
-dirs = [[1,0],[0,1]]
-#n_filas =  max(len(max(palabras, key=len)),2*len(palabras))
-n_filas = len(max(palabras, key=len))
+dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+# ~ dirs = [[1,0],[0,1]]
+
+n_filas =  max(len(max(palabras, key=len)),len(palabras))
+# ~ n_filas = len(max(palabras, key=len))
 n_columnas = n_filas
 tam_grilla = n_filas * n_columnas
 min_pal = len(palabras)
@@ -32,7 +31,7 @@ def leer_palabras(filename):
 	palabras = []
 	with open(filename, "r") as file:
 		for linea in file:
-			if vector_config['mayus']:
+			if config_dicc['mayus']:
 				s = linea.strip().upper()
 			else:
 				s = linea.strip().lower()
@@ -124,32 +123,6 @@ def probar_palabra(grilla, pal):
 
 	return 0
 
-
-def crear_grilla_llena(palabras, msg = ''):
-	grilla = None
-	nun_intentos = 0
-
-	while nun_intentos < 100:
-		nun_intentos += 1
-		shuffle(palabras)
-
-		grilla = Grilla()
-		msg_len = poner_msg(grilla, msg)
-		target = tam_grilla - msg_len
-
-		celdas_llenas = 0
-		for pal in palabras:
-			celdas_llenas += probar_palabra(grilla, pal)
-			if celdas_llenas == target:
-				if len(grilla.soluciones) >= min_pal:
-					grilla.n_intentos = nun_intentos
-					return grilla
-				else:
-					break # grid is full but we didn't pack enough words, start over
-
-	return grilla
-
-
 def crear_grilla(palabras):
 	grilla = None
 	nun_intentos = 0
@@ -203,7 +176,6 @@ def print_resultado(grilla):
 
 
 if __name__ == "__main__":
-	# print_resultado(crear_grilla_llena(leer_palabras("unixdict.txt"),'el pequeño saltamontes'))
 	palabras = list(palabras_docente.keys())
 	print(palabras)
 	print_resultado(crear_grilla(palabras))

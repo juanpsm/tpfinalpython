@@ -1,7 +1,7 @@
 import re
 from random import shuffle, randint
 
-vector_config = {'mayus':True}
+vector_config = {'mayus':False}
 
 dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
 n_filas = 10
@@ -9,6 +9,7 @@ n_columnas = 10
 tam_grilla = n_filas * n_columnas
 min_pal = 25
 
+msg = "MISTERIO"
 
 class Grilla:
 	def __init__(self):
@@ -29,6 +30,20 @@ def leer_palabras(filename):
 			palabras.append(s)
 	return palabras
 
+def poner_msg(grilla, msg):
+    msg = re.sub(r'[^A-Z]', "", msg.upper())
+
+    msg_len = len(msg)
+    if 0 < msg_len < tam_grilla:
+        gap_size = tam_grilla // msg_len
+
+        for i in range(0, msg_len):
+            pos = i * gap_size + randint(0, gap_size)
+            grilla.celdas[pos // n_columnas][pos % n_columnas]['letra'] = msg[i]
+
+        return msg_len
+
+    return 0
 
 def probar_pos(grilla, pal, direccion, pos):
 	f = pos // n_columnas
@@ -105,7 +120,8 @@ def crear_grilla(palabras):
 		shuffle(palabras)
 
 		grilla = Grilla()
-		target = tam_grilla
+		msg_len = poner_msg(grilla, msg)
+		target = tam_grilla - msg_len
 
 		celdas_llenas = 0
 		for pal in palabras:
