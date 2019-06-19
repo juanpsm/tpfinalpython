@@ -5,7 +5,7 @@ import config
 
 config_dicc,palabras_docente,palabras = config.cargar_configuracion()
 
-print (max(palabras, key=len))
+# ~ print (max(palabras, key=len))
 dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
 # ~ dirs = [[1,0],[0,1]]
 

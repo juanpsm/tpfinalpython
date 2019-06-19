@@ -13,18 +13,18 @@ def buscar_en_pattern(palabra):
 		if not palabra.lower() in spelling:
 			if (not(palabra.lower() in lexicon) and not(palabra.upper() in lexicon) and not(palabra.capitalize() in lexicon)):
 				print('No se encuentra en pattern.es')
-				
+				return '_Ninguna_'
 			else:
 				print('La encontró en lexicon')
-				clasificar(palabra)
+				return clasificar(palabra)
 		else:
 			print('La encontró en spelling')
-			clasificar(palabra)
+			return clasificar(palabra)
 	else:
 		print('La encontró en verbs')
-		clasificar(palabra)
+		return clasificar(palabra)
 			
-	print()
+	print('\n?\n')
 
 		
 	# ~ c = 0

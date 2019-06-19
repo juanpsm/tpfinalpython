@@ -9,9 +9,21 @@
 # ~ print(word)
 # ~ print(another_word)
 
-from pattern.web import Wikipedia, SEARCH, Wiktionary
+from pattern.web import Wiktionary, plaintext
 import re
-palabra = 'tancat'
+
+from pprint import pprint
+import traceback
+def debug(__x):
+	'''Devuelve el nombre_var = valor_var, type: tipo_var'''
+	name = traceback.extract_stack(limit=2)[0][3][6:][:-1]
+	print ('',name,'  --  ','(type:',type(__x),')\n\n','      ',__x,'\n\n')
+	# ~ print('[',end='');print(*__x, sep=', ', end='');print(']')
+
+# ~ debug = pprint
+palabra = 'diccionario'
+
+
 def buscar_en_wiktionary(palabra):
 	
 	##resultado = buscar_en_wiktionary(palabra)
@@ -26,7 +38,7 @@ def buscar_en_wiktionary(palabra):
 	resultado['clasificacion_wiktionario'] = None
 	resultado['definicion'] = None
 	resultado['clasificacion_pattern'] = None
-	return resultado
+	#return resultado
 	
 	
 	# ~ engine = Wikipedia(license=None, throttle=5.0, language=None)
@@ -45,46 +57,59 @@ def buscar_en_wiktionary(palabra):
 		   # ~ print()
 	engine = Wiktionary(language="es")
 	sch=engine.search(palabra)
-	# ~ print('\n obj:',sch)
-	# ~ print('\n dir:',dir(sch))
+	debug(palabra)
+	# ~ debug(vars(sch))
+	# ~ debug(dir(sch))
 	if sch != None:
-		# ~ print('\n title',sch.title)
-		# ~ print('\n cat',sch.categories)
-		print('\n sec',sch.sections)
-		# ~ print('\n sec type elemtos',dir(sch.sections[0]))
-		for x in sch.sections:
-			if x.title == 'Español':
-				print('\n x',x)
-				# ~ print('\n x.string',x.string)
-				# ~ print('\n x.children',x.children)
-				# ~ for sub in x.children:
-					# ~ print('\n sub',sub)
-					# ~ print('\n sub content',sub.content)
-				
-				# ~ patron = re.compile('a[3-5]+')
-				
-				sss= x.children[1].content
-				t = sss.find('1')
-				t2 = sss.find('.')
-				t3 = sss.find('2')
-				print('\n-------------',sss[t+1:t+20])
-				print('\n-------------',sss[t+1:t2])
-				print('\n-------------',sss[t+1:t3])
-				print(len(sss))
+		# ~ debug(sch.string)
+		# ~ debug(sch.source)
+		pos_1 = sch.source.find('<dt>1</dt>')
+		pos_2 = sch.source.find('<dt>2</dt>',pos_1)
+		print(pos_1,pos_2)
+		# ~ debug(sch.source[pos_1:pos_2])
+		# ~ debug(plaintext(sch.source[pos_1:pos_2]))
+		pos_punto=plaintext(sch.source[pos_1:pos_2]).find('.')
+		debug(plaintext(sch.source[pos_1:pos_2])[1:pos_punto+1])
+
+		# ~ debug(sch.title)
+		# ~ debug(sch.categories)
+		# ~ debug(sch.sections)
+		# ~ debug(dir(sch.sections[0]))
+		# ~ for section in sch.sections:
+			# ~ for children in section.children:
+				# ~ if section.title == 'Español' or section.title == palabra:
+					# ~ debug(section)
+					# ~ debug(section.content)
+					# ~ debug(section.string)
+					# ~ debug(section.children)
+					# ~ for sub in section.children:
+						# ~ debug(sub)
+						# ~ debug(sub.content)
+					
+					# ~ patron = re.compile('a[3-5]+')
+					# ~ if len(section.children) > 1:
+						# ~ debug(section.children[1])
+						# ~ sss= section.children[1].content
+						# ~ debug(sss)
+						
+						# ~ s1 = sss.find('1')
+
+						# ~ s_ = sss.find('.')
+
+						# ~ s2 = sss.find('2')
+
+						# ~ debug(sss[s1:s_+1])
 		
 		
-		if('ES:Sustantivos' in sch.categories):
-			print('es sustantivo!')
-		if('ES:Adjetivos' in sch.categories):
-			print('es Adjetivo!')
-		if('ES:Verbos' in sch.categories):
-			print('es verbo!')
-	# ~ for result in engine.search('papa'):
-	   # ~ print ('\n title',result.title)
-	   # ~ print ('\n text', result)
-	   # ~ print('\n result',result)
-	   # ~ print(dir(result))
-	   
-	return resultado
+		# ~ if('ES:Sustantivos' in sch.categories):
+			# ~ print('es sustantivo!')
+		# ~ if('ES:Adjetivos' in sch.categories):
+			# ~ print('es Adjetivo!')
+		# ~ if('ES:Verbos' in sch.categories):
+			# ~ print('es verbo!')
+
+	# ~ return resultado
 if __name__ == "__main__":
-	buscar_en_wiktionary(palabra)
+	while(palabra!='q'):
+		buscar_en_wiktionary(palabra)
+		palabra = input('\n--------------------------------------------------------------------------\nPalabra :')

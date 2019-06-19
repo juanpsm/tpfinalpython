@@ -4,7 +4,7 @@ import string
 import json
 import os
 import datetime
-from wiktionary import buscar_en_wiktionary
+from buscar_en_wiktionary import buscar_en_wiktionary
 
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
@@ -14,14 +14,10 @@ def reporte(r,error):
 	hora = str(hora)[:-10]
 	
 	if error == 1:
-		texto = '''
-[{}]{}: Wiktionario la clasificó como "{}"y pattern como "{}".
-'''.format(hora,r['palabra'],r[clasificacion_wiktionario],r[clasificacion_pattern])
+		texto = '[{}]{}: Wiktionario la clasificó como "{}"y pattern como "{}".'.format(hora,r['palabra'],r['clasificacion_wiktionario'],r['clasificacion_pattern'])
 	
 	elif error ==2:
-		texto = '''
-[{}] El termino "{}": no se encontró en ningun motor de busqueda.
-'''.format(hora,r['palabra'])
+		texto = '[{}] El termino "{}": no se encontró en ningun motor de busqueda.'.format(hora,r['palabra'])
 
 	print('Error {}:{}'.format(error,texto))
 	
@@ -45,22 +41,27 @@ def analizarpalabra(palabra,cat):
 	# 'clasif_patt' [str] si se encontro en pattern
 	# 'definicion' [str] si se encontro en wiktionario
 	# los campos que no se pudieron recuperar tendran None
-	if resultado['clasificacion_wiktionario'] != resultado['clasificacion_pattern']:
-		print('Reportando...')
-		reporte(resultado,1)
+	clasificacion_definitiva = resultado['clasificacion_pattern']
+	definicion = resultado['definicion']
+	
+	if resultado['clasificacion_wiktionario'] != resultado['clasificacion_pattern'] and resultado['clasificacion_wiktionario'] != 'MIXTA':
+		print('Reportando Error 1...')
+		reporte(resultado, 1)
 		clasificacion_definitiva = resultado['clasificacion_wiktionario']
-		definicion = resultado['definicion']
-		if resultado['clasificacion_wiktionario'] == None: # y como son distintas se supone que pattern dio distinto de None
+
+		if resultado['clasificacion_wiktionario'] == '_Ninguna_': # y como son distintas se supone que pattern dio distinto de None
 			# aca el problema es que pattern siempre da NN por DEFECTO, pero bueno si seguimos la consigna..
+			# EDIT: ahora anda!!
 			clasificacion_definitiva = resultado['clasificacion_pattern']
-			definicion = input('No se encontro la palabra en Wiktionario.\nDefínala:\n')
-	elif resultado['clasificacion_pattern'] == None: # Las dos None
-		#esto nunca va a pasar por ahora
+			definicion = input('No se encontro la palabra en Wiktionario.\nDefínala:\n') #Aca habría que hacer un popup
+	elif resultado['clasificacion_pattern'] == '_Ninguna_': # Las dos None
+		print('Reportando Error 2...')
 		reporte(resultado,2)
 		#no incluir palabra
 		clasificacion_definitiva = '_no_aceptada_'
 		definicion = '_no_aceptada_'
-	definicion = 'Esto es una def de prueba, cuando ande quitar eta linea'###############################
+	# ~ definicion = 'Esto es una def de prueba, cuando ande quitar eta linea'###############################
+	
 	return clasificacion_definitiva, definicion
 	
 def cargar_configuracion():
