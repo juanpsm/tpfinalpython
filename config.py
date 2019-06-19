@@ -85,42 +85,49 @@ def configuracion():
 	print (palabras_dicc)
 
 	menu = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
+	# ~ menu_adj = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
+	# ~ menu_verb = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
 	# print(config_dicc['palabras'])
 	layout = [
-			[sg.Text('Instrucciones de configuracion')],
-			[sg.Text('Palabra:')],
-			[sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'),
-			 sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
-			 sg.Radio('Verbo', "RADIOp",key='_esVer_')],
-			 
+			 [sg.Frame( layout = [[sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'),
+								 sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
+								sg.Radio('Verbo', "RADIOp",key='_esVer_')],
+					 
 			[sg.Input(key='_IN_', do_not_clear=False)],
 			[sg.Button('Agregar', bind_return_key=True, key='_ADD_')],
 			
-			[sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(40,6),
-									key='_LISTA_', tooltip=None, right_click_menu= menu, visible=True)],
-			[sg.Text('Cantidad de palabras con las que hacer la sopa :')],
-			[sg.Text('sust'),sg.Input(size = (2,1), key='_CANT_S_'),
-			 sg.Text('verb'),sg.Input(size = (2,1), key='_CANT_V_'),
-			 sg.Text('adj'),sg.Input(size = (2,1), key='_CANT_A_')],
+			[sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(43,6),
+									key='_LISTA_', tooltip=None, right_click_menu= menu, visible=True)]],
+			 # ~ sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(12,6),
+									# ~ key='_LISTA_', tooltip=None, right_click_menu= menu_adj, visible=True),
+			 # ~ sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(12,6),
+									# ~ key='_LISTA_', tooltip=None, right_click_menu= menu_verb, visible=True)]],
+								  title= 'Insertar Palabra')],
+									
+									
+			[sg.Frame( layout = [[sg.Text('Sustantivos'),sg.Input(size = (2,1), key='_CANT_S_'),
+								  sg.Text('Adjetivos'),sg.Input(size = (2,1), key='_CANT_A_'),
+								  sg.Text('Verbos'),sg.Input(size = (2,1), key='_CANT_V_')]],
+								 title= 'Cantidad de palabras con las que hacer la sopa')],
 			
-			[sg.Text('Ayudas:')],
-			[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
-			 sg.Radio('Definiciones', "RADIOA", key='defin'),
-			 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')],
+			[sg.Frame( layout = [[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
+								  sg.Radio('Definiciones', "RADIOA", key='defin'),
+								  sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')]],
+								  title= 'Ayudas')],
 			
-			[sg.Text('Orientacion:')],
-			[sg.Radio('Horizontal', "RADIOH",default = True, key='hor', size=(10,1)),
-			 sg.Radio('Vertical', "RADIOH", key='ver'), sg.Radio('Mixto', "RADIOH", key='mix')],
+			[sg.Frame( layout = [[sg.Radio('Horizontal', "RADIOH",default = True, key='hor', size=(10,1)),
+								  sg.Radio('Vertical', "RADIOH", key='ver'), sg.Radio('Mixto', "RADIOH", key='mix')]],
+								  title= 'Orientación')],
 			
-			[sg.Text('Mayus')],
-			[sg.Radio('Mayúscula', "RADIOn", key='mayus', size=(10,1)),
-			 sg.Radio('Minúscula', "RADIOn", default = True, key='minus')],
+			[sg.Frame( layout = [[sg.Radio('Mayúscula', "RADIOn", key='mayus', size=(10,1)),
+							      sg.Radio('Minúscula', "RADIOn", default = True, key='minus')]],
+								  title= 'Mayúscula/Minúscula')],
 			
-			[sg.Text('Fuente')],
-			[sg.InputCombo(('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'), key='_FONT_')],
+			[sg.Frame( layout = [[sg.InputCombo(('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'), key='_FONT_')]],
+								  title= 'Fuente')],
 			
-			[sg.Text('Oficina')],
-			[sg.Button('Guardar configuracion', key='_ACEPTAR_', disabled = False),sg.Button('Cerrar')]
+			# ~ [sg.Text('Oficina')],
+			[sg.Button('Guardar Configuracion', key='_ACEPTAR_', disabled = False),sg.Button('Cerrar')]
 			]
 	window = sg.Window('CONFIGURACION').Layout(layout)
 
