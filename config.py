@@ -5,11 +5,12 @@ import json
 import os
 import datetime
 from buscar_en_wiktionary import buscar_en_wiktionary
-
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
 
 def reporte(r,error):
+	"""pone en archivo de texto un reporte de los errores encontrados en la ejecucion de la sopa de letras"""
+	""" recibe un numero de error y en base a el informa que tipo de error es"""
 	hora = datetime.datetime.now()
 	hora = str(hora)[:-10]
 	
@@ -26,7 +27,7 @@ def reporte(r,error):
 		f = open(nombre_archivo_reporte, 'a')
 	else:
 		f = open(nombre_archivo_reporte, 'w')
-		print('Se ha creado un reporte de errores en',nombre_archivo)
+		print('Se ha creado un reporte de errores en',nombre_archivo_reporte)
 	f.write(texto)
 	f.close()
 	
@@ -53,18 +54,27 @@ def analizarpalabra(palabra,cat):
 			# aca el problema es que pattern siempre da NN por DEFECTO, pero bueno si seguimos la consigna..
 			# EDIT: ahora anda!!
 			clasificacion_definitiva = resultado['clasificacion_pattern']
-			definicion = input('No se encontro la palabra en Wiktionario.\nDefínala:\n') #Aca habría que hacer un popup
+			ingreso = [[sg.T('No se encontro la palabra en Wiktionario.\nDefínala:\n')],
+					[sg.Input(key = 'def')],
+					[sg.Submit(key = 'submit')]]
+			window = sg.Window('Definicion ').Layout(ingreso)
+			button,values=window.Read()
+			if button == 'submit':
+				definicion = values['def']	
+			#definicion = input('No se encontro la palabra en Wiktionario.\nDefínala:\n') #Aca habría que hacer un popup
 	elif resultado['clasificacion_pattern'] == '_Ninguna_': # Las dos None
 		print('Reportando Error 2...')
 		reporte(resultado,2)
 		#no incluir palabra
 		clasificacion_definitiva = '_no_aceptada_'
 		definicion = '_no_aceptada_'
-	# ~ definicion = 'Esto es una def de prueba, cuando ande quitar eta linea'###############################
 	
 	return clasificacion_definitiva, definicion
 	
 def cargar_configuracion():
+	"""abre archivo json con la configuracion cargada anteriormente"""
+	"""si el archivo de configuracion no fue cargado previamente informa que no existe el mismo
+	y devuelve todas las variables vacias necesarias para cargar datos nuevos"""
 	existe = os.path.isfile(nombre_archivo_config)
 	if existe:
 		with open(nombre_archivo_config, 'r') as f:
@@ -81,12 +91,14 @@ def cargar_configuracion():
 	return config_dicc,palabras_dicc,palabras_lista
 	
 def configuracion():
+	"""recibe de cargar_configuracion() la configuracion elegida por el usuario para la sopa de letras"""
 	config_dicc, palabras_dicc, palabras_lista = cargar_configuracion()
 	print (palabras_dicc)
 
 	menu = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
 	# print(config_dicc['palabras'])
 	layout = [
+			[sg.Text('nuevo texto')],
 			[sg.Text('Instrucciones de configuracion')],
 			[sg.Text('Palabra:')],
 			[sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'),
@@ -144,6 +156,8 @@ def configuracion():
 				palabras_lista = window.FindElement('_LISTA_').GetListValues()
 				palabras_lista.append(palabra)  #aca cargo y agrego a la lista, pordría agregar directamente porque ya defini la lista en la importacion.
 				window.FindElement('_LISTA_').Update(values = palabras_lista)
+			else:
+				sg.Popup('La palabra no existe')	
 		if event == 'Definicion::_MENU_':
 			try: # aca hay problemas cuando no hay nada seleccionado, se puede resolver seteando un valor por defecto, aunque eso traeria problemas la primera vez que se carga, se puede resolver con exepciones
 				texto = 'Definición de "'+val['_LISTA_'][0]+'":\n'
@@ -183,4 +197,5 @@ def configuracion():
 
 if __name__ == "__main__":
 	configuracion()
+
 

@@ -4,9 +4,7 @@ import random
 import grilla as g
 import config
 
-
 def dibujar():
-
 	## Esto habra que setearlo luego con la raspberry
 
 	#Colores marcas
@@ -42,64 +40,17 @@ def dibujar():
 	# ~ ]
 
 
-	
+
 	config_dicc, palabras_dicc, palabras_lista = config.cargar_configuracion()
 	fuente = config_dicc['fuente']
-	
-	matriz = g.crear_grilla(palabras_lista)
+
 	ANCHO = max(len(max(palabras_lista, key=len)),len(palabras_lista))
 	#ANCHO = len(max(palabras_lista, key=len))
 	ALTO = ANCHO
-	
-	def cantidad_pal(palabras_dicc):
-			"""recibe diccionario con todos los datos de las palabras y devuelve la cantidad de palabras por cada tipo"""
-			cantv = 0
-			cantadj = 0
-			cantsust = 0
-			for x in palabras_dicc:
-				if palabras_dicc[x]['tipo'] == 'verb':
-					cantv = cantv+1
-				elif palabras_dicc[x]['tipo'] == 'sust':
-					cantsust = cantsust+1
-				elif palabras_dicc[x]['tipo'] == 'adj':	
-					cantadj = cantadj +1 
-			return cantv,cantadj,cantsust
-			
-	def ayuda(palabras_lista,palabras_dicc,config_dicc):
-		"""depende de lo recibido en la configuracion de ayuda modifica el layout  para que informe lo correspondiente a cada caso"""
-		""" ayuda_layout lista creada para agregarlo al frame al layout de la sopa"""
-		cantv,cantadj,cantsust = cantidad_pal(palabras_dicc)
-		ayuda_layout=[]
-		if config_dicc['ayuda'] == 'sin ayuda':
-			column1 = [
-				[sg.T('Total de palabras a buscar palabras a buscar: ' + str(len(palabras_lista)), justification='center')],
-				[sg.T('Verbos: '+ str(cantv)),
-				sg.T('Adjetivos: '+ str(cantadj)),
-				sg.T('Sustantivos: '+ str(cantsust))]
-				]
-			ayuda_layout = [
-							[sg.Column(column1, background_color='#F7F3EC')]]
-		# si es definiciones agrega al layout un numero para la palabra y su descripcion.	
-		# 'palabra num-'+str(j) : asigna un numero a la palabra para mostrar en layout.
-		#  palabras_dicc[palabras_lista[j]]['def'] : accese a la descripcion de la palabra a la que referencia el numero para informar.
-		# para referenciado por numero toma la posicion en la lista de palabras.
-		elif config_dicc['ayuda'] == 'definiciones':
-			column1 = [
-				[sg.T ('palabra num-'+str(j)+' :'+palabras_dicc[palabras_lista[j]]['def'])]for j in range(len(palabras_lista))]
-			ayuda_layout = [ [sg.T('Definiciones: ')],
-							[sg.Column(column1, background_color='#F7F3EC')]]
-		elif config_dicc['ayuda'] == 'palabras':
-			column1 = [
-				[sg.T(palabras_lista[j]) for j in range(len(palabras_lista))]
-				]
-			ayuda_layout = [
-							[sg.T('Palabras a buscar :')],
-							[sg.Column(column1, background_color='#F7F3EC')]]
-		return ayuda_layout
-	
-	ayuda_layout = ayuda(palabras_lista,palabras_dicc,config_dicc)
-	
+
 	print('ANCHO:',ANCHO,'Alto:',ALTO)
+
+	matriz = g.crear_grilla(palabras_lista)
 
 	#g.print_resultado(matriz)
 	
@@ -112,7 +63,7 @@ def dibujar():
 				['!&Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],      
 				['&Help', '&About...']]
 	sopa_layout = [
-				[sg.Button(matriz.celdas[j][i]['letra'],
+				[sg.Button(matriz.celdas[j][i]['letra'].random.choice(string.ascii_uppercase),
 				 size=(3,1),
 				 pad=(0,0),
 				 font=fuente,
@@ -137,13 +88,12 @@ def dibujar():
 	layout = [
 				[sg.Menu(menu_princ)],
 				[sg.Frame('', pincel_layout)],
-				[sg.Frame('', sopa_layout, font='Any 12', title_color='blue')],
-				[sg.Frame('',ayuda_layout)]
+				[sg.Frame('', sopa_layout, font='Any 12', title_color='blue')]
 			]
 
 	layout.append([sg.Button('Cerrar')])
 	window = sg.Window('Sopa de Letras').Layout(layout)
-	
+
 
 	while True:				 # Event Loop
 		event, val = window.Read()

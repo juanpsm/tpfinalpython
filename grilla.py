@@ -2,7 +2,6 @@ import re
 from random import shuffle, randint
 import config
 
-
 config_dicc,palabras_docente,palabras = config.cargar_configuracion()
 
 # ~ print (max(palabras, key=len))
@@ -82,12 +81,16 @@ def probar_pos(grilla, pal, direccion, pos):
 	c_ = c
 	i = 0
 	# si todo esto fue bien, quiere decir que puedo poner la palabra
+	config_dicc2,palabras_docente,palabras = config.cargar_configuracion()
 	while i < largo_pal:
 		if grilla.celdas[f_][c_]['letra'] == pal[i]:
 			superp += 1  # cuento letras superpuestas
 			grilla.celdas[f_][c_]['tipo'] = 'MIXTO'
 		else:
-			grilla.celdas[f_][c_]['letra'] = pal[i]
+			if config_dicc2['mayuscula']:
+				grilla.celdas[f_][c_]['letra'] = pal[i].upper()
+			else:
+				grilla.celdas[f_][c_]['letra'] = pal[i]	
 			grilla.celdas[f_][c_]['tipo'] = clasificar_palabra(pal)
 		#grilla.celdas[f_][c_]['marcada'] = True
 		
