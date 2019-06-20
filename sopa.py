@@ -49,25 +49,29 @@ def dibujar():
 		ayuda_layout=[]
 		if config_dicc['ayuda'] == 'sin ayuda':
 			column1 = [
-				[sg.T('Total de palabras a buscar palabras a buscar: ' + str(len(palabras_lista)), justification='center')],
-				[sg.T('Verbos: '+ str(cantv)),
-				sg.T('Adjetivos: '+ str(cantadj)),
-				sg.T('Sustantivos: '+ str(cantsust))]
+				[sg.T('Total de palabras a buscar: ' + str(len(palabras_lista)), justification='center')],
+				[sg.T('Verbos: '+ str(cantv))],
+				[sg.T('Adjetivos: '+ str(cantadj))],
+				[sg.T('Sustantivos: '+ str(cantsust))]
 				]
 			ayuda_layout = [
-							[sg.Column(column1, background_color='#F7F3EC')]]
+							[sg.Column(column1, background_color='#F7F3EC')]
+							]
 		# si es definiciones agrega al layout un numero para la palabra y su descripcion.	
 		# 'palabra num-'+str(j) : asigna un numero a la palabra para mostrar en layout.
 		#  palabras_dicc[palabras_lista[j]]['def'] : accese a la descripcion de la palabra a la que referencia el numero para informar.
 		# para referenciado por numero toma la posicion en la lista de palabras.
 		elif config_dicc['ayuda'] == 'definiciones':
 			column1 = [
-				[sg.T ('palabra num-'+str(j)+' :'+palabras_dicc[palabras_lista[j]]['def'])]for j in range(len(palabras_lista))]
-			ayuda_layout = [ [sg.T('Definiciones: ')],
-							[sg.Column(column1, background_color='#F7F3EC')]]
+				[sg.T ('-'+str(j)+': '+palabras_dicc[palabras_lista[j]]['def'],auto_size_text = True)]for j in range(len(palabras_lista))
+				]
+			ayuda_layout = [ 
+							[sg.T('Definiciones: ')],
+							[sg.Column(column1, background_color='#F7F3EC')]
+							]
 		elif config_dicc['ayuda'] == 'palabras':
 			column1 = [
-				[sg.T(palabras_lista[j]) for j in range(len(palabras_lista))]
+				[sg.T(palabras_lista[j])] for j in range(len(palabras_lista))
 				]
 			ayuda_layout = [
 							[sg.T('Palabras a buscar :')],
@@ -114,8 +118,7 @@ def dibujar():
 	layout = [
 				[sg.Menu(menu_princ)],
 				[sg.Frame('', pincel_layout)],
-				[sg.Frame('', sopa_layout, font='Any 12', title_color='blue')],
-				[sg.Frame('',ayuda_layout)]
+				[sg.Frame('', sopa_layout, font='Any 12', title_color='blue'),sg.Frame('',ayuda_layout)]
 			]
 
 	layout.append([sg.Button('Cerrar')])
