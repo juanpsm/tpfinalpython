@@ -170,8 +170,8 @@ def configuracion():
 			 
 			
 			[sg.Text('Mayus')],
-			[sg.Radio('Mayúscula', "RADIOn", key='mayus', size=(10,1)),
-			 sg.Radio('Minúscula', "RADIOn", default = True, key='minus')],
+			[sg.Radio('Mayúscula', "RADIOn", key='mayus', default = True),
+			 sg.Radio('Minúscula', "RADIOn", key='minus')],
 			
 			[sg.Text('Fuente')],
 			[sg.InputCombo(('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'), key='_FONT_')],
