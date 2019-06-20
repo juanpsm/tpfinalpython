@@ -95,14 +95,42 @@ def cargar_configuracion():
 		config_dicc = {}
 		config_dicc['palabras'] = []
 		palabras_dicc = {}
-		print('no existe archivo de configuracion')
+		print('No existe archivo de configuración')
 	palabras_lista = list(palabras_dicc.keys())
 	return config_dicc,palabras_dicc,palabras_lista
+	
+def colores():
+	## Esto habrá que setearlo luego con la raspberry
+	
+	## Puedo setear los Colores de la interfaz manualmente
+	sg.SetOptions(
+	background_color='#EFF0D1', #cremita
+	text_element_background_color='#EFF0D1',
+	element_background_color='#EFF0D1',
+	scrollbar_color=None,
+	input_elements_background_color='#D7C0D0', #lila
+	progress_meter_color = ('green', 'blue'),
+	button_color = ('#262730','#77BA99')
+	)
+	
+	## o automaticamente con 
+	# ~ sg.ListOfLookAndFeelValues()
+	#['SystemDefault', 'Reddit', 'Topanga', 'GreenTan', 'Dark', 'LightGreen', 'Dark2', 'Black', 'Tan', 'TanBlue',
+	# 'DarkTanBlue', 'DarkAmber', 'DarkBlue', 'Reds', 'Green', 'BluePurple', 'Purple', 'BlueMono', 'GreenMono',
+	# 'BrownBlue', 'BrightColors', 'NeutralBlue', 'Kayak', 'SandyBeach', 'TealMono']
+	#Temas "FRIOS":[]
+	
+	# ~ sg.ChangeLookAndFeel('TealMono')
+	
+	return ('#262730','#EFF0D1')
 	
 def configuracion():
 	"""recibe de cargar_configuracion() la configuracion elegida por el usuario para la sopa de letras"""
 	
-	color_boton_por_defecto = ('black','white')
+	
+	color_fondo = colores()
+	
+	color_boton_por_defecto = ('#262730','#77BA99')
 	orientacion = 'dirs_1' #por defecto
 	
 	config_dicc, palabras_dicc, palabras_lista = cargar_configuracion()
@@ -111,8 +139,7 @@ def configuracion():
 	menu = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
 	# print(config_dicc['palabras'])
 	layout = [
-			[sg.Text('nuevo texto')],
-			[sg.Text('Instrucciones de configuracion')],
+			[sg.Text('Instrucciones de configuración')],
 			[sg.Text('Palabra:')],
 			# ~ [sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'),  ### Finalmente al andar lo de pattern no es necesario especificar el tipo de palabra
 			 # ~ sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
@@ -134,11 +161,11 @@ def configuracion():
 			 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')],
 			
 			[sg.Text('Orientacion:')],
-			[sg.Button('',image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_1', button_color=color_boton_por_defecto),
-			 sg.Button('',image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_2', button_color=sg.TRANSPARENT_BUTTON),
-			 sg.Button('',image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_3', button_color=sg.TRANSPARENT_BUTTON),
-			 sg.Button('',image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_4', button_color=sg.TRANSPARENT_BUTTON),
-			 sg.Button('',image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_8', button_color=sg.TRANSPARENT_BUTTON),
+			[sg.Button('',image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_1', button_color = color_fondo),
+			 sg.Button('',image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_2', button_color = color_fondo),
+			 sg.Button('',image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_3', button_color = color_fondo),
+			 sg.Button('',image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_4', button_color = color_fondo),
+			 sg.Button('',image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_8', button_color = color_fondo),
 			 ],
 			 
 			
@@ -205,11 +232,11 @@ def configuracion():
 		
 		if event in ('dirs_1','dirs_2','dirs_3','dirs_4','dirs_8'):
 
-			window.Element(event).Update(button_color=('#EFF0D1', '#262730'))
+			window.Element(event).Update(button_color=('#EFF0D1', '#D33F49'))
 			lista_dirs = ['dirs_1','dirs_2','dirs_3','dirs_4','dirs_8']
 			lista_dirs.remove(event)
 			for x in lista_dirs:
-				window.Element(x).Update(button_color = color_boton_por_defecto)
+				window.Element(x).Update(button_color = color_fondo)
 			
 			orientacion = event
 			

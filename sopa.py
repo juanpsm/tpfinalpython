@@ -1,14 +1,14 @@
 import PySimpleGUI as sg
 import random
+import sys
 
-import grilla as g
+from grilla import crear_grilla
+
 import config
 
 
 def dibujar():
-
-	## Esto habrá que setearlo luego con la raspberry
-
+	config.colores()
 	#Colores marcas
 	color_celda_marcada = ('#EFF0D1','#D33F49') #blanco y rojo
 	color_marca = {None:('#EFF0D1','#D33F49'), #blanco y rojo
@@ -18,35 +18,12 @@ def dibujar():
 					'MIXTO':('#262730','#3e8271')}
 	color_celda_default = ('#262730','#77BA99') #negro y verde
 
-	## Colores interfaz
-	sg.SetOptions(
-	background_color='#EFF0D1',
-	text_element_background_color='#EFF0D1',
-	element_background_color='#EFF0D1',
-	scrollbar_color=None,
-	input_elements_background_color='#D7C0D0', #lila
-	progress_meter_color = ('green', 'blue'),
-	button_color=color_celda_default
-	)
 
-	## Configuracion manual
-	# ~ FUENTES=['Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica']
-	# ~ fuente = FUENTES[3]
-
-	# ~ palabras_dicc = {'careta':{'tipo':'adj','def':''},'sucio':{'tipo':'adj','def':''},'apestoso':{'tipo':'adj','def':''},
-						# ~ 'correr':{'tipo':'verb','def':''},'economizar':{'tipo':'verb','def':''},'cancherear':{'tipo':'verb','def':''},
-						# ~ 'rayuela':{'tipo':'sust','def':''},'perro':{'tipo':'sust','def':''},'gato':{'tipo':'sust','def':''}}
-	# ~ matriz=[
-			# ~ [{'key':str(j)+'_'+str(i),'marcada':False,'letra':g.celdas[i][j]} for i in range(ANCHO)]
-			# ~ for j in range(ALTO)
-	# ~ ]
-
-
-	
 	config_dicc, palabras_dicc, palabras_lista = config.cargar_configuracion()
+	
 	fuente = config_dicc['fuente']
 	
-	matriz = g.crear_grilla(palabras_lista)
+	matriz = crear_grilla(palabras_lista)
 	ANCHO = max(len(max(palabras_lista, key=len)),len(palabras_lista))
 	#ANCHO = len(max(palabras_lista, key=len))
 	ALTO = ANCHO
@@ -113,7 +90,7 @@ def dibujar():
 				['&Help', '&About...']]
 	sopa_layout = [
 				[sg.Button(matriz.celdas[j][i]['letra'],
-				 size=(3,1),
+				 size=(4,2),
 				 pad=(0,0),
 				 font=fuente,
 				 key = str(j)+'_'+str(i)) for i in range(ANCHO)]
@@ -177,7 +154,7 @@ def dibujar():
 				if matriz.celdas[j][i]['tipo'] != None:
 					if matriz.celdas[j][i]['tipo'] == 'MIXTO':
 						if not(matriz.celdas[j][i]['marcada']):
-							##print('Marcar',str(j)+'_'+str(i),'con cualquier color', end=' > ')
+							# ~ print('Marcar',str(j)+'_'+str(i),'con cualquier color')
 							#print('win =',win,'lo pongo en',end=' ')
 							win *= False
 							#print(win)
@@ -185,7 +162,7 @@ def dibujar():
 							win *= True
 					else:
 						if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]: #no pudimos extraer el color de pysimplegui por eso le agregamos una key 'color' a la matriz
-							#print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'], end=' > ')
+							# ~ print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'])
 							#print('win =',win,'lo pongo en',end=' ')
 							win *= False
 							#print(win)
@@ -193,16 +170,16 @@ def dibujar():
 							win *= True
 				else:
 					if (matriz.celdas[j][i]['marcada']):
-						#print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo', end=' > ')
+						# ~ print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo')
 						#print('win =',win,'lo pongo en',end=' ')
 						win *= False
 						#print(win)
 					else:
 						win *= True
 
-		print('\n WIN =',win)
+		# ~ print('\n WIN =',win)
 		if win: sg.Popup('GANASTE')
-		print('---------------------------------------')
+		# ~ print('---------------------------------------')
 		window.Refresh()
 
 	window.Close()
@@ -234,4 +211,5 @@ def dibujar():
             # ~ ]
 		# ~ layout.append(([sg.Column(column1, background_color='#F7F3EC')]))
 if __name__ == "__main__":
-	dibujar()
+	if config.cargar_configuracion()[2] != []:
+		dibujar()

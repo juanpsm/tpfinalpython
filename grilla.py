@@ -1,30 +1,37 @@
-import re
+# Algoritmo inspirado en:
+#
+# https://rosettacode.org/wiki/Word_search#Python
+#
 from random import shuffle, randint
 import config
+import string
+import random
 
 config_dicc,palabras_docente,palabras = config.cargar_configuracion()
 
-# ~ print (max(palabras, key=len))
-if config_dicc['orientacion'] == 'dirs_1':
-	#'dirs_2','dirs_3','dirs_4','dirs_8')
-	#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+try:
+	if config_dicc['orientacion'] == 'dirs_1':
+		#'dirs_2','dirs_3','dirs_4','dirs_8')
+		#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+		dirs = [[1,0]]
+	elif config_dicc['orientacion'] == 'dirs_2':
+		dirs = [[1, 0], [0, 1]]
+	elif config_dicc['orientacion'] == 'dirs_3':
+		dirs = [[1, 0], [0, 1], [1, 1]]
+	elif config_dicc['orientacion'] == 'dirs_4':
+		dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+	elif config_dicc['orientacion'] == 'dirs_8':
+		dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+
+	
+	n_filas =  max(len(max(palabras, key=len)),len(palabras))
+	# ~ n_filas = len(max(palabras, key=len))
+	n_columnas = n_filas
+	tam_grilla = n_filas * n_columnas
+	min_pal = len(palabras)
+	char_vacío = ' '
+except:
 	dirs = [[1,0]]
-elif config_dicc['orientacion'] == 'dirs_2':
-	dirs = [[1, 0], [0, 1]]
-elif config_dicc['orientacion'] == 'dirs_3':
-	dirs = [[1, 0], [0, 1], [1, 1]]
-elif config_dicc['orientacion'] == 'dirs_4':
-	dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
-elif config_dicc['orientacion'] == 'dirs_8':
-	dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
-	
-	
-n_filas =  max(len(max(palabras, key=len)),len(palabras))
-# ~ n_filas = len(max(palabras, key=len))
-n_columnas = n_filas
-tam_grilla = n_filas * n_columnas
-min_pal = len(palabras)
-char_vacío = ' '
 
 
 class Grilla:
@@ -65,18 +72,18 @@ def probar_pos(grilla, pal, direccion, pos):
 	c_ = c
 	i = 0
 	# si todo esto fue bien, quiere decir que puedo poner la palabra
-	config_dicc2,palabras_docente,palabras = config.cargar_configuracion()
+	# ~ config_dicc2,palabras_docente,palabras = config.cargar_configuracion()
 	while i < largo_pal:
-		if grilla.celdas[f_][c_]['letra'] == pal[i]:
+		if grilla.celdas[f_][c_]['letra'] == pal[i]: # Si la casilla donde voy a ubicarmetiene la letra que quiero ubicar
 			superp += 1  # cuento letras superpuestas
-			grilla.celdas[f_][c_]['tipo'] = 'MIXTO'
+			grilla.celdas[f_][c_]['tipo'] = 'MIXTO' # El casillero pordrá ser pintado con mas de un color
 		else:
-			if config_dicc2['mayuscula']:
+			if config_dicc['mayuscula']:
 				grilla.celdas[f_][c_]['letra'] = pal[i].upper()
 			else:
 				grilla.celdas[f_][c_]['letra'] = pal[i]	
 			grilla.celdas[f_][c_]['tipo'] = clasificar_palabra(pal)
-		#grilla.celdas[f_][c_]['marcada'] = True
+		#grilla.celdas[f_][c_]['marcada'] = True ## no! marcada es despues para pintar!!
 		
 
 		if i < largo_pal - 1:
@@ -87,7 +94,7 @@ def probar_pos(grilla, pal, direccion, pos):
 
 	letras_puestas = largo_pal - superp
 	if letras_puestas > 0:
-		print('solucion ->',"{0:<10} ({1},{2})({3},{4})".format(pal, c, f, c_, f_))
+		# ~ print('solucion ->',"{0:<10} ({1},{2})({3},{4})".format(pal, c, f, c_, f_))
 		grilla.soluciones.append("{0:<10} ({1},{2})({3},{4})".format(pal, c, f, c_, f_))
 
 	return letras_puestas
@@ -95,7 +102,7 @@ def probar_pos(grilla, pal, direccion, pos):
 def probar_palabra(grilla, pal):
 	rand_dir = randint(0, len(dirs))
 	rand_pos = randint(0, tam_grilla)
-	print('probar en :','dir',rand_dir,'pos',rand_pos)
+	# ~ print('probar en :','dir',rand_dir,'pos',rand_pos)
 	for d in range(0, len(dirs)):
 		d = (d + rand_dir) % len(dirs)
 
@@ -104,7 +111,7 @@ def probar_palabra(grilla, pal):
 
 			letras_puestas = probar_pos(grilla, pal, d, pos)
 			if letras_puestas > 0:
-				print('letraspuestas:',letras_puestas)
+				# ~ print('letraspuestas:',letras_puestas)
 				return letras_puestas
 
 	return 0
@@ -117,24 +124,36 @@ def crear_grilla(palabras):
 	grilla = None
 	nun_intentos = 0
 
-	print(n_filas,n_columnas,tam_grilla,min_pal)
+	print('Filas:',n_filas,'Col:',n_columnas,'Tam:',tam_grilla,'len:',min_pal)
+
 	while nun_intentos < 100:
 		nun_intentos += 1
 		shuffle(palabras)
-		print('pal shufle',palabras)
+		# ~ print('pal shufle',palabras)
 
 		grilla = Grilla()
 
 		celdas_llenas = 0
 		for pal in palabras:
-			print('probar_palabra',pal)
+			# ~ print('probar_palabra',pal)
 			celdas_llenas += probar_palabra(grilla, pal)
-			print ('len sol >>>>>>>>>>>>>>',len(grilla.soluciones))
+			# ~ print ('len sol >>>>>>>>>>>>>>',len(grilla.soluciones))
 		if len(grilla.soluciones) == len(palabras):
 			grilla.n_intentos = nun_intentos
+			#por ultimo lleno los casilleros vacios
+			for i in range(n_columnas):
+				for j in range(n_filas):
+					# ~ if grilla.celdas[j][i]['letra'] == char_vacío:
+						
+						# ~ grilla.celdas[j][i]['letra'] = random.choice(string.ascii_lowercase)
+					if config_dicc['mayuscula']:
+						grilla.celdas[j][i]['letra'] = grilla.celdas[j][i]['letra'].upper()
+					else:
+						grilla.celdas[j][i]['letra'] = grilla.celdas[j][i]['letra'].lower()
+						
 			return grilla
 		else:
-			print('full')
+			# ~ print('full')
 			break # grid is full but we didn't pack enough words, start over
 
 	return grilla
@@ -166,6 +185,7 @@ def print_resultado(grilla):
 
 
 if __name__ == "__main__":
-	palabras = list(palabras_docente.keys())
-	print(palabras)
-	print_resultado(crear_grilla(palabras))
+	if config.cargar_configuracion()[2] != []:
+		palabras = list(palabras_docente.keys())
+		print(palabras)
+		print_resultado(crear_grilla(palabras))

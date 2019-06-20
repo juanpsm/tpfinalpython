@@ -1,22 +1,14 @@
 import config
-import grilla
 import sopa
 import PySimpleGUI as sg
 
 def existe_archivo_de_configuracion():
-	_,res,_ = config.cargar_configuracion()
-	return res != []
+	_,_,res = config.cargar_configuracion()
+	cond = res != []
+	# ~ print(cond)
+	return cond
 
-# ~ ## Colores interfaz
-sg.SetOptions(
-background_color='#EFF0D1',
-text_element_background_color='#EFF0D1',
-element_background_color='#EFF0D1',
-scrollbar_color=None,
-input_elements_background_color='#D7C0D0', #lila
-progress_meter_color = ('green', 'blue'),
-button_color = ('#262730','#77BA99')
-)
+color_fondo = config.colores()
 
 menu_princ = [['&Opciones', ['Configuracion', 'Exit::Menu'  ]],    
 				['&Ayuda', '&Acerca de...']
@@ -24,8 +16,8 @@ menu_princ = [['&Opciones', ['Configuracion', 'Exit::Menu'  ]],
 layout = [
 			[sg.Menu(menu_princ)],
 			[sg.Text('Sopa de Letras', font = ('Fixedsys',25), pad = (90,8),justification = 'center')],
-			[sg.Button('',image_filename='jugar.png', image_size=(450, 210), image_subsample=1, border_width=0, 
-				key='_jugar_', pad = (55,(8,55)), button_color=('#262730','#EFF0D1'))]
+			[sg.Button('',image_filename='jugar.png', image_size =(450, 210), image_subsample=1, border_width=0, 
+				key='_jugar_', pad = (55,(8,55)), button_color = color_fondo)]
 		]
 
 window = sg.Window('Sopa de Letras en PySimpleGUI').Layout(layout)

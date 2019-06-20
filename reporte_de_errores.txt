@@ -1,29 +1,33 @@
+Ôªø
+[00000000] El termino "Hambre": no se encontr√≥ en ningun motor de busqueda.
 
-[00000000] El termino "Hambre": no se encontrÛ en ningun motor de busqueda.
+[00000000] El termino "Antonio": no se encontr√≥ en ningun motor de busqueda.
 
-[00000000] El termino "Antonio": no se encontrÛ en ningun motor de busqueda.
+[00000000] El termino "df": no se encontr√≥ en ningun motor de busqueda.
 
-[00000000] El termino "df": no se encontrÛ en ningun motor de busqueda.
+[00000000] El termino "maraka": no se encontr√≥ en ningun motor de busqueda.
 
-[00000000] El termino "maraka": no se encontrÛ en ningun motor de busqueda.
+[00000000] El termino "bambam": no se encontr√≥ en ningun motor de busqueda.
 
-[00000000] El termino "bambam": no se encontrÛ en ningun motor de busqueda.
+[00000000] El termino "apenas": no se encontr√≥ en ningun motor de busqueda.
 
-[00000000] El termino "apenas": no se encontrÛ en ningun motor de busqueda.
+[2019-06-18 05:39] El termino "maniqui": no se encontr√≥ en ningun motor de busqueda.
 
-[2019-06-18 05:39] El termino "maniqui": no se encontrÛ en ningun motor de busqueda.
-
-[2019-06-19 09:28] El termino "bezoar": no se encontrÛ en ningun motor de busqueda.
-[2019-06-19 09:52] ballotage: Wiktionario la clasificÛ como "_Ninguna_"y pattern como "sust".
-[2019-06-19 10:51] camion: Wiktionario la clasificÛ como "_no_sabe_"y pattern como "_Ninguna_".
-[2019-06-19 10:51] mouse: Wiktionario la clasificÛ como "sust"y pattern como "verb".
-[2019-06-19 10:52] El termino "": no se encontrÛ en ningun motor de busqueda.
-[2019-06-19 23:35] Ballotage: Wiktionario la clasificÛ como "_Ninguna_"y pattern como "sust".
-[2019-06-19 23:37] Ballotage: Wiktionario la clasificÛ como "_Ninguna_"y pattern como "sust".
-[2019-06-19 23:38] Ballotage: Wiktionario la clasificÛ como "_Ninguna_"y pattern como "sust".
-[2019-06-20 06:50] Ballotage: Wiktionario la clasificÛ como "_Ninguna_"y pattern como "sust".
-[2019-06-20 06:52] Ballotage: Wiktionario la clasificÛ como "_Ninguna_"y pattern como "sust".
-[2019-06-20 07:01] El termino "": no se encontrÛ en ningun motor de busqueda.
-[2019-06-20 07:02] El termino "": no se encontrÛ en ningun motor de busqueda.
-[2019-06-20 07:13] Ballotage: Wiktionario la clasificÛ como "_Ninguna_"y pattern como "sust".
-[2019-06-20 07:14] Ballotage: Wiktionario la clasificÛ como "_Ninguna_"y pattern como "sust".
+[2019-06-19 09:28] El termino "bezoar": no se encontr√≥ en ningun motor de busqueda.
+[2019-06-19 09:52] ballotage: Wiktionario la clasific√≥ como "_Ninguna_"y pattern como "sust".
+[2019-06-19 10:51] camion: Wiktionario la clasific√≥ como "_no_sabe_"y pattern como "_Ninguna_".
+[2019-06-19 10:51] mouse: Wiktionario la clasific√≥ como "sust"y pattern como "verb".
+[2019-06-19 10:52] El termino "": no se encontr√≥ en ningun motor de busqueda.
+[2019-06-19 23:35] Ballotage: Wiktionario la clasific√≥ como "_Ninguna_"y pattern como "sust".
+[2019-06-19 23:37] Ballotage: Wiktionario la clasific√≥ como "_Ninguna_"y pattern como "sust".
+[2019-06-19 23:38] Ballotage: Wiktionario la clasific√≥ como "_Ninguna_"y pattern como "sust".
+[2019-06-20 06:50] Ballotage: Wiktionario la clasific√≥ como "_Ninguna_"y pattern como "sust".
+[2019-06-20 06:52] Ballotage: Wiktionario la clasific√≥ como "_Ninguna_"y pattern como "sust".
+[2019-06-20 07:01] El termino "": no se encontr√≥ en ningun motor de busqueda.
+[2019-06-20 07:02] El termino "": no se encontr√≥ en ningun motor de busqueda.
+[2019-06-20 07:13] Ballotage: Wiktionario la clasific√≥ como "_Ninguna_"y pattern como "sust".
+[2019-06-20 07:14] Ballotage: Wiktionario la clasific√≥ como "_Ninguna_"y pattern como "sust".
+[2019-06-20 11:17] El termino "demagogo": no se encontr√≥ en ningun motor de busqueda.
+[2019-06-20 11:18] demagogia: Wiktionario la clasific√≥ como "sust" y pattern como "_Ninguna_".
+[2019-06-20 11:19] El termino "zarpado": no se encontr√≥ en ningun motor de busqueda.
+[2019-06-20 11:31] El termino "terr√≠cola": no se encontr√≥ en ningun motor de busqueda.
