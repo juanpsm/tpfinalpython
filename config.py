@@ -55,13 +55,20 @@ def analizarpalabra(palabra,cat):
 			# aca el problema es que pattern siempre da NN por DEFECTO, pero bueno si seguimos la consigna..
 			# EDIT: ahora anda!!
 			clasificacion_definitiva = resultado['clasificacion_pattern']
-			ingreso = [[sg.T('No se encontro la palabra en Wiktionario.\nDefínala:\n')],
-					[sg.Input(key = 'def')],
-					[sg.Submit(key = 'submit')]]
-			window = sg.Window('Definicion ').Layout(ingreso)
-			button,values=window.Read()
+			
+			ingreso = [	[sg.T('No se encontro la palabra en Wiktionario.\nDefínala:\n')],
+						[sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'), 
+						sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
+						sg.Radio('Verbo', "RADIOp",key='_esVer_')],
+						[sg.Input(key = 'def')],
+						[sg.Submit(key = 'submit')]
+						]
+			window2 = sg.Window('Definicion ').Layout(ingreso)
+			button,values2=window2.Read()
 			if button == 'submit':
-				definicion = values['def']	
+				definicion = values2['def']
+				clasificacion_definitiva = 'adj' if values2['_esAdj_'] else 'verb' if values2['_esVer_'] else 'sust'
+				window2.Close()
 			#definicion = input('No se encontro la palabra en Wiktionario.\nDefínala:\n') #Aca habría que hacer un popup
 	elif resultado['clasificacion_pattern'] == '_Ninguna_': # Las dos None
 		print('Reportando Error 2...')
@@ -93,6 +100,10 @@ def cargar_configuracion():
 	
 def configuracion():
 	"""recibe de cargar_configuracion() la configuracion elegida por el usuario para la sopa de letras"""
+	
+	color_boton_por_defecto = ('black','white')
+	orientacion = 'dirs_1' #por defecto
+	
 	config_dicc, palabras_dicc, palabras_lista = cargar_configuracion()
 	print (palabras_dicc)
 
@@ -102,9 +113,9 @@ def configuracion():
 			[sg.Text('nuevo texto')],
 			[sg.Text('Instrucciones de configuracion')],
 			[sg.Text('Palabra:')],
-			[sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'),
-			 sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
-			 sg.Radio('Verbo', "RADIOp",key='_esVer_')],
+			# ~ [sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'),  ### Finalmente al andar lo de pattern no es necesario especificar el tipo de palabra
+			 # ~ sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
+			 # ~ sg.Radio('Verbo', "RADIOp",key='_esVer_')],
 			 
 			[sg.Input(key='_IN_', do_not_clear=False)],
 			[sg.Button('Agregar', bind_return_key=True, key='_ADD_')],
@@ -122,8 +133,13 @@ def configuracion():
 			 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')],
 			
 			[sg.Text('Orientacion:')],
-			[sg.Radio('Horizontal', "RADIOH",default = True, key='hor', size=(10,1)),
-			 sg.Radio('Vertical', "RADIOH", key='ver'), sg.Radio('Mixto', "RADIOH", key='mix')],
+			[sg.Button('',image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_1', button_color=color_boton_por_defecto),
+			 sg.Button('',image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_2', button_color=sg.TRANSPARENT_BUTTON),
+			 sg.Button('',image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_3', button_color=sg.TRANSPARENT_BUTTON),
+			 sg.Button('',image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_4', button_color=sg.TRANSPARENT_BUTTON),
+			 sg.Button('',image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_8', button_color=sg.TRANSPARENT_BUTTON),
+			 ],
+			 
 			
 			[sg.Text('Mayus')],
 			[sg.Radio('Mayúscula', "RADIOn", key='mayus', size=(10,1)),
@@ -147,18 +163,27 @@ def configuracion():
 			
 		if event == '_ADD_':
 			palabra = val['_IN_']
-			categoria = 'adj' if val['_esAdj_'] else 'verb' if val['_esVer_'] else 'sust'
+			categoria = '' # 'adj' if val['_esAdj_'] else 'verb' if val['_esVer_'] else 'sust'
 			definicion = ''
 			
-			_, definicion = analizarpalabra(palabra,categoria) #tiro la categoria que me da a _ porque todavia no anda
 			
-			if palabra != '' and definicion != '_no_aceptada_': # no la agrego si es vacía o no tiene definicion
-				palabras_dicc[palabra] = {'tipo': categoria,'def': definicion}
-				palabras_lista = window.FindElement('_LISTA_').GetListValues()
-				palabras_lista.append(palabra)  #aca cargo y agrego a la lista, pordría agregar directamente porque ya defini la lista en la importacion.
-				window.FindElement('_LISTA_').Update(values = palabras_lista)
-			else:
-				sg.Popup('La palabra no existe')	
+			
+			if palabra != '':
+				if palabra in palabras_dicc:
+					print('Ya se encuentra esa palabra en la lista.')
+				else:# si es no vacia y no esta en la lista, la analizo
+					
+					categoria, definicion = analizarpalabra(palabra,categoria)
+					
+					if definicion == '_no_aceptada_': 
+						sg.Popup('No consideramos que '+palabra+' sea una palabra')
+					
+					else: # la agrego
+						palabras_dicc[palabra] = {'tipo': categoria,'def': definicion}
+						palabras_lista = window.FindElement('_LISTA_').GetListValues()
+						palabras_lista.append(palabra)  #aca cargo y agrego a la lista, pordría agregar directamente porque ya definí la lista en la importacion.
+						window.FindElement('_LISTA_').Update(values = palabras_lista)
+		
 		if event == 'Definicion::_MENU_':
 			try: # aca hay problemas cuando no hay nada seleccionado, se puede resolver seteando un valor por defecto, aunque eso traeria problemas la primera vez que se carga, se puede resolver con exepciones
 				texto = 'Definición de "'+val['_LISTA_'][0]+'":\n'
@@ -176,16 +201,27 @@ def configuracion():
 				palabras_lista = window.FindElement('_LISTA_').GetListValues()
 				palabras_lista.remove(val['_LISTA_'][0])
 				window.FindElement('_LISTA_').Update(values = palabras_lista)
+		
+		if event in ('dirs_1','dirs_2','dirs_3','dirs_4','dirs_8'):
+
+			window.Element(event).Update(button_color=('#EFF0D1', '#262730'))
+			lista_dirs = ['dirs_1','dirs_2','dirs_3','dirs_4','dirs_8']
+			lista_dirs.remove(event)
+			for x in lista_dirs:
+				window.Element(x).Update(button_color = color_boton_por_defecto)
+			
+			orientacion = event
 			
 		if event == '_ACEPTAR_':
 			config_dicc['palabras'] = palabras_dicc
 			config_dicc['ayuda'] = "sin ayuda" if val['sin'] else "definiciones" if val['defin'] else "palabras" 
-			config_dicc['orientacion'] = "horizontal" if val['hor'] else "vertical" if val['ver'] else "mixto"
+			config_dicc['orientacion'] = orientacion
 			config_dicc['mayuscula'] = val['mayus']
 			config_dicc['fuente'] = val['_FONT_']
 			for key in config_dicc:
 				print(key, '=',config_dicc[key])
 			break
+		
 		if event == '_LISTA_':
 			print (val['_LISTA_'])
 		# ~ if event in ('mayus','minus'): #quizas sirve para no ingresar info erronea

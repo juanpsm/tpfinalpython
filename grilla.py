@@ -5,8 +5,19 @@ import config
 config_dicc,palabras_docente,palabras = config.cargar_configuracion()
 
 # ~ print (max(palabras, key=len))
-dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
-# ~ dirs = [[1,0],[0,1]]
+if config_dicc['orientacion'] == 'dirs_1':
+	#'dirs_2','dirs_3','dirs_4','dirs_8')
+	#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+	dirs = [[1,0]]
+elif config_dicc['orientacion'] == 'dirs_2':
+	dirs = [[1, 0], [0, 1]]
+elif config_dicc['orientacion'] == 'dirs_3':
+	dirs = [[1, 0], [0, 1], [1, 1]]
+elif config_dicc['orientacion'] == 'dirs_4':
+	dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+elif config_dicc['orientacion'] == 'dirs_8':
+	dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+	
 
 n_filas =  max(len(max(palabras, key=len)),len(palabras))
 # ~ n_filas = len(max(palabras, key=len))
@@ -24,33 +35,6 @@ class Grilla:
 
 def clasificar_palabra(pal):
 	return palabras_docente[pal]['tipo']
-
-def leer_palabras(filename):
-
-	palabras = []
-	with open(filename, "r") as file:
-		for linea in file:
-			if config_dicc['mayus']:
-				s = linea.strip().upper()
-			else:
-				s = linea.strip().lower()
-			palabras.append(s)
-	return palabras
-
-def poner_msg(grilla, msg):
-    msg = re.sub(r'[^A-Z]', "", msg.upper())
-
-    msg_len = len(msg)
-    if 0 < msg_len < tam_grilla:
-        gap_size = tam_grilla // msg_len
-
-        for i in range(0, msg_len):
-            pos = i * gap_size + randint(0, gap_size)
-            grilla.celdas[pos // n_columnas][pos % n_columnas]['letra'] = msg[i]
-
-        return msg_len
-
-    return 0
 
 def probar_pos(grilla, pal, direccion, pos):
 	f = pos // n_columnas
@@ -108,7 +92,6 @@ def probar_pos(grilla, pal, direccion, pos):
 
 	return letras_puestas
 
-
 def probar_palabra(grilla, pal):
 	rand_dir = randint(0, len(dirs))
 	rand_pos = randint(0, tam_grilla)
@@ -127,6 +110,10 @@ def probar_palabra(grilla, pal):
 	return 0
 
 def crear_grilla(palabras):
+	
+	config_dicc,palabras_docente,palabras = config.cargar_configuracion()
+	
+	
 	grilla = None
 	nun_intentos = 0
 

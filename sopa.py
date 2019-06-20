@@ -7,7 +7,7 @@ import config
 
 def dibujar():
 
-	## Esto habra que setearlo luego con la raspberry
+	## Esto habrá que setearlo luego con la raspberry
 
 	#Colores marcas
 	color_celda_marcada = ('#EFF0D1','#D33F49') #blanco y rojo
