@@ -4,6 +4,7 @@ import string
 import json
 import os
 import datetime
+from pprint import pprint
 from buscar_en_wiktionary import buscar_en_wiktionary
 
 nombre_archivo_config = 'configuracion.json'
@@ -16,18 +17,18 @@ def reporte(r,error):
 	hora = str(hora)[:-10]
 	
 	if error == 1:
-		texto = '[{}]{}: Wiktionario la clasificó como "{}"y pattern como "{}".'.format(hora,r['palabra'],r['clasificacion_wiktionario'],r['clasificacion_pattern'])
+		texto = '[{}] {}: Wiktionario la clasificó como "{}" y pattern como "{}".\n'.format(hora,r['palabra'],r['clasificacion_wiktionario'],r['clasificacion_pattern'])
 	
 	elif error ==2:
-		texto = '[{}] El termino "{}": no se encontró en ningun motor de busqueda.'.format(hora,r['palabra'])
+		texto = '[{}] El termino "{}": no se encontró en ningun motor de busqueda.\n'.format(hora,r['palabra'])
 
 	print('Error {}:{}'.format(error,texto))
 	
 	existe = os.path.isfile(nombre_archivo_reporte)
 	if existe:
-		f = open(nombre_archivo_reporte, 'a')
+		f = open(nombre_archivo_reporte, 'a', encoding = 'utf-8')
 	else:
-		f = open(nombre_archivo_reporte, 'w')
+		f = open(nombre_archivo_reporte, 'w', encoding = 'utf-8')
 		print('Se ha creado un reporte de errores en',nombre_archivo_reporte)
 	f.write(texto)
 	f.close()
@@ -85,10 +86,10 @@ def cargar_configuracion():
 	y devuelve todas las variables vacias necesarias para cargar datos nuevos"""
 	existe = os.path.isfile(nombre_archivo_config)
 	if existe:
-		with open(nombre_archivo_config, 'r') as f:
+		with open(nombre_archivo_config, 'r', encoding = 'utf-8') as f:
 			config_dicc = json.load(f)
 		# ~ print('Configuracion guardada:')
-		# ~ print(json.dumps(config_dicc, sort_keys=True, indent=4))
+		# ~ print(json.dumps(config_dicc, sort_keys=True, indent=4, ensure_ascii = False))
 		palabras_dicc = config_dicc['palabras']
 	else:
 		config_dicc = {}
@@ -105,7 +106,7 @@ def configuracion():
 	orientacion = 'dirs_1' #por defecto
 	
 	config_dicc, palabras_dicc, palabras_lista = cargar_configuracion()
-	print (palabras_dicc)
+	pprint (palabras_dicc)
 
 	menu = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
 	# print(config_dicc['palabras'])
@@ -229,8 +230,8 @@ def configuracion():
 			# ~ print('mayus =', val['mayus'])
 			# ~ window.FindElement('_ACEPTAR_').Update(disabled = False)
 	window.Close()
-	with open(nombre_archivo_config, 'w') as f:
-		json.dump(config_dicc, f)
+	with open(nombre_archivo_config, 'w', encoding = 'utf-8') as f:
+		json.dump(config_dicc, f, ensure_ascii = False)
 
 if __name__ == "__main__":
 	configuracion()

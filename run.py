@@ -25,10 +25,10 @@ layout = [
 			[sg.Menu(menu_princ)],
 			[sg.Text('Sopa de Letras', font = ('Fixedsys',25), pad = (90,8),justification = 'center')],
 			[sg.Button('',image_filename='jugar.png', image_size=(450, 210), image_subsample=1, border_width=0, 
-				key='_jugar_', pad = (55,(8,55)), button_color=sg.TRANSPARENT_BUTTON)]
+				key='_jugar_', pad = (55,(8,55)), button_color=('#262730','#EFF0D1'))]
 		]
 
-window = sg.Window('').Layout(layout)
+window = sg.Window('Sopa de Letras en PySimpleGUI').Layout(layout)
 
 while True:				 # Event Loop
 	event, val = window.Read()
@@ -36,10 +36,16 @@ while True:				 # Event Loop
 	if event is None or event in ('Cerrar','Exit::Menu'):
 		break
 	if event == 'Configuracion':
+		window.Hide()
 		config.configuracion()
+		window.UnHide()
 	if event == '_jugar_':
 		if existe_archivo_de_configuracion():
+			window.Hide()
 			sopa.dibujar()
+			window.UnHide()
 		else:
 			sg.Popup('Primero debes configurar el juego!\n Ve a Opciones -> Configuración')
 #splash art, menues
+
+

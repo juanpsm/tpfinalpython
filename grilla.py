@@ -18,7 +18,7 @@ elif config_dicc['orientacion'] == 'dirs_4':
 elif config_dicc['orientacion'] == 'dirs_8':
 	dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
 	
-
+	
 n_filas =  max(len(max(palabras, key=len)),len(palabras))
 # ~ n_filas = len(max(palabras, key=len))
 n_columnas = n_filas

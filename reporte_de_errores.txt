@@ -14,4 +14,16 @@
 [2019-06-18 05:39] El termino "maniqui": no se encontró en ningun motor de busqueda.
 
 [2019-06-19 09:28] El termino "bezoar": no se encontró en ningun motor de busqueda.
-[2019-06-19 09:52]ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".[2019-06-19 10:51]camion: Wiktionario la clasificÃ³ como "_no_sabe_"y pattern como "_Ninguna_".[2019-06-19 10:51]mouse: Wiktionario la clasificÃ³ como "sust"y pattern como "verb".[2019-06-19 10:52] El termino "": no se encontrÃ³ en ningun motor de busqueda.[2019-06-19 23:35]Ballotage: Wiktionario la clasificÃ³ como "_Ninguna_"y pattern como "sust".[2019-06-19 23:37]Ballotage: Wiktionario la clasificÃ³ como "_Ninguna_"y pattern como "sust".[2019-06-19 23:38]Ballotage: Wiktionario la clasificÃ³ como "_Ninguna_"y pattern como "sust".[2019-06-20 06:50]Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".[2019-06-20 06:52]Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".[2019-06-20 07:01] El termino "": no se encontró en ningun motor de busqueda.[2019-06-20 07:02] El termino "": no se encontró en ningun motor de busqueda.[2019-06-20 07:13]Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".[2019-06-20 07:14]Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".
+[2019-06-19 09:52] ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".
+[2019-06-19 10:51] camion: Wiktionario la clasificó como "_no_sabe_"y pattern como "_Ninguna_".
+[2019-06-19 10:51] mouse: Wiktionario la clasificó como "sust"y pattern como "verb".
+[2019-06-19 10:52] El termino "": no se encontró en ningun motor de busqueda.
+[2019-06-19 23:35] Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".
+[2019-06-19 23:37] Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".
+[2019-06-19 23:38] Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".
+[2019-06-20 06:50] Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".
+[2019-06-20 06:52] Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".
+[2019-06-20 07:01] El termino "": no se encontró en ningun motor de busqueda.
+[2019-06-20 07:02] El termino "": no se encontró en ningun motor de busqueda.
+[2019-06-20 07:13] Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".
+[2019-06-20 07:14] Ballotage: Wiktionario la clasificó como "_Ninguna_"y pattern como "sust".
