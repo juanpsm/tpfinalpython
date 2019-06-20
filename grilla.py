@@ -143,9 +143,10 @@ def crear_grilla(palabras):
 			#por ultimo lleno los casilleros vacios
 			for i in range(n_columnas):
 				for j in range(n_filas):
-					# ~ if grilla.celdas[j][i]['letra'] == char_vacío:
-						
-						# ~ grilla.celdas[j][i]['letra'] = random.choice(string.ascii_lowercase)
+					################################################################################################## Comentar aqui para quitar el RELLENO 
+					if grilla.celdas[j][i]['letra'] == char_vacío:
+						grilla.celdas[j][i]['letra'] = random.choice(string.ascii_lowercase)
+					##################################################################################################  
 					if config_dicc['mayuscula']:
 						grilla.celdas[j][i]['letra'] = grilla.celdas[j][i]['letra'].upper()
 					else:
