@@ -17,44 +17,44 @@ def dibujar():
 					'verb':('#262730','green3'),
 					'sust':('#262730','yellow2'),
 					'MIXTO':('#262730','#3e8271')}
-	color_celda_default = ('#262730','#77BA99') #negro y verde
+	color_celda_default = ('#262730','#5adbff') #negro y celeste
 
 
-	config_dicc, palabras_dicc, palabras_lista = config.cargar_configuracion()
-	
+	config_dicc, palabras_dicc, _ = config.cargar_configuracion()
+	palabras_lista = config.obtener_lista_palabras(config_dicc)
 	fuente = config_dicc['fuente']
-	
+	print('ORRRR',config_dicc['orientacion'])
 	matriz = crear_grilla(palabras_lista)
-	ANCHO = max(len(max(palabras_lista, key=len)),len(palabras_lista))
+	ANCHO = max(len(max(palabras_lista, key=len)),len(palabras_lista)) # key = len hace que sea por cantidad de char y no alfabeticamente
 	#ANCHO = len(max(palabras_lista, key=len))
 	ALTO = ANCHO
 	
-	def cantidad_pal(palabras_dicc):
-			"""recibe diccionario con todos los datos de las palabras y devuelve la cantidad de palabras por cada tipo"""
-			cantv = 0
-			cantadj = 0
-			cantsust = 0
-			for x in palabras_dicc:
-				if palabras_dicc[x]['tipo'] == 'verb':
-					cantv = cantv+1
-				elif palabras_dicc[x]['tipo'] == 'sust':
-					cantsust = cantsust+1
-				elif palabras_dicc[x]['tipo'] == 'adj':	
-					cantadj = cantadj +1 
-			return cantv,cantadj,cantsust
+	# def cantidad_pal(palabras_dicc): ## Este ahora que se cuentan las palabras en config es redundante
+	# 		"""Recibe diccionario con todos los datos de las palabras y devuelve la cantidad de palabras por cada tipo"""
+	# 		cantv = 0
+	# 		cantadj = 0
+	# 		cantsust = 0
+	# 		for x in palabras_dicc:
+	# 			if palabras_dicc[x]['tipo'] == 'verb':
+	# 				cantv = cantv+1
+	# 			elif palabras_dicc[x]['tipo'] == 'sust':
+	# 				cantsust = cantsust+1
+	# 			elif palabras_dicc[x]['tipo'] == 'adj':	
+	# 				cantadj = cantadj +1 
+	# 		return cantv,cantadj,cantsust
 			
 	def ayuda(palabras_lista,palabras_dicc,config_dicc):
 		"""depende de lo recibido en la configuracion de ayuda modifica el layout  para que informe lo correspondiente a cada caso"""
 		""" ayuda_layout lista creada para agregarlo al frame al layout de la sopa"""
-		cantv,cantadj,cantsust = cantidad_pal(palabras_dicc)
+		# cantv, cantadj, cantsust = cantidad_pal(palabras_dicc)
 		ayuda_layout=[]
 		if config_dicc['ayuda'] == 'sin ayuda':
 			column1 = [
 				[sg.T('Total de palabras a buscar: ' + str(len(palabras_lista)), justification='center')],
-				[sg.T('Verbos: '+ str(cantv))],
-				[sg.T('Adjetivos: '+ str(cantadj))],
-				[sg.T('Sustantivos: '+ str(cantsust))]
-				]
+				[sg.T('Sustantivos: '+ 	str(config_dicc['max_sust']))],
+				[sg.T('Verbos: '+ 		str(config_dicc['max_verb']))],
+				[sg.T('Adjetivos: '+ 	str(config_dicc['max_adj']))]
+			]
 			ayuda_layout = [
 							[sg.Column(column1)]
 							]
@@ -158,7 +158,7 @@ def dibujar():
 				if matriz.celdas[j][i]['tipo'] != None:
 					if matriz.celdas[j][i]['tipo'] == 'MIXTO':
 						if not(matriz.celdas[j][i]['marcada']):
-							# ~ print('Marcar',str(j)+'_'+str(i),'con cualquier color')
+							print('Marcar',str(j)+'_'+str(i),'con cualquier color')
 							#print('win =',win,'lo pongo en',end=' ')
 							win *= False
 							#print(win)
@@ -166,7 +166,7 @@ def dibujar():
 							win *= True
 					else:
 						if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]: #no pudimos extraer el color de pysimplegui por eso le agregamos una key 'color' a la matriz
-							# ~ print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'])
+							print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'])
 							#print('win =',win,'lo pongo en',end=' ')
 							win *= False
 							#print(win)
@@ -174,7 +174,7 @@ def dibujar():
 							win *= True
 				else:
 					if (matriz.celdas[j][i]['marcada']):
-						# ~ print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo')
+						print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo')
 						#print('win =',win,'lo pongo en',end=' ')
 						win *= False
 						#print(win)
@@ -184,36 +184,10 @@ def dibujar():
 		# ~ print('\n WIN =',win)
 		if win: sg.Popup('GANASTE')
 		# ~ print('---------------------------------------')
-		window.Refresh()
+		break
 
 	window.Close()
 
-#MOSTRAR LAS AYUDAS
-# ~ cantv,cantadj,cantsust,total= cantidad_pal(verbos,adjetivos,sustantivos)
-	# ~ if values['sin ayuda'] == True:
-		# ~ column1 = [
-				# ~ [sg.T('Total de palabras a buscar: ' + str(total), justification='center')],
-				# ~ [sg.T('Verbos: '+ str(cantv)),
-				# ~ sg.T('Adjetivos: '+ str(cantadj)),
-				# ~ sg.T('Sustantivos: '+ str(cantsust))]
-				# ~ ]
-		# ~ layout.append(([sg.Column(column1, background_color='#77BA99')]))		
-	# ~ elif values[' definiciones'] == True:
-		# ~ column1 = [
-			# ~ [sg.Text('ayuda: palabras a buscar. ', background_color='#77BA99', justification='center')],
-            # ~ [sg.T(verbos[j])for j in range(cantv)],
-            # ~ [sg.T(adjetivos[j])for j in range(cantadj)],
-            # ~ [sg.T(sustantivos[j])for j in range(cantsust)]
-            # ~ ]
-		# ~ layout.append(([sg.Column(column1, background_color='#F7F3EC')]))    
-	# ~ elif values['mostrar palabras'] == True:
-		# ~ column1 = [
-			# ~ [sg.Text('ayuda: palabras a buscar. ', background_color='#77BA99', justification='center')],
-            # ~ [sg.T(verbos[j])for j in range(cantv)],
-            # ~ [sg.T(adjetivos[j])for j in range(cantadj)],
-            # ~ [sg.T(sustantivos[j])for j in range(cantsust)]
-            # ~ ]
-		# ~ layout.append(([sg.Column(column1, background_color='#F7F3EC')]))
 if __name__ == "__main__":
 	if config.cargar_configuracion()[2] != []:
 		dibujar()

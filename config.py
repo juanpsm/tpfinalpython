@@ -117,7 +117,7 @@ def cargar_configuracion():
 		config_dicc['max_adj'] = 0
 		
 		print('No existe archivo de configuración')
-	
+	print( 'wqerffffffff->', config_dicc['orientacion'] )
 	return config_dicc,palabras_dicc,palabras_clas
 	
 def obtener_lista_palabras(config_dicc):
@@ -153,7 +153,7 @@ def colores():
 	scrollbar_color=None,
 	input_elements_background_color='#EFF0D1', #lila
 	progress_meter_color = ('green', 'blue'),
-	# button_color = ('#262730','#77BA99') #verde
+	button_color = ('#262730','#5adbff') # celeste
 	)
 	
 	## o automaticamente con 
@@ -205,25 +205,26 @@ def configuracion():
 					# ~ key='_LISTA_V_', tooltip=None, right_click_menu= menu, visible=True),
 		# ~ sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(15,6),
 					# ~ key='_LISTA_A_', tooltip=None, right_click_menu= menu, visible=True)],
-		[sg.Frame(title = 'Cantidad máxima de cada tipo a utilizar en la Sopa:',
-			layout = [	[sg.Column([	[sg.Text('Sustantivos:')],	## hago una lista de numeros de cero al minimo entre la cantidad de palabras existentes
-										[sg.T(' '*4),				## y la cantidad maxima para que no se haga muy grande la grilla
-					 						sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))),
-							 				key = '_CANT_S_', default_value = config_dicc['max_sust'], size = (2,1), change_submits = True)]
-						 			]),	
-				 		 sg.Column([	[sg.Text('Verbos:')],
-						  				[sg.T(' '*2),
+		[sg.Frame(title = 'Cantidad máxima de cada tipo a utilizar en la Sopa:', 
+		## hago una lista de numeros de cero al minimo entre la cantidad de palabras existentes
+		## y la cantidad maxima para que no se haga muy grande la grilla.
+			layout = [	[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
+										[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))),
+							 				key = '_CANT_S_', default_value = config_dicc['max_sust'], size = (2,1), pad=((20,),1), change_submits = True)]
+						 			], pad=((0,),2) ),	
+				 		 sg.Column([	[sg.Text('Verbos:', pad=((0,),2) )],
+						  				[
 										  sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['verb'])))),
 										  key = '_CANT_V_', default_value = config_dicc['max_verb'], size = (2,1), change_submits = True, disabled = True)]
-				 					]),
-						 sg.Column([	[sg.Text('Adjetivos:')],
-										[sg.T(' '*4),
+				 					], pad=((0,),2) ),
+						 sg.Column([	[sg.Text('Adjetivos:', pad=((0,),2) )],
+										[
 											sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['adj'])))),
 					 						key = '_CANT_A_', default_value = config_dicc['max_adj'], size = (2,1), change_submits = True, disabled = True)]
-									]),
+									], pad=((0,),2) ),
 				 		sg.Frame(title = 'Total:',
 				 			layout = [	[sg.T(' '*3), sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
-				 					 ])
+				 					 ], pad=((0,),2) )
 						]
 					])
 		],
@@ -241,29 +242,31 @@ def configuracion():
 						 sg.Button('', image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_4', button_color=color_sel if config_dicc['orientacion']=='dirs_4' else color_fondo),
 						 sg.Button('', image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_8', button_color=color_sel if config_dicc['orientacion']=='dirs_8' else color_fondo),
 						]
-					])
+			])
 		],		 
 		[sg.Frame(title = 'Mayúscula/Minúscula',
-			layout = [	[sg.Radio('Mayúscula', "RADIOn", key='mayus', size=(10,1)),
-						 sg.Radio('Minúscula', "RADIOn", default = True, key='minus')
+			layout = [	[sg.Radio('Mayúscula', "RADIOn", key='mayus', default = True, size=(10,1)),
+						 sg.Radio('Minúscula', "RADIOn", key='minus')
 						]
-					])
-		],
-		[sg.Frame(title = 'Fuente',
+			]),
+		 sg.Frame(title = 'Fuente',
 			layout = [	[sg.Combo(	('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'),
 								default_value='Comic',
 								key='_FONT_')
 						]
-					])
+			])
 		],
-		[sg.Text('Oficina')],
-		[sg.Button('Guardar configuración', key='_ACEPTAR_', disabled = False), sg.Button('Cerrar')]
+		[sg.Frame(title = 'Oficina',
+			layout = [	[sg.Text('15')]
+			]),
+		 sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((150,5),1), disabled = False),
+		 sg.Button('Cerrar')]
 	]
 
 	window = sg.Window('CONFIGURACIÓN').Layout(layout)
 
 	while True:                 # Event Loop  
-		pprint (config_dicc)
+		# pprint (config_dicc)
 		event, val = window.Read()  
 		# print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
 		# print(window.FindElement('_LISTA_').GetListValues())
@@ -319,7 +322,7 @@ def configuracion():
 		
 		if event in ('dirs_1','dirs_2','dirs_3','dirs_4','dirs_8'):
 
-			window.Element(event).Update( button_color = color_sel ) #pinto este boton como seleccionado
+			window.Element(event).Update( button_color = color_sel ) # pinto este boton como seleccionado
 			lista_dirs = ['dirs_1','dirs_2','dirs_3','dirs_4','dirs_8']
 			lista_dirs.remove(event)
 			for x in lista_dirs:  # pinto todos menos el actual del color del fondo
@@ -329,7 +332,7 @@ def configuracion():
 		
 		lista_cant = ['_CANT_S_','_CANT_V_','_CANT_A_']
 		if event in lista_cant:
-			if event == '_CANT_S_':  # voy seteando el tope del siguiente segun MAX - actual, habilito y lo seteo en cero.
+			if event == '_CANT_S_':  # voy seteando el tope del siguiente segun MAX - actual, lo habilito y lo seteo en cero.
 				window.Element('_CANT_V_').Update(values = list( range( 0, 1 + MAX - int(val[event]) ) ) , disabled = False, set_to_index = 0 )
 			if event == '_CANT_V_':
 				window.Element('_CANT_A_').Update(values = list( range( 0, 1 + MAX - int(val[event]) - int(val['_CANT_S_']) ) ) , disabled = False, set_to_index = 0 )
@@ -349,21 +352,16 @@ def configuracion():
 		
 		if event == '_ACEPTAR_':
 			if TOTAL_PALABRAS_A_USAR == 0:
-				sg.PopupError('La cantidad de palabras\nnopuede ser cero')
+				sg.PopupError('La cantidad de palabras\n no puede ser cero')
 			else:
 				with open(nombre_archivo_config, 'w', encoding = 'utf-8') as f:
 					json.dump(config_dicc, f, ensure_ascii = False)
-				
-				for key in config_dicc:
-					print(key, '=',config_dicc[key])
-				break
+				print('Configuración guardada:\n')
+				pprint (config_dicc)
 		
 		if event == '_LISTA_':
 			print ('Seleccionado: ',val['_LISTA_'])
-		# ~ if event in ('mayus','minus'): #quizas sirve para no ingresar info erronea
-		# los radio si no tienen valor por defecto son False
-			# ~ print('mayus =', val['mayus'])
-			# ~ window.FindElement('_ACEPTAR_').Update(disabled = False)
+			
 	window.Close()
 
 if __name__ == "__main__":

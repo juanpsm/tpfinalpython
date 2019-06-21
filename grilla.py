@@ -9,9 +9,26 @@ import config
 import string
 import random
 
-config_dicc,palabras_docente,palabras = config.cargar_configuracion()
+config_dicc,palabras_dicc,_ = config.cargar_configuracion()
+dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
+n_filas =  10
+n_columnas = n_filas
+tam_grilla = n_filas * n_columnas
+min_pal = 10
+char_vacío = ' '
 
-try:
+
+class Grilla:
+	def __init__(self):
+		self.n_intentos = 0
+		self.celdas = [[{'key':str(j)+'_'+str(i),'tipo': None, 'marcada':False,'color':None, 'letra':char_vacío, 'totalmarcas' : 0} for i in range(n_columnas)] for j in range(n_filas)]
+		self.soluciones = []
+
+def modifglob(palabras):
+	config_dicc,palabras_dicc,_ = config.cargar_configuracion()
+	global dirs
+	print ('Dirs', dirs)
+	print( '->', config_dicc['orientacion'] )
 	if config_dicc['orientacion'] == 'dirs_1':
 		#'dirs_2','dirs_3','dirs_4','dirs_8')
 		#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
@@ -22,28 +39,17 @@ try:
 		dirs = [[1, 0], [0, 1], [1, 1]]
 	elif config_dicc['orientacion'] == 'dirs_4':
 		dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
-	elif config_dicc['orientacion'] == 'dirs_8':
-		dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
-
-	
+	global n_filas
 	n_filas =  max(len(max(palabras, key=len)),len(palabras))
-	# ~ n_filas = len(max(palabras, key=len))
+	global n_columnas
 	n_columnas = n_filas
+	global tam_grilla
 	tam_grilla = n_filas * n_columnas
+	global min_pal
 	min_pal = len(palabras)
-	char_vacío = ' '
-except:
-	dirs = [[1,0]]
-
-
-class Grilla:
-	def __init__(self):
-		self.n_intentos = 0
-		self.celdas = [[{'key':str(j)+'_'+str(i),'tipo': None, 'marcada':False,'color':None, 'letra':char_vacío, 'totalmarcas' : 0} for i in range(n_columnas)] for j in range(n_filas)]
-		self.soluciones = []
 
 def clasificar_palabra(pal):
-	return palabras_docente[pal]['tipo']
+	return palabras_dicc[pal]['tipo']
 
 def probar_pos(grilla, pal, direccion, pos):
 	f = pos // n_columnas
@@ -119,10 +125,9 @@ def probar_palabra(grilla, pal):
 	return 0
 
 def crear_grilla(palabras):
-	
-	config_dicc,palabras_docente,palabras = config.cargar_configuracion()
-	
-	
+
+	config_dicc, _, _ = config.cargar_configuracion()
+	modifglob(palabras)
 	grilla = None
 	nun_intentos = 0
 
@@ -188,7 +193,9 @@ def print_resultado(grilla):
 
 
 if __name__ == "__main__":
-	if config.cargar_configuracion()[2] != []:
-		palabras = list(palabras_docente.keys())
+	config_dicc, palabras_dicc, _ = config.cargar_configuracion()
+
+	palabras = config.obtener_lista_palabras(config_dicc)
+	if palabras != []:
 		print(palabras)
 		print_resultado(crear_grilla(palabras))
