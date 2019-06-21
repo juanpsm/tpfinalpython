@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pattern.es import verbs, tag, spelling, lexicon
 import string
 def clasificar(palabra):
@@ -8,7 +9,8 @@ def clasificar(palabra):
 
 def buscar_en_pattern(palabra):
 
-	print('Buscar',palabra, 'en pattern')
+	print('Buscar "',palabra,'" en pattern',end='')
+	print()
 	if not palabra.lower() in verbs:
 		if not palabra.lower() in spelling:
 			if (not(palabra.lower() in lexicon) and not(palabra.upper() in lexicon) and not(palabra.capitalize() in lexicon)):

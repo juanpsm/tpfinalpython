@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import PySimpleGUI as sg
 import random
 import sys
@@ -55,7 +56,7 @@ def dibujar():
 				[sg.T('Sustantivos: '+ str(cantsust))]
 				]
 			ayuda_layout = [
-							[sg.Column(column1, background_color='#F7F3EC')]
+							[sg.Column(column1)]
 							]
 		# si es definiciones agrega al layout un numero para la palabra y su descripcion.	
 		# 'palabra num-'+str(j) : asigna un numero a la palabra para mostrar en layout.
@@ -67,7 +68,7 @@ def dibujar():
 				]
 			ayuda_layout = [ 
 							[sg.T('Definiciones: ')],
-							[sg.Column(column1, background_color='#F7F3EC')]
+							[sg.Column(column1)]
 							]
 		elif config_dicc['ayuda'] == 'palabras':
 			column1 = [
@@ -75,7 +76,7 @@ def dibujar():
 				]
 			ayuda_layout = [
 							[sg.T('Palabras a buscar :')],
-							[sg.Column(column1, background_color='#F7F3EC')]]
+							[sg.Column(column1)]]
 		return ayuda_layout
 	
 	ayuda_layout = ayuda(palabras_lista,palabras_dicc,config_dicc)

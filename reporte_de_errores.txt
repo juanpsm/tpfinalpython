@@ -31,3 +31,22 @@
 [2019-06-20 11:18] demagogia: Wiktionario la clasificó como "sust" y pattern como "_Ninguna_".
 [2019-06-20 11:19] El termino "zarpado": no se encontró en ningun motor de busqueda.
 [2019-06-20 11:31] El termino "terrícola": no se encontró en ningun motor de busqueda.
+[2019-06-20 21:11] El termino "gagaga": no se encontró en ningun motor de busqueda.
+[2019-06-20 22:20] sd: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 22:23] sd: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 22:30] sd: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 22:33] sd: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 22:36] sd: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 22:38] sd: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 22:40] sd: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 22:42] sd: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 22:55] El termino "tocornal": no se encontró en ningun motor de busqueda.
+[2019-06-20 23:09] bebe: Wiktionario la clasificó como "sust" y pattern como "verb".
+[2019-06-20 23:10] El termino "jazmin": no se encontró en ningun motor de busqueda.
+[2019-06-20 23:10] azucena: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 23:14] barrilete: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-20 23:35] mansión: Wiktionario la clasificó como "_no_sabe_" y pattern como "sust".
+[2019-06-21 00:54] El termino "cabecear": no se encontró en ningun motor de busqueda.
+[2019-06-21 00:57] El termino "salidar": no se encontró en ningun motor de busqueda.
+[2019-06-21 00:57] El termino "gruñon": no se encontró en ningun motor de busqueda.
+[2019-06-21 00:58] El termino "gruñón": no se encontró en ningun motor de busqueda.

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from pattern.web import Wiktionary, plaintext
 from buscar_en_pattern import buscar_en_pattern
 
@@ -19,7 +20,8 @@ def buscar_en_wiktionary(palabra):
 
 	engine = Wiktionary(language="es")
 	sch=engine.search(palabra)
-	print('Buscar "',palabra,'" en wiktionario')
+	print('Buscar "',palabra,'" en wiktionario', end='')
+	print()
 	if sch != None:
 
 		pos_1 = sch.source.find('<dt>1</dt>')

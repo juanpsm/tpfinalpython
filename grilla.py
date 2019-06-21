@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Algoritmo inspirado en:
 #
 # https://rosettacode.org/wiki/Word_search#Python
