@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import PySimpleGUI as sg
 import random
 import string
@@ -5,11 +6,12 @@ import json
 import os
 import datetime
 from pprint import pprint
+from collections import defaultdict
 from buscar_en_wiktionary import buscar_en_wiktionary
 
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
-
+MAX = 10
 def reporte(r,error):
 	"""pone en archivo de texto un reporte de los errores encontrados en la ejecucion de la sopa de letras"""
 	""" recibe un numero de error y en base a el informa que tipo de error es"""
@@ -48,8 +50,7 @@ def analizarpalabra(palabra,cat):
 	definicion = resultado['definicion']
 	
 	if resultado['clasificacion_wiktionario'] != resultado['clasificacion_pattern'] and resultado['clasificacion_wiktionario'] != 'MIXTA':
-		print('Reportando Error 1...')
-		reporte(resultado, 1)
+		
 		clasificacion_definitiva = resultado['clasificacion_wiktionario']
 
 		if resultado['clasificacion_wiktionario'] == '_Ninguna_': # y como son distintas se supone que pattern dio distinto de None
@@ -62,15 +63,21 @@ def analizarpalabra(palabra,cat):
 						sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
 						sg.Radio('Verbo', "RADIOp",key='_esVer_')],
 						[sg.Input(key = 'def')],
-						[sg.Submit(key = 'submit')]
+						[sg.Submit(key = 'submit'),sg.Cancel(key = 'cancel')]
 						]
 			window2 = sg.Window('Definicion ').Layout(ingreso)
 			button,values2=window2.Read()
+			if button == 'cancel':
+				clasificacion_definitiva = '_cancelada_'
+				definicion = '_cancelada_'
 			if button == 'submit':
 				definicion = values2['def']
 				clasificacion_definitiva = 'adj' if values2['_esAdj_'] else 'verb' if values2['_esVer_'] else 'sust'
-				window2.Close()
+			window2.Close()
 			#definicion = input('No se encontro la palabra en Wiktionario.\nDefínala:\n') #Aca habría que hacer un popup
+		print('Reportando Error 1...')
+		reporte(resultado, 1)
+		
 	elif resultado['clasificacion_pattern'] == '_Ninguna_': # Las dos None
 		print('Reportando Error 2...')
 		reporte(resultado,2)
@@ -81,9 +88,10 @@ def analizarpalabra(palabra,cat):
 	return clasificacion_definitiva, definicion
 	
 def cargar_configuracion():
-	"""abre archivo json con la configuracion cargada anteriormente"""
-	"""si el archivo de configuracion no fue cargado previamente informa que no existe el mismo
-	y devuelve todas las variables vacias necesarias para cargar datos nuevos"""
+	"""Abre archivo json con la configuración cargada anteriormente.
+si el archivo de configuracion no fue cargado previamente informa que no existe el mismo,
+inicializa las estructuras vacías para poder cargarle nuevas en el futuro.
+Retorna: (config_dicc,palabras_dicc,palabras_lista)"""
 	existe = os.path.isfile(nombre_archivo_config)
 	if existe:
 		with open(nombre_archivo_config, 'r', encoding = 'utf-8') as f:
@@ -91,24 +99,53 @@ def cargar_configuracion():
 		# ~ print('Configuracion guardada:')
 		# ~ print(json.dumps(config_dicc, sort_keys=True, indent=4, ensure_ascii = False))
 		palabras_dicc = config_dicc['palabras']
+		
+		palabras_clas = config_dicc['palabras_clas']
+		
 	else:
 		config_dicc = {}
-		config_dicc['palabras'] = []
+		config_dicc['palabras'] = {}
+		config_dicc['palabras_clas'] = {'sust':[],'verb':[],'adj':[]}
 		palabras_dicc = {}
+		palabras_clas = {'sust':[],'verb':[],'adj':[]}
+		config_dicc['max_sust'] = 0
+		config_dicc['max_verb'] = 0
+		config_dicc['max_adj'] = 0
+		
 		print('No existe archivo de configuración')
-	palabras_lista = list(palabras_dicc.keys())
-	return config_dicc,palabras_dicc,palabras_lista
+	
+	return config_dicc,palabras_dicc,palabras_clas
+	
+def elegir_palabras(config_dicc):
+	lista_s = config_dicc['palabras_clas']['sust']
+	lista_v = config_dicc['palabras_clas']['verb']
+	lista_a = config_dicc['palabras_clas']['adj']
+	
+	cant = min ( len(lista_s), config_dicc['max_sust'] ) # tambien puedo comprobarlo antes y que max nunca tenga algo mayor que el largo de la lista
+	palabras_lista = random.sample(lista_s, cant)
+	
+	cant = min ( len(lista_v), config_dicc['max_verb'] )
+	palabras_lista.extend(random.sample(lista_v, cant))
+	
+	cant = min ( len(lista_a), config_dicc['max_adj'] )
+	palabras_lista.extend(random.sample(lista_a, cant))
+	
+	
+	return random.sample(lista, cant_max)
 	
 def colores():
 	## Esto habrá que setearlo luego con la raspberry
 	
 	## Puedo setear los Colores de la interfaz manualmente
 	sg.SetOptions(
+	icon = 'bee.ico',
+	text_color='black',
+	input_text_color='black',
 	background_color='#EFF0D1', #cremita
 	text_element_background_color='#EFF0D1',
 	element_background_color='#EFF0D1',
 	scrollbar_color=None,
-	input_elements_background_color='#D7C0D0', #lila
+	input_elements_background_color='#EFF0D1', #lila
 	progress_meter_color = ('green', 'blue'),
 	button_color = ('#262730','#77BA99')
 	)
@@ -129,18 +166,23 @@ def configuracion():
 	
 	
 	color_fondo = colores()
-	
+	color_sel = ('#EFF0D1', '#D33F49')
 	color_boton_por_defecto = ('#262730','#77BA99')
 	orientacion = 'dirs_1' #por defecto
 	
-	config_dicc, palabras_dicc, palabras_lista = cargar_configuracion()
-	pprint (palabras_dicc)
+	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
+
+	palabras_lista = list(palabras_dicc.keys())
+	
+	TOTAL_PALABRAS_A_USAR = config_dicc['max_sust']+config_dicc['max_verb']+config_dicc['max_adj']
+	
+	print('Configuración cargada:')
+	pprint (config_dicc)
 
 	menu = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
 	# print(config_dicc['palabras'])
 	layout = [
-			[sg.Text('Instrucciones de configuración')],
-			[sg.Text('Palabra:')],
+			[sg.Text('Ingrese palabras la lista para ser usadas por la sopa de letras:')],
 			# ~ [sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'),  ### Finalmente al andar lo de pattern no es necesario especificar el tipo de palabra
 			 # ~ sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
 			 # ~ sg.Radio('Verbo', "RADIOp",key='_esVer_')],
@@ -148,12 +190,30 @@ def configuracion():
 			[sg.Input(key='_IN_', do_not_clear=False)],
 			[sg.Button('Agregar', bind_return_key=True, key='_ADD_')],
 			
-			[sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(40,6),
+			[sg.Listbox(values=palabras_lista, enable_events=True, size=(15,6),
 									key='_LISTA_', tooltip=None, right_click_menu= menu, visible=True)],
-			[sg.Text('Cantidad de palabras con las que hacer la sopa :')],
-			[sg.Text('sust'),sg.Input(size = (2,1), key='_CANT_S_'),
-			 sg.Text('verb'),sg.Input(size = (2,1), key='_CANT_V_'),
-			 sg.Text('adj'),sg.Input(size = (2,1), key='_CANT_A_')],
+			 ## para implementar una lista por cada tipo
+			 # ~ sg.Listbox(values=[], default_values=None, enable_events=True, size=(15,6),
+									# ~ key='_LISTA_V_', tooltip=None, right_click_menu= menu, visible=True),
+			 # ~ sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(15,6),
+									# ~ key='_LISTA_A_', tooltip=None, right_click_menu= menu, visible=True)],
+			
+			[sg.Text('Cantidad máxima de cada tipo a utilizar en la Sopa:')],
+			[sg.Column([[sg.Text('Sustantivos:')],[sg.T(' '*4), sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))), key = '_CANT_S_',
+							 default_value = config_dicc['max_sust'], size =(2,1),change_submits=True)]
+						]),
+			 sg.Column([[sg.Text('Verbos:')], [sg.T(' '*2), sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['verb'])))), key = '_CANT_V_',
+							 default_value = config_dicc['max_verb'], size =(2,1),change_submits=True, disabled = True)]
+						]),
+			 sg.Column([[sg.Text('Adjetivos:')],[sg.T(' '*4), sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['adj'])))), key = '_CANT_A_',
+							 default_value = config_dicc['max_adj'], size =(2,1),change_submits=True, disabled = True)]
+						]),
+			 sg.Frame('Total:',[[sg.T(' '*3), sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
+						])
+			],
+			#hago una lista de numeros de cero al minimo entre la cantidad de palabras existentes y la cantidad maxima para que no se haga muy grande la grilla
+			
+			 
 			
 			[sg.Text('Ayudas:')],
 			[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
@@ -161,11 +221,16 @@ def configuracion():
 			 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')],
 			
 			[sg.Text('Orientacion:')],
-			[sg.Button('',image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_1', button_color = color_fondo),
-			 sg.Button('',image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_2', button_color = color_fondo),
-			 sg.Button('',image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_3', button_color = color_fondo),
-			 sg.Button('',image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_4', button_color = color_fondo),
-			 sg.Button('',image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_8', button_color = color_fondo),
+			[sg.Button('',image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0,
+			  key='dirs_1', button_color = color_sel if config_dicc['orientacion']=='dirs_1'else color_fondo),
+			 sg.Button('',image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0,
+			  key='dirs_2', button_color = color_sel if config_dicc['orientacion']=='dirs_2'else color_fondo),
+			 sg.Button('',image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0,
+			  key='dirs_3', button_color = color_sel if config_dicc['orientacion']=='dirs_3'else color_fondo),
+			 sg.Button('',image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0,
+			  key='dirs_4', button_color = color_sel if config_dicc['orientacion']=='dirs_4'else color_fondo),
+			 sg.Button('',image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0,
+			  key='dirs_8', button_color = color_sel if config_dicc['orientacion']=='dirs_8'else color_fondo),
 			 ],
 			 
 			
@@ -182,32 +247,35 @@ def configuracion():
 	window = sg.Window('CONFIGURACION').Layout(layout)
 
 	while True:                 # Event Loop  
-		
+		pprint (config_dicc)
 		event, val = window.Read()  
-		# ~ print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
-		# ~ print(window.FindElement('_LISTA_').GetListValues())
+		print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
+		print(window.FindElement('_LISTA_').GetListValues())
 		if event is None or event == 'Cerrar':  
 			break
 			
 		if event == '_ADD_':
-			palabra = val['_IN_']
-			categoria = '' # 'adj' if val['_esAdj_'] else 'verb' if val['_esVer_'] else 'sust'
+			palabra = val['_IN_']  #Guardo lo que puso en el imput
+			categoria = '' # inicializo
 			definicion = ''
 			
-			
-			
-			if palabra != '':
+			if palabra != '': #descarto vacías
 				if palabra in palabras_dicc:
 					print('Ya se encuentra esa palabra en la lista.')
 				else:# si es no vacia y no esta en la lista, la analizo
 					
 					categoria, definicion = analizarpalabra(palabra,categoria)
-					
+					# devolvera no aceptada si no la encuentra en ningun lado o cancelada si la encuentra pero el usuariocancela a la hora de 
+					# agregar la definicion.
 					if definicion == '_no_aceptada_': 
-						sg.Popup('No consideramos que '+palabra+' sea una palabra')
+						sg.Popup('No consideramos que "'+palabra+'" sea una palabra')
 					
-					else: # la agrego
+					elif definicion != '_cancelada_': # la agrego
 						palabras_dicc[palabra] = {'tipo': categoria,'def': definicion}
+						print('\n**palabras_dicc\n',palabras_dicc,'\n\n')
+						palabras_clas[categoria].append(palabra) #esto lo puedo hacer gracias al paquete defaultdict sino da keyError la primera vez
+						print('\n***palabras_clas\n',palabras_clas,'\n\n')
+						
 						palabras_lista = window.FindElement('_LISTA_').GetListValues()
 						palabras_lista.append(palabra)  #aca cargo y agrego a la lista, pordría agregar directamente porque ya definí la lista en la importacion.
 						window.FindElement('_LISTA_').Update(values = palabras_lista)
@@ -225,40 +293,64 @@ def configuracion():
 			
 		if event == 'Eliminar::_MENU_':
 			if val['_LISTA_'] != []: # otra forma de resolver el tema de la listbox sin seleccionar
-				del palabras_dicc[val['_LISTA_'][0]]# El Listbox guarda en val una lista con un unico elemento que es el que esta seleccionado en ese momento.
+				palabra = val['_LISTA_'][0]# El Listbox guarda en val una lista con un unico elemento que es el que esta seleccionado en ese momento.
+				#elimino de ambdas estructuras:
+				palabras_clas[palabras_dicc[palabra]['tipo']].remove(palabra)
+				del palabras_dicc[palabra]
+				
 				palabras_lista = window.FindElement('_LISTA_').GetListValues()
-				palabras_lista.remove(val['_LISTA_'][0])
+				palabras_lista.remove(palabra)
 				window.FindElement('_LISTA_').Update(values = palabras_lista)
+				print('Se eliminó',palabra)
 		
 		if event in ('dirs_1','dirs_2','dirs_3','dirs_4','dirs_8'):
 
-			window.Element(event).Update(button_color=('#EFF0D1', '#D33F49'))
+			window.Element(event).Update( button_color = color_sel ) #pinto este boton como seleccionado
 			lista_dirs = ['dirs_1','dirs_2','dirs_3','dirs_4','dirs_8']
 			lista_dirs.remove(event)
-			for x in lista_dirs:
+			for x in lista_dirs:  # pinto todos menos el actual del color del fondo
 				window.Element(x).Update(button_color = color_fondo)
 			
 			orientacion = event
-			
+		
+		lista_cant = ['_CANT_S_','_CANT_V_','_CANT_A_']
+		if event in lista_cant:
+			if event == '_CANT_S_':  # voy seteando el tope del siguiente segun MAX - actual, habilito y lo seteo en cero.
+				window.Element('_CANT_V_').Update(values = list( range( 0, 1 + MAX - int(val[event]) ) ) , disabled = False, set_to_index = 0 )
+			if event == '_CANT_V_':
+				window.Element('_CANT_A_').Update(values = list( range( 0, 1 + MAX - int(val[event]) - int(val['_CANT_S_']) ) ) , disabled = False, set_to_index = 0 )
+			TOTAL_PALABRAS_A_USAR = int(val['_CANT_S_']) + int(val['_CANT_V_']) + int(val['_CANT_A_'])
+			window.Element('_TOTAL_').Update(value = TOTAL_PALABRAS_A_USAR )
+				
+		##LLeno diccionario
+		config_dicc['palabras'] = palabras_dicc
+		config_dicc['palabras_clas'] = palabras_clas
+		config_dicc['ayuda'] = "sin ayuda" if val['sin'] else "definiciones" if val['defin'] else "palabras" 
+		config_dicc['orientacion'] = orientacion
+		config_dicc['mayuscula'] = val['mayus']
+		config_dicc['fuente'] = val['_FONT_']
+		config_dicc['max_sust'] = int(val['_CANT_S_'])
+		config_dicc['max_verb'] = int(val['_CANT_V_'])
+		config_dicc['max_adj'] = int(val['_CANT_A_'])
+		
 		if event == '_ACEPTAR_':
-			config_dicc['palabras'] = palabras_dicc
-			config_dicc['ayuda'] = "sin ayuda" if val['sin'] else "definiciones" if val['defin'] else "palabras" 
-			config_dicc['orientacion'] = orientacion
-			config_dicc['mayuscula'] = val['mayus']
-			config_dicc['fuente'] = val['_FONT_']
-			for key in config_dicc:
-				print(key, '=',config_dicc[key])
-			break
+			if TOTAL_PALABRAS_A_USAR == 0:
+				sg.PopupError('La cantidad de palabras\nnopuede ser cero')
+			else:
+				with open(nombre_archivo_config, 'w', encoding = 'utf-8') as f:
+					json.dump(config_dicc, f, ensure_ascii = False)
+				
+				for key in config_dicc:
+					print(key, '=',config_dicc[key])
+				break
 		
 		if event == '_LISTA_':
-			print (val['_LISTA_'])
+			print ('Seleccionado: ',val['_LISTA_'])
 		# ~ if event in ('mayus','minus'): #quizas sirve para no ingresar info erronea
 		# los radio si no tienen valor por defecto son False
 			# ~ print('mayus =', val['mayus'])
 			# ~ window.FindElement('_ACEPTAR_').Update(disabled = False)
 	window.Close()
-	with open(nombre_archivo_config, 'w', encoding = 'utf-8') as f:
-		json.dump(config_dicc, f, ensure_ascii = False)
 
 if __name__ == "__main__":
 	configuracion()
