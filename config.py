@@ -89,14 +89,18 @@ def analizarpalabra(palabra,cat):
 	
 def cargar_configuracion():
 	"""Abre archivo json con la configuración cargada anteriormente.
-si el archivo de configuracion no fue cargado previamente informa que no existe el mismo,
-inicializa las estructuras vacías para poder cargarle nuevas en el futuro.
-Retorna: (config_dicc,palabras_dicc,palabras_lista)"""
+	si el archivo de configuracion no fue cargado previamente informa que no existe el mismo,
+	inicializa las estructuras vacías para poder cargarle nuevas en el futuro.
+
+
+	Retorna: (config_dicc, palabras_dicc, palabras_clas)
+	
+	"""
 	existe = os.path.isfile(nombre_archivo_config)
 	if existe:
 		with open(nombre_archivo_config, 'r', encoding = 'utf-8') as f:
 			config_dicc = json.load(f)
-		# ~ print('Configuracion guardada:')
+		# ~ print('Configuracion cargada:')
 		# ~ print(json.dumps(config_dicc, sort_keys=True, indent=4, ensure_ascii = False))
 		palabras_dicc = config_dicc['palabras']
 		
@@ -116,26 +120,28 @@ Retorna: (config_dicc,palabras_dicc,palabras_lista)"""
 	
 	return config_dicc,palabras_dicc,palabras_clas
 	
-def elegir_palabras(config_dicc):
+def obtener_lista_palabras(config_dicc):
+	'''Este metodo es para elegir aleatoriamente palabras, respentando las cantidades 
+	máximas definidas para cada tipo.'''
+
 	lista_s = config_dicc['palabras_clas']['sust']
 	lista_v = config_dicc['palabras_clas']['verb']
 	lista_a = config_dicc['palabras_clas']['adj']
 	
 	cant = min ( len(lista_s), config_dicc['max_sust'] ) # tambien puedo comprobarlo antes y que max nunca tenga algo mayor que el largo de la lista
-	palabras_lista = random.sample(lista_s, cant)
+	palabras_rand = random.sample(lista_s, cant)
 	
 	cant = min ( len(lista_v), config_dicc['max_verb'] )
-	palabras_lista.extend(random.sample(lista_v, cant))
+	palabras_rand.extend(random.sample(lista_v, cant))
 	
 	cant = min ( len(lista_a), config_dicc['max_adj'] )
-	palabras_lista.extend(random.sample(lista_a, cant))
+	palabras_rand.extend(random.sample(lista_a, cant))
 	
-	
-	return random.sample(lista, cant_max)
+	return palabras_rand
 	
 def colores():
 	## Esto habrá que setearlo luego con la raspberry
-	
+	sg.ChangeLookAndFeel('Reddit')
 	## Puedo setear los Colores de la interfaz manualmente
 	sg.SetOptions(
 	icon = 'bee.ico',
@@ -147,7 +153,7 @@ def colores():
 	scrollbar_color=None,
 	input_elements_background_color='#EFF0D1', #lila
 	progress_meter_color = ('green', 'blue'),
-	button_color = ('#262730','#77BA99')
+	# button_color = ('#262730','#77BA99') #verde
 	)
 	
 	## o automaticamente con 
@@ -159,7 +165,7 @@ def colores():
 	
 	# ~ sg.ChangeLookAndFeel('TealMono')
 	
-	return ('#262730','#EFF0D1')
+	return ('#262730','#EFF0D1') #·nego y crema
 	
 def configuracion():
 	"""recibe de cargar_configuracion() la configuracion elegida por el usuario para la sopa de letras"""
@@ -167,114 +173,100 @@ def configuracion():
 	
 	color_fondo = colores()
 	color_sel = ('#EFF0D1', '#D33F49')
-	color_boton_por_defecto = ('#262730','#77BA99')
 	orientacion = 'dirs_1' #por defecto
 	
 	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
 
-	palabras_lista = list(palabras_dicc.keys())
+	palabras_lista = list(palabras_dicc.keys()) ## esto lovoy a usar apra popular el listbox
 	
 	TOTAL_PALABRAS_A_USAR = config_dicc['max_sust']+config_dicc['max_verb']+config_dicc['max_adj']
 	
 	print('Configuración cargada:')
 	pprint (config_dicc)
 
-	menu = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
+	menu = ['Menu', ['Definicion::_MENU_',
+					 'Eliminar::_MENU_'
+					]
+			]
 	# print(config_dicc['palabras'])
 	layout = [
+		[sg.Text('Ingrese palabras la lista para ser usadas por la sopa de letras:')],
 
-			[sg.Text('Ingrese palabras la lista para ser usadas por la sopa de letras:')],
+		[sg.Text('Instrucciones de configuración')],
+		[sg.Frame(title='Ingrese palabras',
+			layout = [	[sg.Input(key = '_IN_', do_not_clear = False)],
+						[sg.Button('Agregar', bind_return_key = True, key = '_ADD_')],
+						[sg.Listbox(values = palabras_lista, enable_events = True, size = (15,6),
+									key = '_LISTA_', tooltip = 'gato', right_click_menu = menu)]
+					])
+		],
+		## para implementar una lista por cada tipo
+		# ~ sg.Listbox(values=[], default_values=None, enable_events=True, size=(15,6),
+					# ~ key='_LISTA_V_', tooltip=None, right_click_menu= menu, visible=True),
+		# ~ sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(15,6),
+					# ~ key='_LISTA_A_', tooltip=None, right_click_menu= menu, visible=True)],
+		[sg.Frame(title = 'Cantidad máxima de cada tipo a utilizar en la Sopa:',
+			layout = [	[sg.Column([	[sg.Text('Sustantivos:')],	## hago una lista de numeros de cero al minimo entre la cantidad de palabras existentes
+										[sg.T(' '*4),				## y la cantidad maxima para que no se haga muy grande la grilla
+					 						sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))),
+							 				key = '_CANT_S_', default_value = config_dicc['max_sust'], size = (2,1), change_submits = True)]
+						 			]),	
+				 		 sg.Column([	[sg.Text('Verbos:')],
+						  				[sg.T(' '*2),
+										  sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['verb'])))),
+										  key = '_CANT_V_', default_value = config_dicc['max_verb'], size = (2,1), change_submits = True, disabled = True)]
+				 					]),
+						 sg.Column([	[sg.Text('Adjetivos:')],
+										[sg.T(' '*4),
+											sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['adj'])))),
+					 						key = '_CANT_A_', default_value = config_dicc['max_adj'], size = (2,1), change_submits = True, disabled = True)]
+									]),
+				 		sg.Frame(title = 'Total:',
+				 			layout = [	[sg.T(' '*3), sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
+				 					 ])
+						]
+					])
+		],
+		[sg.Frame(title= 'Ayudas',
+			layout = [	[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
+						 sg.Radio('Definiciones', "RADIOA", key='defin'),
+						 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')
+						]
+					])
+		],
+		[sg.Frame(title = 'Orientacion', 
+			layout = [	[sg.Button('', image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_1', button_color=color_sel if config_dicc['orientacion']=='dirs_1' else color_fondo),
+						 sg.Button('', image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_2', button_color=color_sel if config_dicc['orientacion']=='dirs_2' else color_fondo),
+						 sg.Button('', image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_3', button_color=color_sel if config_dicc['orientacion']=='dirs_3' else color_fondo),
+						 sg.Button('', image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_4', button_color=color_sel if config_dicc['orientacion']=='dirs_4' else color_fondo),
+						 sg.Button('', image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_8', button_color=color_sel if config_dicc['orientacion']=='dirs_8' else color_fondo),
+						]
+					])
+		],		 
+		[sg.Frame(title = 'Mayúscula/Minúscula',
+			layout = [	[sg.Radio('Mayúscula', "RADIOn", key='mayus', size=(10,1)),
+						 sg.Radio('Minúscula', "RADIOn", default = True, key='minus')
+						]
+					])
+		],
+		[sg.Frame(title = 'Fuente',
+			layout = [	[sg.Combo(	('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'),
+								default_value='Comic',
+								key='_FONT_')
+						]
+					])
+		],
+		[sg.Text('Oficina')],
+		[sg.Button('Guardar configuración', key='_ACEPTAR_', disabled = False), sg.Button('Cerrar')]
+	]
 
-			[sg.Text('Instrucciones de configuración')],
-			[sg.Frame( layout = [
-
-			# ~ [sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'),  ### Finalmente al andar lo de pattern no es necesario especificar el tipo de palabra
-			 # ~ sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
-			 # ~ sg.Radio('Verbo', "RADIOp",key='_esVer_')],
-			 
-								[sg.Input(key='_IN_', do_not_clear=False)],
-								[sg.Button('Agregar', bind_return_key=True, key='_ADD_')],
-			
-
-			[sg.Listbox(values=palabras_lista, enable_events=True, size=(15,6),
-									key='_LISTA_', tooltip=None, right_click_menu= menu, visible=True)],
-			 ## para implementar una lista por cada tipo
-			 # ~ sg.Listbox(values=[], default_values=None, enable_events=True, size=(15,6),
-									# ~ key='_LISTA_V_', tooltip=None, right_click_menu= menu, visible=True),
-			 # ~ sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(15,6),
-									# ~ key='_LISTA_A_', tooltip=None, right_click_menu= menu, visible=True)],
-			
-			[sg.Text('Cantidad máxima de cada tipo a utilizar en la Sopa:')],
-			[sg.Column([[sg.Text('Sustantivos:')],[sg.T(' '*4), sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))), key = '_CANT_S_',
-							 default_value = config_dicc['max_sust'], size =(2,1),change_submits=True)]
-						]),
-			 sg.Column([[sg.Text('Verbos:')], [sg.T(' '*2), sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['verb'])))), key = '_CANT_V_',
-							 default_value = config_dicc['max_verb'], size =(2,1),change_submits=True, disabled = True)]
-						]),
-			 sg.Column([[sg.Text('Adjetivos:')],[sg.T(' '*4), sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['adj'])))), key = '_CANT_A_',
-							 default_value = config_dicc['max_adj'], size =(2,1),change_submits=True, disabled = True)]
-						]),
-			 sg.Frame('Total:',[[sg.T(' '*3), sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
-						])
-			],
-			#hago una lista de numeros de cero al minimo entre la cantidad de palabras existentes y la cantidad maxima para que no se haga muy grande la grilla
-			
-
-								[sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(40,6),
-									key='_LISTA_', tooltip=None, right_click_menu= menu, visible=True)]],
-									title= 'Insertar Palabra')],
-			[sg.Frame( layout = [[sg.Text('Sustantivos'),sg.Input(size = (2,1), key='_CANT_S_'),
-								  sg.Text('Adjetivos'),sg.Input(size = (2,1), key='_CANT_A_'),
-								  sg.Text('Verbos'),sg.Input(size = (2,1), key='_CANT_V_')]],
-								 title= 'Cantidad de palabras con las que hacer la sopa')],
-
-			 
-			
-			[sg.Frame( layout = [[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
-								  sg.Radio('Definiciones', "RADIOA", key='defin'),
-								  sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')]],
-								  title= 'Ayudas')],
-			
-
-			[sg.Text('Orientacion:')],
-			[sg.Button('',image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0,
-			  key='dirs_1', button_color = color_sel if config_dicc['orientacion']=='dirs_1'else color_fondo),
-			 sg.Button('',image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0,
-			  key='dirs_2', button_color = color_sel if config_dicc['orientacion']=='dirs_2'else color_fondo),
-			 sg.Button('',image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0,
-			  key='dirs_3', button_color = color_sel if config_dicc['orientacion']=='dirs_3'else color_fondo),
-			 sg.Button('',image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0,
-			  key='dirs_4', button_color = color_sel if config_dicc['orientacion']=='dirs_4'else color_fondo),
-			 sg.Button('',image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0,
-			  key='dirs_8', button_color = color_sel if config_dicc['orientacion']=='dirs_8'else color_fondo),
-			 ],
-
-			[sg.Frame( layout = [[sg.Button('',image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_1', button_color = color_fondo),
-								  sg.Button('',image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_2', button_color = color_fondo),
-								  sg.Button('',image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_3', button_color = color_fondo),
-								  sg.Button('',image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_4', button_color = color_fondo),
-							      sg.Button('',image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_8', button_color = color_fondo),
-			                      ]],title= 'Orientacion')],
-
-			 
-			
-			[sg.Frame( layout = [[sg.Radio('Mayúscula', "RADIOn", key='mayus', size=(10,1)),
-							      sg.Radio('Minúscula', "RADIOn", default = True, key='minus')]],
-								  title= 'Mayúscula/Minúscula')],
-			
-			[sg.Frame( layout = [[sg.InputCombo(('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'), key='_FONT_')]],
-								  title= 'Fuente')],
-			
-			[sg.Text('Oficina')],
-			[sg.Button('Guardar configuracion', key='_ACEPTAR_', disabled = False),sg.Button('Cerrar')]
-			]
-	window = sg.Window('CONFIGURACION').Layout(layout)
+	window = sg.Window('CONFIGURACIÓN').Layout(layout)
 
 	while True:                 # Event Loop  
 		pprint (config_dicc)
 		event, val = window.Read()  
-		print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
-		print(window.FindElement('_LISTA_').GetListValues())
+		# print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
+		# print(window.FindElement('_LISTA_').GetListValues())
 		if event is None or event == 'Cerrar':  
 			break
 			
@@ -283,7 +275,7 @@ def configuracion():
 			categoria = '' # inicializo
 			definicion = ''
 			
-			if palabra != '': #descarto vacías
+			if palabra != '': # descarto vacías
 				if palabra in palabras_dicc:
 					print('Ya se encuentra esa palabra en la lista.')
 				else:# si es no vacia y no esta en la lista, la analizo
@@ -294,14 +286,12 @@ def configuracion():
 					if definicion == '_no_aceptada_': 
 						sg.Popup('No consideramos que "'+palabra+'" sea una palabra')
 					
-					elif definicion != '_cancelada_': # la agrego
+					elif definicion != '_cancelada_': # la agrego en las estructuras
 						palabras_dicc[palabra] = {'tipo': categoria,'def': definicion}
-						print('\n**palabras_dicc\n',palabras_dicc,'\n\n')
-						palabras_clas[categoria].append(palabra) #esto lo puedo hacer gracias al paquete defaultdict sino da keyError la primera vez
-						print('\n***palabras_clas\n',palabras_clas,'\n\n')
+						palabras_clas[categoria].append(palabra) # ojo inicializar siempre antes los diccionarios
 						
 						palabras_lista = window.FindElement('_LISTA_').GetListValues()
-						palabras_lista.append(palabra)  #aca cargo y agrego a la lista, pordría agregar directamente porque ya definí la lista en la importacion.
+						palabras_lista.append(palabra)  # aca cargo y agrego a la lista, pordría agregar directamente porque ya definí la lista en la importacion.
 						window.FindElement('_LISTA_').Update(values = palabras_lista)
 		
 		if event == 'Definicion::_MENU_':
