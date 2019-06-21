@@ -9,21 +9,20 @@ def clasificar(palabra):
 
 def buscar_en_pattern(palabra):
 
-	print('Buscar "',palabra,'" en pattern',end='')
-	print()
+	print('\n  Buscar "',palabra,'" en pattern', sep='')
 	if not palabra.lower() in verbs:
 		if not palabra.lower() in spelling:
 			if (not(palabra.lower() in lexicon) and not(palabra.upper() in lexicon) and not(palabra.capitalize() in lexicon)):
-				print('No se encuentra en pattern.es')
+				print('\n  No se encuentra en pattern.es')
 				return '_Ninguna_'
 			else:
-				print('La encontró en lexicon')
+				print('\n  La encontró en lexicon')
 				return clasificar(palabra)
 		else:
-			print('La encontró en spelling')
+			print('\n  La encontró en spelling')
 			return clasificar(palabra)
 	else:
-		print('La encontró en verbs')
+		print('\n  La encontró en verbs')
 		return clasificar(palabra)
 			
 	print('\n?\n')

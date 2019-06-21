@@ -20,33 +20,55 @@ def buscar_en_wiktionary(palabra):
 
 	engine = Wiktionary(language="es")
 	sch=engine.search(palabra)
-	print('Buscar "',palabra,'" en wiktionario', end='')
-	print()
+	print('\n  Buscar "',palabra,'" en Wiktionario', sep='')
+
 	if sch != None:
 
 		pos_1 = sch.source.find('<dt>1</dt>')
-		pos_2 = sch.source.find('<dt>2</dt>',pos_1)
+		if pos_1 == -1:
+			# ~ debug(pos_1)
+			pos_1 = sch.source.find('<dt>')
+			# ~ debug( pos_1 )
+			pos_cierre_1 = sch.source.find('</dt>',pos_1+1) #busca a partir de pos 1
+			# ~ debug( pos_cierre_1 )
+		else:
+			pos_cierre_1 = pos_1
+			
+		pos_2 = sch.source.find('<dt>2</dt>',pos_1+1)
+		if pos_2 == -1:
+			# ~ debug(pos_2)
+			pos_2 = sch.source.find('<dt>',pos_1+1)
+			# ~ debug(pos_2)
+			pos_cierre_2 = sch.source.find('</dt>',pos_2+1)
+		else:
+			pos_cierre_2 = pos_2
 		
-		# ~ debug(sch.source[pos_1:pos_2])
-		# ~ debug(plaintext(sch.source[pos_1:pos_2]))
-		pos_punto=plaintext(sch.source[pos_1:pos_2]).find('.')
+		print('\n  slice: ', pos_cierre_1, pos_2)
 		
-		print('slice:',pos_1,pos_punto)
+		print('\n  source: ',sch.source[pos_cierre_1: pos_2])
+
+		print('\n  plaintext: ',plaintext(sch.source[pos_cierre_1:pos_2]))
 		
-		definicion = plaintext(sch.source[pos_1:pos_2])[1:pos_punto+1]
-		print('Def: ',definicion)
+		pos_punto=plaintext(sch.source[pos_cierre_1:pos_2]).find('.')
+		
+		definicion = plaintext(sch.source[pos_cierre_1: pos_2])[:pos_punto+1]
+		
+		if definicion[:1] == '1':
+			definicion = definicion[1:pos_punto+1]
+
+		print('\n  Def: ',definicion)
 		
 		cat = '_no_sabe_'
 		if('ES:Sustantivos' in sch.categories):
-			print('Wik dice que es Sustantivo!')
+			print('\n  Wiktionary dice que es Sustantivo!')
 			cat = 'sust'
 		if('ES:Adjetivos' in sch.categories):
-			print('Wik dice que es Adjetivo!')
+			print('\n  Wiktionary dice que es Adjetivo!')
 			if cat == '' :
 				cat = 'adj'
 			else: cat = 'MIXTA'
 		if('ES:Verbos' in sch.categories):
-			print('Wik dice que es verbo!')
+			print('\n  Wiktionary dice que es verbo!')
 			if cat == '' :
 				cat = 'verb'
 			else: cat = 'MIXTA'
@@ -55,7 +77,7 @@ def buscar_en_wiktionary(palabra):
 	
 		resultado['definicion'] = definicion
 	else:
-		print('No se encontró en wiktionario')
+		print('\n  No se encontró en Wiktionary')
 
 		
 		
@@ -63,13 +85,13 @@ def buscar_en_wiktionary(palabra):
 	
 	if cat_pattern != '_Ninguna_':
 		if cat_pattern[:1] == 'N':
-			print('Pattern dice que es sust!')
+			print('\n  Pattern dice que es Sustantivo!')
 			cat_pattern = 'sust'
 		if cat_pattern[:1] == 'V':
-			print('Pattern dice que es verbo!')
+			print('\n  Pattern dice que es Verbo!')
 			cat_pattern = 'verb'
 		if cat_pattern[:1] == 'J':
-			print('Pattern dice que es adj!')
+			print('\n  Pattern dice que es Adjetivo!')
 			cat_pattern = 'adj'
 		
 		resultado['clasificacion_pattern'] = cat_pattern
@@ -79,4 +101,4 @@ if __name__ == "__main__":
 	palabra = 'diccionario'
 	while(palabra!='q'):
 		buscar_en_wiktionary(palabra)
-		palabra = input('\n--------------------------------------------------------------------------\nPalabra :')
+		palabra = input('\n--------------------------------------------------------------------------\nPalabra: ')

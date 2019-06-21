@@ -17,11 +17,11 @@ import traceback
 def debug(__x):
 	'''Devuelve el nombre_var = valor_var, type: tipo_var'''
 	name = traceback.extract_stack(limit=2)[0][3][6:][:-1]
-	print ('',name,'  --  ','(type:',type(__x),')\n\n','      ',__x,'\n\n')
+	print ('\n',name,'  --  ','(type:',type(__x),')\n\n','      ',__x,'\n\n')
 	# ~ print('[',end='');print(*__x, sep=', ', end='');print(']')
 
 # ~ debug = pprint
-palabra = 'diccionario'
+palabra = 'gato'
 
 
 def buscar_en_wiktionary(palabra):
@@ -56,6 +56,9 @@ def buscar_en_wiktionary(palabra):
 		   # ~ print(repr(plaintext(result.text)))
 		   # ~ print()
 	engine = Wiktionary(language="es")
+	
+	palabra = palabra.lower()
+	
 	sch=engine.search(palabra)
 	debug(palabra)
 	# ~ debug(vars(sch))
@@ -64,13 +67,37 @@ def buscar_en_wiktionary(palabra):
 		# ~ debug(sch.string)
 		# ~ debug(sch.source)
 		pos_1 = sch.source.find('<dt>1</dt>')
-		pos_2 = sch.source.find('<dt>2</dt>',pos_1)
-		print(pos_1,pos_2)
-		# ~ debug(sch.source[pos_1:pos_2])
-		# ~ debug(plaintext(sch.source[pos_1:pos_2]))
-		pos_punto=plaintext(sch.source[pos_1:pos_2]).find('.')
-		debug(plaintext(sch.source[pos_1:pos_2])[1:pos_punto+1])
+		
+		if pos_1 == -1:
+			debug(pos_1)
+			pos_1 = sch.source.find('<dt>')
+			debug( pos_1 )
+			pos_cierre_1 = sch.source.find('</dt>',pos_1+1) #busca a partir de pos 1
+			debug( pos_cierre_1 )
+		else:
+			pos_cierre_1 = pos_1
+			
+		pos_2 = sch.source.find('<dt>2</dt>',pos_1+1)
+		if pos_2 == -1:
+			debug(pos_2)
+			pos_2 = sch.source.find('<dt>',pos_1+1)
+			debug(pos_2)
+			pos_cierre_2 = sch.source.find('</dt>',pos_2+1)
+		else:
+			pos_cierre_2 = pos_2
+		
+		print(pos_cierre_1, pos_2)
+		debug(sch.source[pos_cierre_1: pos_2])
 
+		debug(plaintext(sch.source[pos_cierre_1:pos_2]))
+		
+		pos_punto=plaintext(sch.source[pos_cierre_1:pos_2]).find('.')
+		
+
+		definicion = plaintext(sch.source[pos_cierre_1: pos_2])
+		debug(definicion[:pos_punto+1])
+		if definicion[:1] == '1':
+			debug(definicion[1:pos_punto+1])
 		# ~ debug(sch.title)
 		# ~ debug(sch.categories)
 		# ~ debug(sch.sections)
@@ -107,7 +134,8 @@ def buscar_en_wiktionary(palabra):
 			# ~ print('es Adjetivo!')
 		# ~ if('ES:Verbos' in sch.categories):
 			# ~ print('es verbo!')
-
+	else:
+		print('No la encuentra!!')
 	# ~ return resultado
 if __name__ == "__main__":
 	while(palabra!='q'):

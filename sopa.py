@@ -182,9 +182,10 @@ def dibujar():
 						win *= True
 
 		# ~ print('\n WIN =',win)
-		if win: sg.Popup('GANASTE')
+		if win: 
+			sg.Popup('GANASTE')
 		# ~ print('---------------------------------------')
-		break
+		
 
 	window.Close()
 
