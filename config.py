@@ -182,14 +182,20 @@ def configuracion():
 	menu = ['Menu', ['Definicion::_MENU_', 'Eliminar::_MENU_']]
 	# print(config_dicc['palabras'])
 	layout = [
+<<<<<<< HEAD
 			[sg.Text('Ingrese palabras la lista para ser usadas por la sopa de letras:')],
+=======
+			[sg.Text('Instrucciones de configuración')],
+			[sg.Frame( layout = [
+>>>>>>> 39ef7f8865a69910903becd5663e7a7aef272447
 			# ~ [sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'),  ### Finalmente al andar lo de pattern no es necesario especificar el tipo de palabra
 			 # ~ sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
 			 # ~ sg.Radio('Verbo', "RADIOp",key='_esVer_')],
 			 
-			[sg.Input(key='_IN_', do_not_clear=False)],
-			[sg.Button('Agregar', bind_return_key=True, key='_ADD_')],
+								[sg.Input(key='_IN_', do_not_clear=False)],
+								[sg.Button('Agregar', bind_return_key=True, key='_ADD_')],
 			
+<<<<<<< HEAD
 			[sg.Listbox(values=palabras_lista, enable_events=True, size=(15,6),
 									key='_LISTA_', tooltip=None, right_click_menu= menu, visible=True)],
 			 ## para implementar una lista por cada tipo
@@ -213,13 +219,23 @@ def configuracion():
 			],
 			#hago una lista de numeros de cero al minimo entre la cantidad de palabras existentes y la cantidad maxima para que no se haga muy grande la grilla
 			
+=======
+								[sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(40,6),
+									key='_LISTA_', tooltip=None, right_click_menu= menu, visible=True)]],
+									title= 'Insertar Palabra')],
+			[sg.Frame( layout = [[sg.Text('Sustantivos'),sg.Input(size = (2,1), key='_CANT_S_'),
+								  sg.Text('Adjetivos'),sg.Input(size = (2,1), key='_CANT_A_'),
+								  sg.Text('Verbos'),sg.Input(size = (2,1), key='_CANT_V_')]],
+								 title= 'Cantidad de palabras con las que hacer la sopa')],
+>>>>>>> 39ef7f8865a69910903becd5663e7a7aef272447
 			 
 			
-			[sg.Text('Ayudas:')],
-			[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
-			 sg.Radio('Definiciones', "RADIOA", key='defin'),
-			 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')],
+			[sg.Frame( layout = [[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
+								  sg.Radio('Definiciones', "RADIOA", key='defin'),
+								  sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')]],
+								  title= 'Ayudas')],
 			
+<<<<<<< HEAD
 			[sg.Text('Orientacion:')],
 			[sg.Button('',image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0,
 			  key='dirs_1', button_color = color_sel if config_dicc['orientacion']=='dirs_1'else color_fondo),
@@ -232,14 +248,22 @@ def configuracion():
 			 sg.Button('',image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0,
 			  key='dirs_8', button_color = color_sel if config_dicc['orientacion']=='dirs_8'else color_fondo),
 			 ],
+=======
+			[sg.Frame( layout = [[sg.Button('',image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_1', button_color = color_fondo),
+								  sg.Button('',image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_2', button_color = color_fondo),
+								  sg.Button('',image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_3', button_color = color_fondo),
+								  sg.Button('',image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_4', button_color = color_fondo),
+							      sg.Button('',image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_8', button_color = color_fondo),
+			                      ]],title= 'Orientacion')],
+>>>>>>> 39ef7f8865a69910903becd5663e7a7aef272447
 			 
 			
-			[sg.Text('Mayus')],
-			[sg.Radio('Mayúscula', "RADIOn", key='mayus', default = True),
-			 sg.Radio('Minúscula', "RADIOn", key='minus')],
+			[sg.Frame( layout = [[sg.Radio('Mayúscula', "RADIOn", key='mayus', size=(10,1)),
+							      sg.Radio('Minúscula', "RADIOn", default = True, key='minus')]],
+								  title= 'Mayúscula/Minúscula')],
 			
-			[sg.Text('Fuente')],
-			[sg.InputCombo(('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'), key='_FONT_')],
+			[sg.Frame( layout = [[sg.InputCombo(('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'), key='_FONT_')]],
+								  title= 'Fuente')],
 			
 			[sg.Text('Oficina')],
 			[sg.Button('Guardar configuracion', key='_ACEPTAR_', disabled = False),sg.Button('Cerrar')]
