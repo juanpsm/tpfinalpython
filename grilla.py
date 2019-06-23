@@ -15,7 +15,7 @@ n_filas =  10
 n_columnas = n_filas
 tam_grilla = n_filas * n_columnas
 min_pal = 10
-char_vacío = ' '
+char_vacío = '*'
 
 
 class Grilla:
@@ -156,6 +156,7 @@ def crear_grilla(palabras):
 			# ~ print ('len sol >>>>>>>>>>>>>>',len(grilla.soluciones))
 		if len(grilla.soluciones) == len(palabras):
 			grilla.n_intentos = nun_intentos
+			
 			#por ultimo lleno los casilleros vacios
 			for i in range(n_columnas):
 				for j in range(n_filas):
@@ -170,8 +171,8 @@ def crear_grilla(palabras):
 						
 			return grilla
 		else:
-			# ~ print('full')
-			break # grid is full but we didn't pack enough words, start over
+			print('No se pudo crear, reintentos =',nun_intentos)
+			# ~ break # grid is full but we didn't pack enough words, start over
 
 	return grilla
 
