@@ -12,14 +12,20 @@ from buscar_en_wiktionary import buscar_en_wiktionary
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
 MAX = 10
-def reporte(r,error):
+def reporte( res, error, clas, defi ):
 	"""pone en archivo de texto un reporte de los errores encontrados en la ejecucion de la sopa de letras"""
 	""" recibe un numero de error y en base a el informa que tipo de error es"""
 	hora = datetime.datetime.now()
 	hora = str(hora)[:-10]
+	 
+	if error == 0:
+		texto = '''[{}] {}: Wiktionario la clasificó como "{}" y pattern como "{}". 
+		El usuario la clasificó como "{}" y definió: "{}".\n'''
+		texto = texto.format(hora, res['palabra'], res['clasificacion_wiktionario'], res['clasificacion_pattern'], clas, defi)
 	
 	if error == 1:
-		texto = '[{}] {}: Wiktionario la clasificó como "{}" y pattern como "{}".\n'.format(hora,r['palabra'],r['clasificacion_wiktionario'],r['clasificacion_pattern'])
+		texto = '[{}] {}: Wiktionario la clasificó como "{}" y pattern como "{}".\n'
+		texto = texto.format(hora,r['palabra'],r['clasificacion_wiktionario'],r['clasificacion_pattern'])
 	
 	elif error ==2:
 		texto = '[{}] El termino "{}": no se encontró en ningun motor de busqueda.\n'.format(hora,r['palabra'])
@@ -42,27 +48,32 @@ def analizarpalabra(palabra,cat):
 	resultado = buscar_en_wiktionary(palabra)
 	# resultado tiene los campos:
 	# 'palabra' [str] la que busqué
-	# 'clasif_wik' [str] si se encontro en wiktionario
-	# 'clasif_patt' [str] si se encontro en pattern
+	# 'clasificacion_pattern' [str] si se encontro en wiktionario
+	# 'clasificacion_wiktionario' [str] si se encontro en pattern
 	# 'definicion' [str] si se encontro en wiktionario
 	# los campos que no se pudieron recuperar tendran None
 	clasificacion_definitiva = resultado['clasificacion_pattern']
 	definicion = resultado['definicion']
 	
-	if resultado['clasificacion_wiktionario'] != resultado['clasificacion_pattern'] and resultado['clasificacion_wiktionario'] != 'MIXTA':
+	if ( (resultado['clasificacion_wiktionario'] != resultado['clasificacion_pattern'] 
+		  and resultado['clasificacion_wiktionario'] != 'MIXTA')
+		 or resultado['definicion'] == ''):
 		
 		clasificacion_definitiva = resultado['clasificacion_wiktionario']
 
-		if resultado['clasificacion_wiktionario'] == '_Ninguna_': # y como son distintas se supone que pattern dio distinto de None
+		if (resultado['clasificacion_wiktionario'] == '_Ninguna_'		## no la encontró
+			or resultado['clasificacion_wiktionario'] == '_no_sabe_'	## existe, pero filtra mal las categorías por ej "ES:Sustantivos"
+			or resultado['definicion'] == ''):								## existe, pero parseó mal la definicion por no encontrar los <dt>1</dt>
+			# y como son distintas se supone que pattern dio distinto de _Ninguna_
 			# aca el problema es que pattern siempre da NN por DEFECTO, pero bueno si seguimos la consigna..
 			# EDIT: ahora anda!!
 			clasificacion_definitiva = resultado['clasificacion_pattern']
 			
-			ingreso = [	[sg.T('No se encontro la palabra en Wiktionario.\nDefínala:\n')],
+			ingreso = [	[sg.T('Falló la búsqueda de "'+palabra+'" en Wiktionario.\nDefínala:\n')],
 						[sg.Radio('Sustantivo', "RADIOp",default = True,key='_esSus_'), 
-						sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
-						sg.Radio('Verbo', "RADIOp",key='_esVer_')],
-						[sg.Input(key = 'def')],
+							sg.Radio('Adjetivo', "RADIOp",key='_esAdj_'),
+							sg.Radio('Verbo', "RADIOp",key='_esVer_')],
+						[sg.Input(default_text = resultado['definicion'], key = 'def')],
 						[sg.Submit(key = 'submit'),sg.Cancel(key = 'cancel')]
 						]
 			window2 = sg.Window('Definicion ').Layout(ingreso)
@@ -74,13 +85,16 @@ def analizarpalabra(palabra,cat):
 				definicion = values2['def']
 				clasificacion_definitiva = 'adj' if values2['_esAdj_'] else 'verb' if values2['_esVer_'] else 'sust'
 			window2.Close()
-			#definicion = input('No se encontro la palabra en Wiktionario.\nDefínala:\n') #Aca habría que hacer un popup
-		print('Reportando Error 1...')
-		reporte(resultado, 1)
+			## Reporto error con la info que proporcionó el usuario
+			reporte(resultado, 0,clasificacion_definitiva,definicion)
 		
-	elif resultado['clasificacion_pattern'] == '_Ninguna_': # Las dos None
+		else: ## Reporto que las claificaciones difieren pero sin ingreso por parte del usuario
+			print('Reportando Error 1...') 
+			reporte(resultado, 1,'','')
+		
+	elif resultado['clasificacion_pattern'] == '_Ninguna_': # Las dos None ya que no son distintas
 		print('Reportando Error 2...')
-		reporte(resultado,2)
+		reporte(resultado,2,'','')
 		#no incluir palabra
 		clasificacion_definitiva = '_no_aceptada_'
 		definicion = '_no_aceptada_'
@@ -282,12 +296,14 @@ def configuracion():
 				else:# si es no vacia y no esta en la lista, la analizo
 					
 					categoria, definicion = analizarpalabra(palabra,categoria)
-					# devolvera no aceptada si no la encuentra en ningun lado o cancelada si la encuentra pero el usuariocancela a la hora de 
-					# agregar la definicion.
+					
+					# devolvera '_no_aceptada_'' si no la encuentra en ningun lado o '_cancelada_' si la encuentra pero el usuario
+					# cancela a la hora de agregar la definicion. Tambien puede no saber clasificarla por no encontrar 
+					# "ES:Sustantivo", etc, en las categorías, entonces devolverá '_no_sabe_' como categoría
 					if definicion == '_no_aceptada_': 
 						sg.Popup('No consideramos que "'+palabra+'" sea una palabra')
 					
-					elif definicion != '_cancelada_': # la agrego en las estructuras
+					elif definicion != '_cancelada_' and categoria != '_no_sabe_' : # la agrego en las estructuras
 						palabras_dicc[palabra] = {'tipo': categoria,'def': definicion}
 						palabras_clas[categoria].append(palabra) # ojo inicializar siempre antes los diccionarios
 						

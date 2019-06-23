@@ -56,7 +56,7 @@ def buscar_en_wiktionary(palabra):
 		if definicion[:1] == '1':
 			definicion = definicion[1:pos_punto+1]
 
-		print('\n  Def: ',definicion)
+		print('\n  Def: *',definicion,'*',sep='')
 		
 		cat = '_no_sabe_'
 		if('ES:Sustantivos' in sch.categories):
@@ -72,19 +72,18 @@ def buscar_en_wiktionary(palabra):
 			if cat == '' :
 				cat = 'verb'
 			else: cat = 'MIXTA'
-	
+		if cat == '_no_sabe_':
+			print('\n  Wiktionary no la clasificó!')
 		resultado['clasificacion_wiktionario'] = cat
 	
 		resultado['definicion'] = definicion
 	else:
 		print('\n  No se encontró en Wiktionary')
-
-		
 		
 	cat_pattern = buscar_en_pattern(palabra)
 	
 	if cat_pattern != '_Ninguna_':
-		if cat_pattern[:1] == 'N':
+		if cat_pattern[:1] == 'N': #me fijo la primera letra del tag que e sla significativa
 			print('\n  Pattern dice que es Sustantivo!')
 			cat_pattern = 'sust'
 		if cat_pattern[:1] == 'V':

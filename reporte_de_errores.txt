@@ -51,3 +51,34 @@
 [2019-06-21 00:57] El termino "gruñon": no se encontró en ningun motor de busqueda.
 [2019-06-21 00:58] El termino "gruñón": no se encontró en ningun motor de busqueda.
 [2019-06-22 18:10] letrina: Wiktionario la clasificó como "sust" y pattern como "_Ninguna_".
+[2019-06-22 22:38] El termino "WENSI": no se encontró en ningun motor de busqueda.
+[2019-06-22 22:39] El termino "Skombrowsito": no se encontró en ningun motor de busqueda.
+[2019-06-22 22:40] El termino "policia": no se encontró en ningun motor de busqueda.
+[2019-06-22 22:40] El termino "profe puto": no se encontró en ningun motor de busqueda.
+[2019-06-22 22:41] tetas: Wiktionario la clasificó como "_no_sabe_" y pattern como "_Ninguna_".
+[2019-06-22 22:43] tetas: Wiktionario la clasificó como "_no_sabe_" y pattern como "_Ninguna_".
+[2019-06-22 22:43] alexis: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-22 22:44] senos: Wiktionario la clasificó como "_no_sabe_" y pattern como "sust".
+[2019-06-22 22:45] PENE: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-22 22:45] penes: Wiktionario la clasificó como "_no_sabe_" y pattern como "sust".
+[2019-06-22 22:46] El termino "chucky": no se encontró en ningun motor de busqueda.
+[2019-06-22 22:46] poronga: Wiktionario la clasificó como "sust" y pattern como "_Ninguna_".
+[2019-06-22 22:48] maradona: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust".
+[2019-06-22 22:48] cancer: Wiktionario la clasificó como "_no_sabe_" y pattern como "sust".
+[2019-06-22 23:06] tetas: Wiktionario la clasificó como "_no_sabe_" y pattern como "_Ninguna_".
+[2019-06-22 23:11] tetas: Wiktionario la clasificó como "_no_sabe_" y pattern como "_Ninguna_".
+[2019-06-22 23:11] El termino "sanguche": no se encontró en ningun motor de busqueda.
+[2019-06-22 23:18] tetas: Wiktionario la clasificó como "_no_sabe_" y pattern como "_Ninguna_".
+[2019-06-22 23:43] tetas: Wiktionario la clasificó como "_no_sabe_" y pattern como "_Ninguna_". 
+		El usuario la clasificó como "_Ninguna_" y definió: "Segunda persona del singular (tú) del presente de indicativo de tetar.
+[2019-06-22 23:43] tetas: Wiktionario la clasificó como "_no_sabe_" y pattern como "_Ninguna_". 
+		El usuario la clasificó como "sust" y definió: "".
+[2019-06-22 23:46] tetas: Wiktionario la clasificó como "_no_sabe_" y pattern como "_Ninguna_". 
+		El usuario la clasificó como "_cancelada_" y definió: "_cancelada_".
+[2019-06-22 23:50] verga: Wiktionario la clasificó como "sust" y pattern como "sust". 
+		El usuario la clasificó como "sust" y definió: "Mastil mayor de un barco".
+[2019-06-22 23:52] verga: Wiktionario la clasificó como "sust" y pattern como "sust". 
+		El usuario la clasificó como "sust" y definió: "Mastil mayor de un velero".
+[2019-06-22 23:52] gatos: Wiktionario la clasificó como "_no_sabe_" y pattern como "sust". 
+		El usuario la clasificó como "sust" y definió: "Forma del plural de gato.".
+
