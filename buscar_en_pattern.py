@@ -4,7 +4,7 @@ import string
 def clasificar(palabra):
 	# tag(palabra, tokenize=True, encoding='utf-8',tagset = 'UNIVERSAL')
 	t = tag(palabra, tokenize=True, encoding='utf-8')[0][1] # si fueran varias palabras devuelve una lista de pares (palabra, tag)
-	print('tag:',t)
+	print('  tag:',t)
 	return t
 
 def buscar_en_pattern(palabra):

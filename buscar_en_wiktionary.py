@@ -45,9 +45,9 @@ def buscar_en_wiktionary(palabra):
 		
 		print('\n  slice: ', pos_cierre_1, pos_2)
 		
-		print('\n  source: ',sch.source[pos_cierre_1: pos_2])
+		# ~ print('\n  source: ',sch.source[pos_cierre_1: pos_2])
 
-		print('\n  plaintext: ',plaintext(sch.source[pos_cierre_1:pos_2]))
+		# ~ print('\n  plaintext: ',plaintext(sch.source[pos_cierre_1:pos_2]))
 		
 		pos_punto=plaintext(sch.source[pos_cierre_1:pos_2]).find('.')
 		

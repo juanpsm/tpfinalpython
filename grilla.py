@@ -25,10 +25,14 @@ class Grilla:
 		self.soluciones = []
 
 def modifglob(palabras):
+	global config_dicc
+	global palabras_dicc
 	config_dicc,palabras_dicc,_ = config.cargar_configuracion()
 	global dirs
 	print ('Dirs', dirs)
-	print( '->', config_dicc['orientacion'] )
+	print( 'config_dicc ->', config_dicc['orientacion'] )
+	if config_dicc['orientacion'] == 'dirs_0':
+		dirs = [[0,1]]
 	if config_dicc['orientacion'] == 'dirs_1':
 		#'dirs_2','dirs_3','dirs_4','dirs_8')
 		#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
@@ -39,6 +43,8 @@ def modifglob(palabras):
 		dirs = [[1, 0], [0, 1], [1, 1]]
 	elif config_dicc['orientacion'] == 'dirs_4':
 		dirs = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+	elif config_dicc['orientacion'] == 'dirs_8':
+		dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
 	global n_filas
 	n_filas =  max(len(max(palabras, key=len)),len(palabras))
 	global n_columnas
@@ -125,15 +131,18 @@ def probar_palabra(grilla, pal):
 	return 0
 
 def crear_grilla(palabras):
-
+	print('Recibo palabras en crear_grilla()',palabras)
 	config_dicc, _, _ = config.cargar_configuracion()
+	print('Cargo en crear_grilla()',config_dicc['orientacion'])
+	print('antes de modifglob(), dirs =',dirs)
 	modifglob(palabras)
+	print('luego de modifglob(), dirs =',dirs)
 	grilla = None
 	nun_intentos = 0
 
 	print('Filas:',n_filas,'Col:',n_columnas,'Tam:',tam_grilla,'len:',min_pal)
 
-	while nun_intentos < 100:
+	while nun_intentos < 10000:
 		nun_intentos += 1
 		shuffle(palabras)
 		# ~ print('pal shufle',palabras)
@@ -165,7 +174,6 @@ def crear_grilla(palabras):
 			break # grid is full but we didn't pack enough words, start over
 
 	return grilla
-
 
 def print_resultado(grilla):
 	if grilla is None or grilla.n_intentos == 0:
