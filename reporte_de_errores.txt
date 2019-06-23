@@ -50,3 +50,4 @@
 [2019-06-21 00:57] El termino "salidar": no se encontró en ningun motor de busqueda.
 [2019-06-21 00:57] El termino "gruñon": no se encontró en ningun motor de busqueda.
 [2019-06-21 00:58] El termino "gruñón": no se encontró en ningun motor de busqueda.
+[2019-06-22 18:10] letrina: Wiktionario la clasificó como "sust" y pattern como "_Ninguna_".

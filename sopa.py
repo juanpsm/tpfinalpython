@@ -1,4 +1,37 @@
 # -*- coding: utf-8 -*-
+CREDITS = '''
+Sopa de Letras
+v alpha.0.1
+
+Trabajo Final para Seminario Opción Python
+	Facultad de Informática
+		UNLP
+
+Alumnos:
+
+	Matías Agustin Cabral
+	Bruno Sbrancia
+	Juan Pablo Sanchez Magariños
+'''
+HOWTO = '''
+Sopa de Letras:
+
+Primero seleccionar color segun el tipo de
+palabra que va a buscar.
+Marque los casilleros de la palabras, 
+clickeando las letras de la grilla.
+
+Podrá seleccionar el tipo de ayuda en el 
+apartado Configuración.
+
+El juego finaliza una vez que todas las 
+letras de todas las palabras esten marcadas
+con el color correspondiente.
+
+Si una letra pertenece a más de una 
+palabra (intersección), podrá marcarla
+con cualquier color.
+'''
 import PySimpleGUI as sg
 import random
 import sys
@@ -9,7 +42,8 @@ import config
 
 
 def dibujar():
-	config.colores()
+	
+	color_fondo = config.colores()
 	#Colores marcas
 	color_celda_marcada = ('#EFF0D1','#D33F49') #blanco y rojo
 	color_marca = {None:('#EFF0D1','#D33F49'), #blanco y rojo
@@ -23,11 +57,19 @@ def dibujar():
 	config_dicc, palabras_dicc, _ = config.cargar_configuracion()
 	palabras_lista = config.obtener_lista_palabras(config_dicc)
 	fuente = config_dicc['fuente']
-	print('ORRRR',config_dicc['orientacion'])
-	matriz = crear_grilla(palabras_lista)
+	
+	# ~ print('Cargo en dibujar()',config_dicc['orientacion'])
+	print('Creo lista de palabras random en dibujar()')
+	print('palabras_lista =',palabras_lista)
+	
+	## Defino el ancho de la grilla como el mayor entre la cantidad de palabras o la palabra mas larga
 	ANCHO = max(len(max(palabras_lista, key=len)),len(palabras_lista)) # key = len hace que sea por cantidad de char y no alfabeticamente
+	## O solo la palabra más larga
 	#ANCHO = len(max(palabras_lista, key=len))
+	## Y siquieropuede ser cuadrada
 	ALTO = ANCHO
+	
+	matriz = crear_grilla(palabras_lista)
 	
 	# def cantidad_pal(palabras_dicc): ## Este ahora que se cuentan las palabras en config es redundante
 	# 		"""Recibe diccionario con todos los datos de las palabras y devuelve la cantidad de palabras por cada tipo"""
@@ -71,8 +113,9 @@ def dibujar():
 							[sg.Column(column1)]
 							]
 		elif config_dicc['ayuda'] == 'palabras':
-			column1 = [
-				[sg.T(palabras_lista[j])] for j in range(len(palabras_lista))
+			column1 = [                   ## agrego que el color aparezca en modo fácil, buscar el tipo en el dicc de colores, el segundo elemento porque es una tupla (texto, fondo)
+				[sg.T(palabras_lista[j], background_color = color_marca[ palabras_dicc[palabras_lista[j]]['tipo']][1]
+				)] for j in range(len(palabras_lista)) ## podrias poner pal in palabras lista en lugar de usar ese j
 				]
 			ayuda_layout = [
 							[sg.T('Palabras a buscar :')],
@@ -90,22 +133,20 @@ def dibujar():
             # ~ ['!&Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],      
             # ~ ['&Help', '&About...'],]    
 	#layout = [[sg.Menu(menu_def)]]
-	menu_princ = [['&File', ['&Open', '!&Save', '---', 'Properties', 'E&xit'  ]],
-				['!&Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],      
-				['&Help', '&About...']]
-	sopa_layout = [
-				[sg.Button(matriz.celdas[j][i]['letra'],
-				 size=(4,2),
-				 pad=(0,0),
-				 font=fuente,
-				 key = str(j)+'_'+str(i)) for i in range(ANCHO)]
-			for j in range(ALTO)
-			 ]
-
+	menu_princ = [	['&Archivo', ['!&Cargar...', '!&Guardar...', '---', '!Configuracion::Menu', 'E&xit'  ]],
+					#['!&Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],      
+					['&Ayuda', ['Como jugar?::Menu','Acerca de...::Menu']]
+				 ]
+	sopa_layout = [	[sg.Button(matriz.celdas[j][i]['letra'],
+					 size=(4,2),
+					 pad=(0,0),
+					 font=fuente,
+					 key = str(j)+'_'+str(i)) for i in range(ANCHO)	] for j in range(ALTO)
+				 ]
 	# Botones para seleccionar que tipo de palabra marcar
 			 # ~ ,sg.Button('Verb',button_color='green3'),sg.Button('Sust',button_color='yellow2')
 			 # ~ flat, groove, raised, ridge, solid, or sunken
-	size_pincel=(7, 1)
+	size_pincel=(7, 2)
 	pincel_layout = [
 				[sg.Text('Adj', size=size_pincel, auto_size_text=False, enable_events=True,
 				 relief='raised', text_color=color_marca['adj'][0], background_color=color_marca['adj'][1], justification='center', key='adj', tooltip='Elegir para marcar Adjetivos'),
@@ -118,8 +159,16 @@ def dibujar():
 
 	layout = [
 				[sg.Menu(menu_princ)],
-				[sg.Frame('', pincel_layout)],
-				[sg.Frame('', sopa_layout, font='Any 12', title_color='blue'),sg.Frame('',ayuda_layout)]
+				[sg.Frame('Seleccionar color: ', pincel_layout)],
+				[sg.Frame('', sopa_layout, font='System', title_color='blue'),
+					sg.Frame('Ayudas: ',[	[sg.Text('Direcciones:', pad = ((20,0),0) )],
+											[sg.Button(image_filename = config_dicc['orientacion']+'.png', 
+														image_size=(80, 80), image_subsample=4, border_width=0,
+														pad = ((30,0),(10,30)), button_color = color_fondo)],
+											[sg.Column(ayuda_layout)]
+										]
+							)
+				]
 			]
 
 	layout.append([sg.Button('Cerrar')])
@@ -129,8 +178,21 @@ def dibujar():
 	while True:				 # Event Loop
 		event, val = window.Read()
 		#print(event, val)
+
 		if event is None or event == 'Cerrar':
 			break
+
+		if event == 'Como jugar?::Menu':
+			sg.Popup(HOWTO,font = 'System')
+		
+		if event == 'Acerca de...::Menu':
+			sg.Popup(CREDITS,font = 'System')
+			
+		if event == 'Configuracion::Menu': ## Esto lo deshabilito hasta que solucionemos el bug de _tkinter.TclError:
+			window.Hide()
+			# ~ config.configuracion()
+			# ~ break
+
 		if event in ('adj','verb','sust'):
 			color_celda_marcada = color_marca[event]
 			for element in ('adj','verb','sust'):
@@ -158,7 +220,7 @@ def dibujar():
 				if matriz.celdas[j][i]['tipo'] != None:
 					if matriz.celdas[j][i]['tipo'] == 'MIXTO':
 						if not(matriz.celdas[j][i]['marcada']):
-							print('Marcar',str(j)+'_'+str(i),'con cualquier color')
+							# ~ print('Marcar',str(j)+'_'+str(i),'con cualquier color')
 							#print('win =',win,'lo pongo en',end=' ')
 							win *= False
 							#print(win)
@@ -166,7 +228,7 @@ def dibujar():
 							win *= True
 					else:
 						if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]: #no pudimos extraer el color de pysimplegui por eso le agregamos una key 'color' a la matriz
-							print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'])
+							# ~ print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'])
 							#print('win =',win,'lo pongo en',end=' ')
 							win *= False
 							#print(win)
@@ -174,7 +236,7 @@ def dibujar():
 							win *= True
 				else:
 					if (matriz.celdas[j][i]['marcada']):
-						print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo')
+						# ~ print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo')
 						#print('win =',win,'lo pongo en',end=' ')
 						win *= False
 						#print(win)

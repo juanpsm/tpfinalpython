@@ -32,11 +32,11 @@ def modifglob(palabras):
 	print ('Dirs', dirs)
 	print( 'config_dicc ->', config_dicc['orientacion'] )
 	if config_dicc['orientacion'] == 'dirs_0':
-		dirs = [[0,1]]
+		dirs = [[1,0]]
 	if config_dicc['orientacion'] == 'dirs_1':
 		#'dirs_2','dirs_3','dirs_4','dirs_8')
 		#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
-		dirs = [[1,0]]
+		dirs = [[0,1]]
 	elif config_dicc['orientacion'] == 'dirs_2':
 		dirs = [[1, 0], [0, 1]]
 	elif config_dicc['orientacion'] == 'dirs_3':

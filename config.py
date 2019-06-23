@@ -117,7 +117,9 @@ def cargar_configuracion():
 		config_dicc['max_adj'] = 0
 		
 		print('No existe archivo de configuración')
-	print( 'wqerffffffff->', config_dicc['orientacion'] )
+	# ~ print( 'Carga config -> ')
+	# ~ pprint(config_dicc)
+	print('Cargo en cargar_configuracion()',config_dicc['orientacion'])
 	return config_dicc,palabras_dicc,palabras_clas
 	
 def obtener_lista_palabras(config_dicc):
@@ -181,8 +183,9 @@ def configuracion():
 	
 	TOTAL_PALABRAS_A_USAR = config_dicc['max_sust']+config_dicc['max_verb']+config_dicc['max_adj']
 	
-	print('Configuración cargada:')
-	pprint (config_dicc)
+	# ~ print('Configuración cargada en configuracion():')
+	# ~ pprint (config_dicc)
+	print('Cargo en configuracion()',config_dicc['orientacion'])
 
 	menu = ['Menu', ['Definicion::_MENU_',
 					 'Eliminar::_MENU_'
@@ -210,21 +213,19 @@ def configuracion():
 		## y la cantidad maxima para que no se haga muy grande la grilla.
 			layout = [	[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
 										[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))),
-							 				key = '_CANT_S_', default_value = config_dicc['max_sust'], size = (2,1), pad=((20,),1), change_submits = True)]
+							 				key = '_CANT_S_', default_value = config_dicc['max_sust'], size = (2,1), pad=((20,),1), enable_events = True)]
 						 			], pad=((0,),2) ),	
 				 		 sg.Column([	[sg.Text('Verbos:', pad=((0,),2) )],
-						  				[
-										  sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['verb'])))),
-										  key = '_CANT_V_', default_value = config_dicc['max_verb'], size = (2,1), change_submits = True, disabled = True)]
+						  				[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['verb'])))),
+											key = '_CANT_V_', default_value = config_dicc['max_verb'], size = (2,1), enable_events = True, disabled = True)]
 				 					], pad=((0,),2) ),
 						 sg.Column([	[sg.Text('Adjetivos:', pad=((0,),2) )],
-										[
-											sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['adj'])))),
-					 						key = '_CANT_A_', default_value = config_dicc['max_adj'], size = (2,1), change_submits = True, disabled = True)]
+										[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['adj'])))),
+					 						key = '_CANT_A_', default_value = config_dicc['max_adj'], size = (2,1), enable_events = True, disabled = True)]
 									], pad=((0,),2) ),
 				 		sg.Frame(title = 'Total:',
-				 			layout = [	[sg.T(' '*3), sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
-				 					 ], pad=((0,),2) )
+				 			layout = [	[sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
+				 					 ], pad=((20,0),2) )
 						]
 					])
 		],
@@ -236,12 +237,9 @@ def configuracion():
 					])
 		],
 		[sg.Frame(title = 'Orientacion', 
-			layout = [	[sg.Button('', image_filename='dirs_1.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_1', button_color=color_sel if config_dicc['orientacion']=='dirs_1' else color_fondo),
-						 sg.Button('', image_filename='dirs_2.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_2', button_color=color_sel if config_dicc['orientacion']=='dirs_2' else color_fondo),
-						 sg.Button('', image_filename='dirs_3.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_3', button_color=color_sel if config_dicc['orientacion']=='dirs_3' else color_fondo),
-						 sg.Button('', image_filename='dirs_4.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_4', button_color=color_sel if config_dicc['orientacion']=='dirs_4' else color_fondo),
-						 sg.Button('', image_filename='dirs_8.png', image_size=(60, 60), image_subsample=9, border_width=0, key='dirs_8', button_color=color_sel if config_dicc['orientacion']=='dirs_8' else color_fondo),
-						]
+			layout = [	[sg.Button('', image_filename='dirs_'+str(i)+'.png', image_size=(60, 60), image_subsample=6, border_width=0,
+									key='dirs_'+str(i), button_color=color_sel if config_dicc['orientacion']=='dirs_+str(i)' else color_fondo)
+						 for i in (0,1,2,3,4,8)]
 			])
 		],		 
 		[sg.Frame(title = 'Mayúscula/Minúscula',
@@ -264,11 +262,11 @@ def configuracion():
 	]
 
 	window = sg.Window('CONFIGURACIÓN').Layout(layout)
-
+	window.Finalize()
 	while True:                 # Event Loop  
 		# pprint (config_dicc)
 		event, val = window.Read()  
-		# print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
+		# ~ print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
 		# print(window.FindElement('_LISTA_').GetListValues())
 		if event is None or event == 'Cerrar':  
 			break
@@ -320,10 +318,10 @@ def configuracion():
 				window.FindElement('_LISTA_').Update(values = palabras_lista)
 				print('Se eliminó',palabra)
 		
-		if event in ('dirs_1','dirs_2','dirs_3','dirs_4','dirs_8'):
+		if event in ('dirs_0','dirs_1','dirs_2','dirs_3','dirs_4','dirs_8'):
 
 			window.Element(event).Update( button_color = color_sel ) # pinto este boton como seleccionado
-			lista_dirs = ['dirs_1','dirs_2','dirs_3','dirs_4','dirs_8']
+			lista_dirs = ['dirs_0','dirs_1','dirs_2','dirs_3','dirs_4','dirs_8']
 			lista_dirs.remove(event)
 			for x in lista_dirs:  # pinto todos menos el actual del color del fondo
 				window.Element(x).Update(button_color = color_fondo)
@@ -340,16 +338,18 @@ def configuracion():
 			window.Element('_TOTAL_').Update(value = TOTAL_PALABRAS_A_USAR )
 				
 		##LLeno diccionario
-		config_dicc['palabras'] = palabras_dicc
-		config_dicc['palabras_clas'] = palabras_clas
-		config_dicc['ayuda'] = "sin ayuda" if val['sin'] else "definiciones" if val['defin'] else "palabras" 
-		config_dicc['orientacion'] = orientacion
-		config_dicc['mayuscula'] = val['mayus']
-		config_dicc['fuente'] = val['_FONT_']
-		config_dicc['max_sust'] = int(val['_CANT_S_'])
-		config_dicc['max_verb'] = int(val['_CANT_V_'])
-		config_dicc['max_adj'] = int(val['_CANT_A_'])
-		
+		try:
+			config_dicc['palabras'] = palabras_dicc
+			config_dicc['palabras_clas'] = palabras_clas
+			config_dicc['ayuda'] = "sin ayuda" if val['sin'] else "definiciones" if val['defin'] else "palabras" 
+			config_dicc['orientacion'] = orientacion
+			config_dicc['mayuscula'] = val['mayus']
+			config_dicc['fuente'] = val['_FONT_']
+			config_dicc['max_sust'] = int(val['_CANT_S_'])
+			config_dicc['max_verb'] = int(val['_CANT_V_'])
+			config_dicc['max_adj'] = int(val['_CANT_A_'])
+		except ValueError:
+			print('Debe seleccionar cantidades!!')
 		if event == '_ACEPTAR_':
 			if TOTAL_PALABRAS_A_USAR == 0:
 				sg.PopupError('La cantidad de palabras\n no puede ser cero')
