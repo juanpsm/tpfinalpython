@@ -82,3 +82,5 @@
 [2019-06-22 23:52] gatos: Wiktionario la clasificó como "_no_sabe_" y pattern como "sust". 
 		El usuario la clasificó como "sust" y definió: "Forma del plural de gato.".
 
+[2019-06-23 01:31] El termino "werfwe": no se encontró en ningun motor de busqueda.
+[2019-06-23 01:53] bebe: Wiktionario la clasificó como "sust" y pattern como "verb".

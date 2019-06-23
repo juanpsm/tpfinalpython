@@ -34,12 +34,14 @@ con cualquier color.
 '''
 import PySimpleGUI as sg
 import random
+import math
+import time
+from playsound import playsound
 import sys
 
 from grilla import crear_grilla
 
 import config
-
 
 def dibujar():
 	
@@ -133,7 +135,7 @@ def dibujar():
             # ~ ['!&Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],      
             # ~ ['&Help', '&About...'],]    
 	#layout = [[sg.Menu(menu_def)]]
-	menu_princ = [	['&Archivo', ['!&Cargar...', '!&Guardar...', '---', '!Configuracion::Menu', 'E&xit'  ]],
+	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', '!Configuracion::Menu', 'E&xit'  ]],
 					#['!&Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],      
 					['&Ayuda', ['Como jugar?::Menu','Acerca de...::Menu']]
 				 ]
@@ -174,19 +176,30 @@ def dibujar():
 	layout.append([sg.Button('Cerrar')])
 	window = sg.Window('Sopa de Letras').Layout(layout)
 	
-
+	start_time = time.time()
 	while True:				 # Event Loop
 		event, val = window.Read()
 		#print(event, val)
 
 		if event is None or event == 'Cerrar':
 			break
-
+		if event == 'Guardar...::Menu':
+			filename = 'savegame.sav'
+			print('Guardo en ',filename)
+			window.SaveToDisk(filename)
+		if event == 'Cargar...::Menu':
+			filename = 'savegame.sav'
+			print('Cargar ',filename)
+			window.LoadFromDisk(filename)
 		if event == 'Como jugar?::Menu':
-			sg.Popup(HOWTO,font = 'System')
+			window.SetAlpha(0.5)
+			sg.Popup(HOWTO,font = 'System', keep_on_top=True)
+			window.Reappear() 
 		
 		if event == 'Acerca de...::Menu':
-			sg.Popup(CREDITS,font = 'System')
+			window.SetAlpha(0.5)
+			sg.Popup(CREDITS,font = 'System', keep_on_top=True)
+			window.Reappear() 
 			
 		if event == 'Configuracion::Menu': ## Esto lo deshabilito hasta que solucionemos el bug de _tkinter.TclError:
 			window.Hide()
@@ -244,8 +257,62 @@ def dibujar():
 						win *= True
 
 		# ~ print('\n WIN =',win)
-		if win: 
-			sg.Popup('GANASTE')
+		if win:
+			print('\nGanaste!')
+					
+			x_max,y_max = window.GetScreenDimensions()
+			for rep in range(5):
+				margen = 150
+				x_0, y_0 =  random.randrange(x_max-margen-50), random.randrange(y_max-margen-50)
+				# ~ x_0, y_0 = 555,450
+				sign = random.choice([-1,1])
+				v_x = sign*random.randrange(1,50)
+				
+				v_y = -1*random.randrange(10,30)
+				# ~ v_x, v_y = 10,10
+				g = 5
+				t = 0
+				rebote = 0
+				x,y=x_0,y_0
+				
+				while rebote < 3 and t < 500:
+					x = x + v_x
+					v_y = v_y + g
+					y = y + v_y
+					
+					rand_col = ['#'+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+									for i in range(4)]
+					# ~ print(rand_col)## ['#C7980A', '#F4651F', '#82D8A7', '#CC3A05', '#575E76', '#156943', '#0BD055', '#ACD338']
+					sg.Popup(' W I N N E R ',
+							button_color = (rand_col[0],rand_col[1]),					# Color of buttons (text_color, background_color)
+							background_color = rand_col[2],				# Color of background
+							text_color = rand_col[3], 					# Color of text
+							# ~ button_type = 'POPUP_BUTTONS_NO_BUTTONS',
+							auto_close = True,					# If True window will automatically close
+							auto_close_duration = 5,			# Number of seconds for autoclose
+							non_blocking = True,					# If True returns immediately
+							line_width = 50,						# Width of lines in characters
+							font = 'Fixedsys' ,							# Font to use for characters
+							no_titlebar = False,					# If True no titlebar will be shown
+							grab_anywhere = False,					# If True can move window by grabbing anywhere
+							keep_on_top = True,					# If True window will be on top of other windows
+							location = (x,y)					# (x,y) coordinates to show the window
+							)
+					if x < 5:
+						v_x = -1 * v_x
+					if y < 5: 
+						v_y = -1 * v_y
+					if x > x_max-margen:
+						v_x = -1 * v_x
+					if y > y_max-margen:
+						rebote +=1
+						v_y = -1 * v_y
+					t+=1
+				
+			elapsed_time = time.time() - start_time
+			elapsed_time = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
+			playsound('mlg-airhorn.mp3')
+			sg.Popup('¡¡GANASTE!!\nTiempo: '+elapsed_time, font = 'Fixedsys', keep_on_top=True)
 		# ~ print('---------------------------------------')
 		
 

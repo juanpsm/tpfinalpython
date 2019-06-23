@@ -25,10 +25,10 @@ def reporte( res, error, clas, defi ):
 	
 	if error == 1:
 		texto = '[{}] {}: Wiktionario la clasificó como "{}" y pattern como "{}".\n'
-		texto = texto.format(hora,r['palabra'],r['clasificacion_wiktionario'],r['clasificacion_pattern'])
+		texto = texto.format(hora,res['palabra'],res['clasificacion_wiktionario'],res['clasificacion_pattern'])
 	
 	elif error ==2:
-		texto = '[{}] El termino "{}": no se encontró en ningun motor de busqueda.\n'.format(hora,r['palabra'])
+		texto = '[{}] El termino "{}": no se encontró en ningun motor de busqueda.\n'.format(hora,res['palabra'])
 
 	print('Error {}:{}'.format(error,texto))
 	
@@ -41,7 +41,6 @@ def reporte( res, error, clas, defi ):
 	f.write(texto)
 	f.close()
 	
-
 def analizarpalabra(palabra,cat):
 	#recibo categoria pero en la consigna no la piden, tengo que extraerla de los motores.
 	#Si funciona esto bien, si no nos queadremos con nuestro metodo de ponerla manualmente.
@@ -202,6 +201,9 @@ def configuracion():
 	print('Cargo en configuracion()',config_dicc['orientacion'])
 
 	menu = ['Menu', ['Definicion::_MENU_',
+					 'Editar',
+					 ' ',
+					 '---',
 					 'Eliminar::_MENU_'
 					]
 			]
@@ -211,10 +213,13 @@ def configuracion():
 
 		[sg.Text('Instrucciones de configuración')],
 		[sg.Frame(title='Ingrese palabras',
-			layout = [	[sg.Input(key = '_IN_', do_not_clear = False)],
+			layout = [	[sg.Input(key = '_IN_', do_not_clear = False, focus = True, background_color = '#DB91D6')],
 						[sg.Button('Agregar', bind_return_key = True, key = '_ADD_')],
 						[sg.Listbox(values = palabras_lista, enable_events = True, size = (15,6),
-									key = '_LISTA_', tooltip = 'gato', right_click_menu = menu)]
+									key = '_LISTA_', tooltip = 'Click para seleccionar', right_click_menu = menu),
+						 sg.Multiline('',size=(None, None), pad = None, font = None, right_click_menu=None,
+									auto_size_text=None, key = '_OUT_',do_not_clear = True)
+						 ]
 					])
 		],
 		## para implementar una lista por cada tipo
@@ -301,7 +306,9 @@ def configuracion():
 					# cancela a la hora de agregar la definicion. Tambien puede no saber clasificarla por no encontrar 
 					# "ES:Sustantivo", etc, en las categorías, entonces devolverá '_no_sabe_' como categoría
 					if definicion == '_no_aceptada_': 
-						sg.Popup('No consideramos que "'+palabra+'" sea una palabra')
+						window.SetAlpha(0.5)
+						sg.Popup('No consideramos que "'+palabra+'" sea una palabra', keep_on_top=True)
+						window.Reappear() 
 					
 					elif definicion != '_cancelada_' and categoria != '_no_sabe_' : # la agrego en las estructuras
 						palabras_dicc[palabra] = {'tipo': categoria,'def': definicion}
@@ -310,13 +317,29 @@ def configuracion():
 						palabras_lista = window.FindElement('_LISTA_').GetListValues()
 						palabras_lista.append(palabra)  # aca cargo y agrego a la lista, pordría agregar directamente porque ya definí la lista en la importacion.
 						window.FindElement('_LISTA_').Update(values = palabras_lista)
-		
+		if event == '_LISTA_':
+			try: # aca hay problemas cuando no hay nada seleccionado, se puede resolver seteando un valor por defecto, aunque eso traeria problemas la primera vez que se carga, se puede resolver con exepciones
+				window.Element('_OUT_').Update(disabled = False)
+				texto = '--> "' + val['_LISTA_'][0] + '":\n'
+				texto = 'Clasificación : ' + palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
+				texto += '\n  ' + palabras_dicc[ val['_LISTA_'][0] ]['def']
+				window.Element('_OUT_').Update(value = texto)
+				window.Element('_OUT_').Update(disabled = True)
+			except(KeyError):
+				print(val['_LISTA_'][0])
+			except(IndexError):
+				print(val['_LISTA_'])
+				
 		if event == 'Definicion::_MENU_':
 			try: # aca hay problemas cuando no hay nada seleccionado, se puede resolver seteando un valor por defecto, aunque eso traeria problemas la primera vez que se carga, se puede resolver con exepciones
-				texto = 'Definición de "'+val['_LISTA_'][0]+'":\n'
-				texto += 'La palabra es un '+palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
-				texto += palabras_dicc[ val['_LISTA_'][0] ]['def']
-				sg.Popup(texto)
+				texto = '--> "' + val['_LISTA_'][0] + '":\n'
+				texto = 'Clasificación : ' + palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
+				texto += '\n  ' + palabras_dicc[ val['_LISTA_'][0] ]['def']
+				# ~ window.Disappear()
+				# ~ window.Disable() #anda mal, deshabilita el popup en lugar de la ventana
+				window.SetAlpha(0.5)
+				sg.Popup(texto, keep_on_top=True)
+				window.Reappear() ##igual que poner el alpha en 1
 			except(KeyError):
 				print(val['_LISTA_'][0])
 			except(IndexError):
@@ -365,10 +388,17 @@ def configuracion():
 			config_dicc['max_verb'] = int(val['_CANT_V_'])
 			config_dicc['max_adj'] = int(val['_CANT_A_'])
 		except ValueError:
-			print('Debe seleccionar cantidades!!')
+			window.SetAlpha(0.5)
+			sg.Popup('Debe seleccionar cantidades!!', keep_on_top=True)
+			window.Reappear()
+			
+			
 		if event == '_ACEPTAR_':
 			if TOTAL_PALABRAS_A_USAR == 0:
-				sg.PopupError('La cantidad de palabras\n no puede ser cero')
+				window.SetAlpha(0.5)
+				sg.PopupError('La cantidad de palabras\n no puede ser cero', keep_on_top=True)
+				window.Reappear()
+
 			else:
 				with open(nombre_archivo_config, 'w', encoding = 'utf-8') as f:
 					json.dump(config_dicc, f, ensure_ascii = False)
