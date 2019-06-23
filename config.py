@@ -191,7 +191,7 @@ def configuracion():
 	orientacion = 'dirs_1' #por defecto
 	
 	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
-
+	
 	palabras_lista = list(palabras_dicc.keys()) ## esto lovoy a usar apra popular el listbox
 	
 	TOTAL_PALABRAS_A_USAR = config_dicc['max_sust']+config_dicc['max_verb']+config_dicc['max_adj']
@@ -257,7 +257,7 @@ def configuracion():
 		],
 		[sg.Frame(title = 'Orientacion', 
 			layout = [	[sg.Button('', image_filename='dirs_'+str(i)+'.png', image_size=(60, 60), image_subsample=6, border_width=0,
-									key='dirs_'+str(i), button_color=color_sel if config_dicc['orientacion']=='dirs_+str(i)' else color_fondo)
+									key='dirs_'+str(i), button_color=color_sel if config_dicc['orientacion']=='dirs_'+str(i) else color_fondo)
 						 for i in (0,1,2,3,4,8)]
 			])
 		],		 
