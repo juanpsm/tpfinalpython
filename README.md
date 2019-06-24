@@ -2,9 +2,9 @@
 
 # tpfinalpython
 
-![GitHub issues](https://img.shields.io/github/issues/lossh/tpfinalpython.svg?style=plastic)
-![GitHub contributors](https://img.shields.io/github/contributors/lossh/tpfinalpython.svg?style=plastic)
-![GitHub last commit](https://img.shields.io/github/last-commit/lossh/tpfinalpython.svg)
+[![GitHub issues](https://img.shields.io/github/issues/lossh/tpfinalpython.svg?style=plastic)](https://github.com/lossh/tpfinalpython/issues)
+[![GitHub contributors](https://img.shields.io/github/contributors/lossh/tpfinalpython.svg?style=plastic)](https://github.com/lossh/tpfinalpython/graphs/contributors)
+[![GitHub last commit](https://img.shields.io/github/last-commit/lossh/tpfinalpython.svg?style=plastic)](https://github.com/lossh/tpfinalpython/commits/master)
 [![HitCount](http://hits.dwyl.io/lossh/tpfinalpython.svg?style=plastic)](http://hits.dwyl.io/lossh/tpfinalpython)
 
 ## Dependencias
