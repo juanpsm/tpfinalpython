@@ -1,8 +1,11 @@
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 
 # tpfinalpython
-[![Build Status](https://travis-ci.org/lossh/tpfinalpython.svg?branch=master)](https://travis-ci.org/lossh/tpfinalpython)
-[![HitCount](http://hits.dwyl.io/lossh/tpfinalpython.svg)](http://hits.dwyl.io/lossh/tpfinalpython)
+
+![GitHub issues](https://img.shields.io/github/issues/lossh/tpfinalpython.svg?style=plastic)
+![GitHub contributors](https://img.shields.io/github/contributors/lossh/tpfinalpython.svg?style=plastic)
+![GitHub last commit](https://img.shields.io/github/last-commit/lossh/tpfinalpython.svg)
+[![HitCount](http://hits.dwyl.io/lossh/tpfinalpython.svg?style=plastic)](http://hits.dwyl.io/lossh/tpfinalpython)
 
 ## Dependencias
 [Python 3.6](https://www.python.org/downloads/release/python-368/) (con 3.7 no anda la librería [pattern](https://github.com/clips/pattern/issues/243#issuecomment-430067331)):
