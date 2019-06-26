@@ -71,7 +71,26 @@ def dibujar():
 	## Y siquieropuede ser cuadrada
 	ALTO = ANCHO
 	
+	
+	## Crear la matriz de elementos y llenarla con las letras
+	
 	matriz = crear_grilla(palabras_lista)
+	
+	## En realidad es una lista de listas cuyos elementos son un diccionario con varias propiedades que 
+	## mas adelante utilizara el codigo pero la que muestra es la clave 'letra'.
+	
+	####   Matriz creada manualmente
+	# ~ elemento = {'tipo': None, 'marcada':False,'color':None, 'letra':'TE'}
+	# ~ matriz = [	[elemento,elemento,elemento],
+				# ~ [elemento,elemento,elemento],
+				# ~ [elemento,elemento,elemento],
+			 # ~ ]
+	# ~ from grilla import Grilla
+	# ~ matriz = Grilla()
+	# ~ for i in range(ANCHO):
+		# ~ for j in range(ALTO):
+			# ~ matriz.celdas[j][i]['letra'] = 'A'
+
 	
 	# def cantidad_pal(palabras_dicc): ## Este ahora que se cuentan las palabras en config es redundante
 	# 		"""Recibe diccionario con todos los datos de las palabras y devuelve la cantidad de palabras por cada tipo"""
@@ -201,17 +220,18 @@ def dibujar():
 			sg.Popup(CREDITS,font = 'System', keep_on_top=True)
 			window.Reappear() 
 			
-		if event == 'Configuracion::Menu': ## Esto lo deshabilito hasta que solucionemos el bug de _tkinter.TclError:
-			window.Hide()
+		# ~ if event == 'Configuracion::Menu': ## Esto lo deshabilito hasta que solucionemos el bug de _tkinter.TclError:
+			# ~ window.Hide()
 			# ~ config.configuracion()
 			# ~ break
 
-		if event in ('adj','verb','sust'):
+		if event in ('adj','verb','sust'):  # Si toco el pincel
 			color_celda_marcada = color_marca[event]
 			for element in ('adj','verb','sust'):
 				window.FindElement(element).Update(value = element)
 			window.FindElement(event).Update(value ='* '+event.upper()+' *')
 		# ~ if any([event in matriz[j] for j in range(ALTO)]):
+		
 		for i in range(ANCHO):
 			for j in range(ALTO):
 				if (matriz.celdas[j][i]['key'] == event ):

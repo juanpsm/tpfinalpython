@@ -19,6 +19,7 @@ import sopa
 import PySimpleGUI as sg
 
 def existe_archivo_de_configuracion():
+	''' Para ver si existe la configuracion me fijo si la funion devuelve el elemento vacío que es cuando lo inicializa'''
 	_,_,res = config.cargar_configuracion()
 	cond = res != []
 	# ~ print(cond)
@@ -61,9 +62,10 @@ while True:				 # Event Loop
 		config.configuracion()
 		
 		## por ahora lo solucionamos editando el menu para deshabilitar la opciond de config
-		menu_princ = [	['&Opciones', ['!Configuracion::Menu', 'Exit::Menu'  ]],    
-						['&Ayuda', '&Acerca de...::Menu']
-					 ]
+		# menu_princ = [	['&Opciones', ['!Configuracion::Menu', 'Exit::Menu'  ]],    
+		# 				['&Ayuda', '&Acerca de...::Menu']
+		# 			 ]
+		menu_princ[0][1][0] = '!Configuracion::Menu'
 		window.Element('Menu').Update(menu_princ)
 		
 		window.Refresh()

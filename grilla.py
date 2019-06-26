@@ -133,7 +133,8 @@ def probar_palabra(grilla, pal):
 def crear_grilla(palabras):
 	print('Recibo palabras en crear_grilla()',palabras)
 	config_dicc, _, _ = config.cargar_configuracion()
-	print('Cargo en crear_grilla()',config_dicc['orientacion'])
+	if config_dicc != {}:
+		print('Cargo en crear_grilla()',config_dicc['orientacion'])
 	print('antes de modifglob(), dirs =',dirs)
 	modifglob(palabras)
 	print('luego de modifglob(), dirs =',dirs)
@@ -180,7 +181,9 @@ def print_resultado(grilla):
 	if grilla is None or grilla.n_intentos == 0:
 		print("No fue posible producir la grilla")
 		return
-
+	
+	print(grilla.celdas)
+	
 	size = len(grilla.soluciones)
 
 	print("Intentos: {0}".format(grilla.n_intentos))

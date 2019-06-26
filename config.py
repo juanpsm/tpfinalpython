@@ -11,6 +11,7 @@ from buscar_en_wiktionary import buscar_en_wiktionary
 
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
+## con MAX seteamos el numero maximo de palabras a usar en total entre sust verb y adj.
 MAX = 10
 def reporte( res, error, clas, defi ):
 	"""pone en archivo de texto un reporte de los errores encontrados en la ejecucion de la sopa de letras"""
@@ -123,6 +124,7 @@ def cargar_configuracion():
 		config_dicc = {}
 		config_dicc['palabras'] = {}
 		config_dicc['palabras_clas'] = {'sust':[],'verb':[],'adj':[]}
+		config_dicc['orientacion'] = None
 		palabras_dicc = {}
 		palabras_clas = {'sust':[],'verb':[],'adj':[]}
 		config_dicc['max_sust'] = 0
@@ -155,6 +157,7 @@ def obtener_lista_palabras(config_dicc):
 	return palabras_rand
 	
 def colores():
+	'''Setea parametros de Pysimplegui sobre todo colores de los elementos de las ventanas. Devuelve una tupla con un color de texto y fondo para usar luego en botones'''
 	## Esto habrá que setearlo luego con la raspberry
 	sg.ChangeLookAndFeel('Reddit')
 	## Puedo setear los Colores de la interfaz manualmente
@@ -180,7 +183,7 @@ def colores():
 	
 	# ~ sg.ChangeLookAndFeel('TealMono')
 	
-	return ('#262730','#EFF0D1') #·nego y crema
+	return ('#262730','#EFF0D1') #·negro y crema
 	
 def configuracion():
 	"""recibe de cargar_configuracion() la configuracion elegida por el usuario para la sopa de letras"""
@@ -188,11 +191,11 @@ def configuracion():
 	
 	color_fondo = colores()
 	color_sel = ('#EFF0D1', '#D33F49')
-	orientacion = 'dirs_1' #por defecto
+	orientacion = 'dirs_0' #por defecto
 	
 	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
 	
-	palabras_lista = list(palabras_dicc.keys()) ## esto lovoy a usar apra popular el listbox
+	palabras_lista = list(palabras_dicc.keys()) ## esto lo voy a usar apra popular el listbox
 	
 	TOTAL_PALABRAS_A_USAR = config_dicc['max_sust']+config_dicc['max_verb']+config_dicc['max_adj']
 	
@@ -200,7 +203,8 @@ def configuracion():
 	# ~ pprint (config_dicc)
 	print('Cargo en configuracion()',config_dicc['orientacion'])
 
-	menu = ['Menu', ['Definicion::_MENU_',
+	menu = ['Menu', [' ',
+					 'Definicion::_MENU_',
 					 'Editar',
 					 ' ',
 					 '---',
@@ -321,7 +325,7 @@ def configuracion():
 			try: # aca hay problemas cuando no hay nada seleccionado, se puede resolver seteando un valor por defecto, aunque eso traeria problemas la primera vez que se carga, se puede resolver con exepciones
 				window.Element('_OUT_').Update(disabled = False)
 				texto = '--> "' + val['_LISTA_'][0] + '":\n'
-				texto = 'Clasificación : ' + palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
+				texto += 'Clasificación : ' + palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
 				texto += '\n  ' + palabras_dicc[ val['_LISTA_'][0] ]['def']
 				window.Element('_OUT_').Update(value = texto)
 				window.Element('_OUT_').Update(disabled = True)
@@ -333,7 +337,7 @@ def configuracion():
 		if event == 'Definicion::_MENU_':
 			try: # aca hay problemas cuando no hay nada seleccionado, se puede resolver seteando un valor por defecto, aunque eso traeria problemas la primera vez que se carga, se puede resolver con exepciones
 				texto = '--> "' + val['_LISTA_'][0] + '":\n'
-				texto = 'Clasificación : ' + palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
+				texto += 'Clasificación : ' + palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
 				texto += '\n  ' + palabras_dicc[ val['_LISTA_'][0] ]['def']
 				# ~ window.Disappear()
 				# ~ window.Disable() #anda mal, deshabilita el popup en lugar de la ventana
