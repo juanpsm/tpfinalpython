@@ -28,7 +28,7 @@ sudo apt-get install python3.6
 
 ### Luego podemos instalar todas las dependencias usando el [requirements.txt](https://medium.com/@boscacci/why-and-how-to-make-a-requirements-txt-f329c685181e)
 
-`python3 -m pip install install -r requirements.txt`
+`python3 -m pip install -r requirements.txt`
 
 ### O sino, por separado:
 
