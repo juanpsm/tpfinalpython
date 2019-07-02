@@ -9,6 +9,9 @@ from pprint import pprint
 from collections import defaultdict
 from buscar_en_wiktionary import buscar_en_wiktionary
 
+
+# no sabemos que colores son el 1 y 4. averiguiar, no habia internet en lo de bruno.
+listaColores= {'rojo': ('#EFF0D1','#D33F49'),'violeta':('#262730','purple1'),'verde':('#262730','green3'),'amarillo':('#262730','yellow2'),'azul':('#262730','#1225cc')}
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
 ## con MAX seteamos el numero maximo de palabras a usar en total entre sust verb y adj.
@@ -186,6 +189,8 @@ def colores():
 	return ('#262730','#EFF0D1') #·negro y crema
 	
 def configuracion():
+	# crea lista auxiliar de colores para los combo de seleccion de color de pincel.
+	lista_Combo_colores = list(listaColores.keys())
 	"""recibe de cargar_configuracion() la configuracion elegida por el usuario para la sopa de letras"""
 	
 	
@@ -252,6 +257,26 @@ def configuracion():
 						]
 					])
 		],
+		## frame de seleccion de color de pincel.
+		##falta poner colores distintos por default.
+		[sg.Frame( title = 'Seleccion de colores: ',
+				layout = [
+						[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
+										[sg.Combo(lista_Combo_colores,key = 'comboSust',default_value ='amarillo', enable_events = True)]
+						 			], pad=((0,),2) ),	
+				 		 sg.Column([	[sg.Text('Verbos:', pad=((0,),2) )],
+						  				[sg.Combo(lista_Combo_colores,key = 'comboVerb',default_value ='verde', enable_events = True)]
+				 					], pad=((0,),2) ),
+						 sg.Column([	[sg.Text('Adjetivos:', pad=((0,),2) )],
+										[sg.Combo(lista_Combo_colores,key = 'comboAdj',default_value ='violeta', enable_events = True)]
+									], pad=((0,),2) ),
+						],
+					])
+			],		
+		
+		
+		
+		
 		[sg.Frame(title= 'Ayudas',
 			layout = [	[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
 						 sg.Radio('Definiciones', "RADIOA", key='defin'),
@@ -370,6 +395,25 @@ def configuracion():
 				window.Element(x).Update(button_color = color_fondo)
 			
 			orientacion = event
+		##configuracion de colores de pinceles
+		#if hay colores repetidos para distintos tipos de palabras deshabilita la opcion de guardar.
+		# chekea en cada vuelta que sean distintas. cuando son todas distintas vuelve a habilitar la opcion de guardar.
+		if event in ['comboSust','comboAdj','comboVerb']:	
+			if event == 'comboSust':
+				if val['comboSust'] == val['comboVerb'] or val['comboSust'] == val['comboAdj']:
+					sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras. Seleccione otra opción para poder guardar configuración.')
+					window.FindElement('_ACEPTAR_').Update(disabled = True)
+			if event == 'comboAdj':
+				if val['comboAdj'] == val['comboVerb'] or val['comboAdj'] == val['comboSust']:
+					sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras')
+					window.FindElement('_ACEPTAR_').Update(disabled = True)
+			if event == 'comboVerb':
+				if val['comboVerb'] == val['comboAdj'] or val['comboVerb'] == val['comboSust']:
+					sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras')
+					window.FindElement('_ACEPTAR_').Update(disabled = True)
+			if val['comboSust'] != val['comboVerb'] and val['comboVerb'] != val['comboAdj']:
+					window.FindElement('_ACEPTAR_').Update(disabled = False)
+		
 		
 		lista_cant = ['_CANT_S_','_CANT_V_','_CANT_A_']
 		if event in lista_cant:

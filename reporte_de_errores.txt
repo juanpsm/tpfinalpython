@@ -88,3 +88,4 @@
 		El usuario la clasificó como "sust" y definió: "Segunda vuelta en una elección presidencial.".
 [2019-06-26 13:21] El termino "jgdjfvsdjfvjsdhvfjsdh": no se encontró en ningun motor de busqueda.
 [2019-06-26 14:34] El termino "ñññññ": no se encontró en ningun motor de busqueda.
+[2019-07-01 16:59] jirafa: Wiktionario la clasificó como "sust" y pattern como "_Ninguna_".
