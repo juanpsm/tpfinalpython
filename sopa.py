@@ -44,21 +44,21 @@ from grilla import crear_grilla
 import config
 
 def dibujar():
-	
+	config_dicc, palabras_dicc, _ = config.cargar_configuracion()
+	palabras_lista = config.obtener_lista_palabras(config_dicc)
+	fuente = config_dicc['fuente']
 	color_fondo = config.colores()
 	#Colores marcas
-	color_celda_marcada = ('#EFF0D1','#D33F49') #blanco y rojo
-	color_marca = {None:('#EFF0D1','#D33F49'), #blanco y rojo
-					'adj':('#262730','purple1'),
-					'verb':('#262730','green3'),
-					'sust':('#262730','yellow2'),
+	color_celda_marcada = ('#EFF0D1','#854e0b') #blanco y marron
+	color_marca = {None:('#EFF0D1','#854e0b'), #blanco y marron
+					'adj':(config_dicc['color_pincel']['ADJ']),
+					'verb':(config_dicc['color_pincel']['VERB']),
+					'sust':(config_dicc['color_pincel']['SUST']),
 					'MIXTO':('#262730','#3e8271')}
 	color_celda_default = ('#262730','#5adbff') #negro y celeste
 
 
-	config_dicc, palabras_dicc, _ = config.cargar_configuracion()
-	palabras_lista = config.obtener_lista_palabras(config_dicc)
-	fuente = config_dicc['fuente']
+	
 	
 	# ~ print('Cargo en dibujar()',config_dicc['orientacion'])
 	print('Creo lista de palabras random en dibujar()')

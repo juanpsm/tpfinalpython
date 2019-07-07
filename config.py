@@ -10,8 +10,7 @@ from collections import defaultdict
 from buscar_en_wiktionary import buscar_en_wiktionary
 
 
-# no sabemos que colores son el 1 y 4. averiguiar, no habia internet en lo de bruno.
-listaColores= {'rojo': ('#EFF0D1','#D33F49'),'violeta':('#262730','purple1'),'verde':('#262730','green3'),'amarillo':('#262730','yellow2'),'azul':('#262730','#1225cc')}
+listaColores= {'rojo': ('#EFF0D1','#f05959'),'violeta':('#262730','#c382ff'),'verde':('#262730','green3'),'amarillo':('#262730','yellow2'),'azul':('#262730','#1282cc')}
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
 ## con MAX seteamos el numero maximo de palabras a usar en total entre sust verb y adj.
@@ -258,7 +257,6 @@ def configuracion():
 					])
 		],
 		## frame de seleccion de color de pincel.
-		##falta poner colores distintos por default.
 		[sg.Frame( title = 'Seleccion de colores: ',
 				layout = [
 						[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
@@ -402,7 +400,7 @@ def configuracion():
 			if event == 'comboSust':
 				if val['comboSust'] == val['comboVerb'] or val['comboSust'] == val['comboAdj']:
 					sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras. Seleccione otra opción para poder guardar configuración.')
-					window.FindElement('_ACEPTAR_').Update(disabled = True)
+					window.FindElement('_ACEPTAR_').Update(disabled = True)	
 			if event == 'comboAdj':
 				if val['comboAdj'] == val['comboVerb'] or val['comboAdj'] == val['comboSust']:
 					sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras')
@@ -435,6 +433,9 @@ def configuracion():
 			config_dicc['max_sust'] = int(val['_CANT_S_'])
 			config_dicc['max_verb'] = int(val['_CANT_V_'])
 			config_dicc['max_adj'] = int(val['_CANT_A_'])
+			config_dicc['color_pincel']= {'SUST': listaColores[val['comboSust']],'ADJ':listaColores[val['comboAdj']],'VERB': listaColores[val['comboVerb']]}
+			print('VALORES')
+			print(config_dicc)	 
 		except ValueError:
 			window.SetAlpha(0.5)
 			sg.Popup('Debe seleccionar cantidades!!', keep_on_top=True)

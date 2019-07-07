@@ -89,3 +89,7 @@
 [2019-06-26 13:21] El termino "jgdjfvsdjfvjsdhvfjsdh": no se encontró en ningun motor de busqueda.
 [2019-06-26 14:34] El termino "ñññññ": no se encontró en ningun motor de busqueda.
 [2019-07-01 16:59] jirafa: Wiktionario la clasificó como "sust" y pattern como "_Ninguna_".
+[2019-07-07 16:54] El termino "petiso": no se encontró en ningun motor de busqueda.
+[2019-07-07 16:55] El termino "petizo": no se encontró en ningun motor de busqueda.
+[2019-07-07 16:56] patalear: Wiktionario la clasificó como "MIXTA" y pattern como "_Ninguna_". 
+		El usuario la clasificó como "verb" y definió: "Agitar los pies contra el suelo en signo de disconformidad".
