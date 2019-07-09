@@ -54,10 +54,11 @@ def dibujar():
 					'adj':(config_dicc['color_pincel']['ADJ']),
 					'verb':(config_dicc['color_pincel']['VERB']),
 					'sust':(config_dicc['color_pincel']['SUST']),
+					'Erroneas':('#262730','#f4f4f4'),
 					'MIXTO':('#262730','#3e8271')}
 	color_celda_default = ('#262730','#5adbff') #negro y celeste
 
-
+	#celda mal marcada('#262730','#f4f4f4')
 	
 	
 	# ~ print('Cargo en dibujar()',config_dicc['orientacion'])
@@ -177,10 +178,10 @@ def dibujar():
 				 relief='raised', text_color=color_marca['sust'][0], background_color=color_marca['sust'][1], justification='center', key='sust', tooltip='Elegir para marcar Sustantivos'),
 				 ]
 				]
-
+	#Layout principal.
 	layout = [
 				[sg.Menu(menu_princ)],
-				[sg.Frame('Seleccionar color: ', pincel_layout)],
+				[sg.Frame('Seleccionar color: ', pincel_layout),sg.Button('  Comprobar Victoria', key = 'comprobar victoria',tooltip= 'Marca con blanco las marcadas erroneamente.')],
 				[sg.Frame('', sopa_layout, font='System', title_color='blue'),
 					sg.Frame('Ayudas: ',[	[sg.Text('Direcciones:', pad = ((20,0),0) )],
 											[sg.Button(image_filename = config_dicc['orientacion']+'.png', 
@@ -196,6 +197,20 @@ def dibujar():
 	window = sg.Window('Sopa de Letras').Layout(layout)
 	
 	start_time = time.time()
+	def comprobar_victoria(layout,matriz):
+		"""si seleccionamos boton comprobar victorias marca en blanco todas las letras que hayan sido presionadas erroneamente."""
+		"""recorre toda la matriz comprobando que las celdas marcadas sean correctas"""
+		for j in range(ANCHO):
+					for i in range(ALTO):
+						if matriz.celdas[j][i]['marcada'] == True:
+							if matriz.celdas[j][i]['tipo'] in ('adj','verb','sust'):
+								if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]:
+									window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
+									matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
+									window.Refresh()
+							else:
+								window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
+								matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
 	while True:				 # Event Loop
 		event, val = window.Read()
 		#print(event, val)
@@ -224,7 +239,9 @@ def dibujar():
 			# ~ window.Hide()
 			# ~ config.configuracion()
 			# ~ break
-
+		if event == 'comprobar victoria':
+			comprobar_victoria(layout,matriz)
+			
 		if event in ('adj','verb','sust'):  # Si toco el pincel
 			color_celda_marcada = color_marca[event]
 			for element in ('adj','verb','sust'):
