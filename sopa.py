@@ -148,7 +148,6 @@ def dibujar():
 	
 	print('ANCHO:',ANCHO,'Alto:',ALTO)
 
-	#g.print_resultado(matriz)
 	
 	# ------ Menu Definition ------ #      
 # ~ menu_def = [['&File', ['&Open', '!&Save', '---', 'Properties', 'E&xit'  ]],      
@@ -181,7 +180,7 @@ def dibujar():
 	#Layout principal.
 	layout = [
 				[sg.Menu(menu_princ)],
-				[sg.Frame('Seleccionar color: ', pincel_layout),sg.Button('  Comprobar Victoria', key = 'comprobar victoria',tooltip= 'Marca con blanco las marcadas erroneamente.')],
+				[sg.Frame('Seleccionar color: ', pincel_layout),sg.Button('  Comprobar Victoria', key = 'comprobar victoria',tooltip= 'Marca con blanco las marcadasz erroneamente.')],
 				[sg.Frame('', sopa_layout, font='System', title_color='blue'),
 					sg.Frame('Ayudas: ',[	[sg.Text('Direcciones:', pad = ((20,0),0) )],
 											[sg.Button(image_filename = config_dicc['orientacion']+'.png', 
@@ -211,44 +210,10 @@ def dibujar():
 							else:
 								window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
 								matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
-	while True:				 # Event Loop
-		event, val = window.Read()
-		#print(event, val)
-
-		if event is None or event == 'Cerrar':
-			break
-		if event == 'Guardar...::Menu':
-			filename = 'savegame.sav'
-			print('Guardo en ',filename)
-			window.SaveToDisk(filename)
-		if event == 'Cargar...::Menu':
-			filename = 'savegame.sav'
-			print('Cargar ',filename)
-			window.LoadFromDisk(filename)
-		if event == 'Como jugar?::Menu':
-			window.SetAlpha(0.5)
-			sg.Popup(HOWTO,font = 'System', keep_on_top=True)
-			window.Reappear() 
-		
-		if event == 'Acerca de...::Menu':
-			window.SetAlpha(0.5)
-			sg.Popup(CREDITS,font = 'System', keep_on_top=True)
-			window.Reappear() 
-			
-		# ~ if event == 'Configuracion::Menu': ## Esto lo deshabilito hasta que solucionemos el bug de _tkinter.TclError:
-			# ~ window.Hide()
-			# ~ config.configuracion()
-			# ~ break
-		if event == 'comprobar victoria':
-			comprobar_victoria(layout,matriz)
-			
-		if event in ('adj','verb','sust'):  # Si toco el pincel
-			color_celda_marcada = color_marca[event]
-			for element in ('adj','verb','sust'):
-				window.FindElement(element).Update(value = element)
-			window.FindElement(event).Update(value ='* '+event.upper()+' *')
-		# ~ if any([event in matriz[j] for j in range(ALTO)]):
-		
+								
+	def Win_Condition(matriz,win):
+		"""primera parte: si la celda presionada esta marcada la desmarca y le asigna color Default. Sino la marca y le asigna color de celda marcada."""
+		"""segunda parte: comprueba victoria atravez de un AND. si encuentra una celda que este marcada erroneamente arrastra el False."""
 		for i in range(ANCHO):
 			for j in range(ALTO):
 				if (matriz.celdas[j][i]['key'] == event ):
@@ -258,43 +223,28 @@ def dibujar():
 					else:
 						matriz.celdas[j][i]['marcada'] = True
 						color_celda = color_celda_marcada
-					#print(matriz.celdas)
 					matriz.celdas[j][i]['color'] = color_celda
 					window.FindElement(event).Update(button_color = color_celda)
-					
-		## Luego de cada movimiento reviso todas las celdas para ver si ya gané. Claramente se puede juntar con los for de arriba
-		win = True #despues lo voy a juntar con "and" asi que con que haya uno falso me lo vuelve todo falso
-		for i in range(ANCHO):
-			for j in range(ALTO):
 				
 				if matriz.celdas[j][i]['tipo'] != None:
 					if matriz.celdas[j][i]['tipo'] == 'MIXTO':
 						if not(matriz.celdas[j][i]['marcada']):
-							# ~ print('Marcar',str(j)+'_'+str(i),'con cualquier color')
-							#print('win =',win,'lo pongo en',end=' ')
 							win *= False
-							#print(win)
 						else:
 							win *= True
 					else:
 						if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]: #no pudimos extraer el color de pysimplegui por eso le agregamos una key 'color' a la matriz
-							# ~ print('Marcar',str(j)+'_'+str(i),'con color',matriz.celdas[j][i]['tipo'])
-							#print('win =',win,'lo pongo en',end=' ')
 							win *= False
-							#print(win)
 						else:
 							win *= True
 				else:
 					if (matriz.celdas[j][i]['marcada']):
-						# ~ print(str(j)+'_'+str(i),'esa marcada y deberia no estarlo')
-						#print('win =',win,'lo pongo en',end=' ')
 						win *= False
-						#print(win)
 					else:
 						win *= True
-
-		# ~ print('\n WIN =',win)
-		if win:
+		return win	
+	
+	def Mensaje_Victoria():
 			print('\nGanaste!')
 					
 			x_max,y_max = window.GetScreenDimensions()
@@ -349,9 +299,50 @@ def dibujar():
 			elapsed_time = time.time() - start_time
 			elapsed_time = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
 			playsound('mlg-airhorn.mp3')
-			sg.Popup('¡¡GANASTE!!\nTiempo: '+elapsed_time, font = 'Fixedsys', keep_on_top=True)
-		# ~ print('---------------------------------------')
+			sg.Popup('¡¡GANASTE!!\nTiempo: '+elapsed_time, font = 'Fixedsys', keep_on_top=True)				
+	
+	while True:				 # Event Loop
+		event, val = window.Read()
 		
+		if event is None or event == 'Cerrar':
+			break
+			
+		if event == 'Guardar...::Menu':
+			filename = 'savegame.sav'
+			print('Guardo en ',filename)
+			window.SaveToDisk(filename)
+			
+		if event == 'Cargar...::Menu':
+			filename = 'savegame.sav'
+			print('Cargar ',filename)
+			window.LoadFromDisk(filename)
+			
+		if event == 'Como jugar?::Menu':
+			window.SetAlpha(0.5)
+			sg.Popup(HOWTO,font = 'System', keep_on_top=True)
+			window.Reappear() 
+		
+		if event == 'Acerca de...::Menu':
+			window.SetAlpha(0.5)
+			sg.Popup(CREDITS,font = 'System', keep_on_top=True)
+			window.Reappear() 
+			
+		if event == 'comprobar victoria':
+			comprobar_victoria(layout,matriz)
+			
+		if event in ('adj','verb','sust'):  # Si toco el pincel
+			color_celda_marcada = color_marca[event]
+			for element in ('adj','verb','sust'):
+				window.FindElement(element).Update(value = element)
+			window.FindElement(event).Update(value ='* '+event.upper()+' *')
+		
+		#despues lo voy a juntar con "and" asi que con que haya uno falso me lo vuelve todo falso			
+		win = True
+		win = Win_Condition(matriz,win)
+		if win == True and event == 'comprobar victoria':
+			Mensaje_Victoria()
+		elif event == 'comprobar victoria':
+			sg.Popup((chr(27)+"[1;33m"+"Texto en negrita de color amarillo") )
 
 	window.Close()
 
