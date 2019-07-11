@@ -342,7 +342,7 @@ def dibujar():
 		if win == True and event == 'comprobar victoria':
 			Mensaje_Victoria()
 		elif event == 'comprobar victoria':
-			sg.Popup((chr(27)+"[1;33m"+"Texto en negrita de color amarillo") )
+			sg.Popup('Quedan palabras por buscar o letras por marcar.')
 
 	window.Close()
 
