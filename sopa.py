@@ -177,6 +177,13 @@ def dibujar():
 				 relief='raised', text_color=color_marca['sust'][0], background_color=color_marca['sust'][1], justification='center', key='sust', tooltip='Elegir para marcar Sustantivos'),
 				 ]
 				]
+	Errores_layout =[ [sg.T('--------------------------------------------------')],
+					[ sg.T('Al presiona boton COMPROBAR VICTORIA:  ')],
+					[ sg.T('# Si las letras cambian a color blanco:\n'
+					'   °fueron marcadas con una categoria incorrecta')],
+					[ sg.T('# Si no muestra mensaje de victoria :\n '
+					'   °pueden quedar letras por marcar. \n'
+					'    °Hay una palabra marcada incorrectamente.')]]
 	#Layout principal.
 	layout = [
 				[sg.Menu(menu_princ)],
@@ -185,8 +192,10 @@ def dibujar():
 					sg.Frame('Ayudas: ',[	[sg.Text('Direcciones:', pad = ((20,0),0) )],
 											[sg.Button(image_filename = config_dicc['orientacion']+'.png', 
 														image_size=(80, 80), image_subsample=4, border_width=0,
-														pad = ((30,0),(10,30)), button_color = color_fondo)],
-											[sg.Column(ayuda_layout)]
+														pad = ((30,0),(10,30)), button_color = color_fondo),
+											sg.Column(ayuda_layout)],
+											[sg.Column(Errores_layout)]
+											
 										]
 							)
 				]
@@ -341,8 +350,6 @@ def dibujar():
 		win = Win_Condition(matriz,win)
 		if win == True and event == 'comprobar victoria':
 			Mensaje_Victoria()
-		elif event == 'comprobar victoria':
-			sg.Popup('Quedan palabras por buscar o letras por marcar.')
 
 	window.Close()
 

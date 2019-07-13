@@ -215,97 +215,78 @@ def configuracion():
 					 'Eliminar::_MENU_'
 					]
 			]
-	# print(config_dicc['palabras'])
-	layout = [
+			
+	agregar_palabra_layout = [	[sg.Input(key = '_IN_', do_not_clear = False, focus = True, background_color = '#DB91D6')],
+			[sg.Button('Agregar', bind_return_key = True, key = '_ADD_')],
+			[sg.Listbox(values = palabras_lista, enable_events = True, size = (15,6),
+						key = '_LISTA_', tooltip = 'Click para seleccionar', right_click_menu = menu),
+			 sg.Multiline('',size=(None, None), pad = None, font = None, right_click_menu=None,
+						auto_size_text=None, key = '_OUT_',do_not_clear = True)
+			 ]]
+	## para implementar una lista por cada tipo
+	# ~ sg.Listbox(values=[], default_values=None, enable_events=True, size=(15,6),
+		# ~ key='_LISTA_V_', tooltip=None, right_click_menu= menu, visible=True),
+	# ~ sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(15,6),
+		# ~ key='_LISTA_A_', tooltip=None, right_click_menu= menu, visible=True)],
+	## hago una lista de numeros de cero al minimo entre la cantidad de palabras existentes
+	## y la cantidad maxima para que no se haga muy grande la grilla.
+	palabras_layout = [	[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
+							[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))),
+				 				key = '_CANT_S_', default_value = config_dicc['max_sust'], size = (2,1), pad=((20,),1), enable_events = True)]
+			 			], pad=((0,),2) ),	
+	 		 sg.Column([	[sg.Text('Verbos:', pad=((0,),2) )],
+			  				[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['verb'])))),
+								key = '_CANT_V_', default_value = config_dicc['max_verb'], size = (2,1), enable_events = True, disabled = True)]
+	 					], pad=((0,),2) ),
+			 sg.Column([	[sg.Text('Adjetivos:', pad=((0,),2) )],
+							[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['adj'])))),
+		 						key = '_CANT_A_', default_value = config_dicc['max_adj'], size = (2,1), enable_events = True, disabled = True)]
+						], pad=((0,),2) ),
+	 		sg.Frame(title = 'Total:',
+	 			layout = [	[sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
+	 					 ], pad=((20,0),2) )
+			]]
+	## frame de seleccion de color de pincel.
+	colores_layout = [
+			[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
+							[sg.Combo(lista_Combo_colores,key = 'comboSust',default_value ='amarillo', enable_events = True)]
+			 			], pad=((0,),2) ),	
+	 		 sg.Column([	[sg.Text('Verbos:', pad=((0,),2) )],
+			  				[sg.Combo(lista_Combo_colores,key = 'comboVerb',default_value ='verde', enable_events = True)]
+	 					], pad=((0,),2) ),
+			 sg.Column([	[sg.Text('Adjetivos:', pad=((0,),2) )],
+							[sg.Combo(lista_Combo_colores,key = 'comboAdj',default_value ='violeta', enable_events = True)]
+						], pad=((0,),2) ),
+			]]
+			
+	layout_ayudas = [	[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
+				 sg.Radio('Definiciones', "RADIOA", key='defin'),
+				 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')]]
+				  
+	layout_orientacion = [	[sg.Button('', image_filename='dirs_'+str(i)+'.png', image_size=(60, 60), image_subsample=6, border_width=0,
+							key='dirs_'+str(i), button_color=color_sel if config_dicc['orientacion']=='dirs_'+str(i) else color_fondo)
+				 for i in (0,1,2,3,4,8)]]
+				 
+	layout_mayuscula = [	[sg.Radio('Mayúscula', "RADIOn", key='mayus', default = True, size=(10,1)),
+				 sg.Radio('Minúscula', "RADIOn", key='minus')]]
+				 
+	layout_fuente = [	[sg.Combo(	('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'),
+						default_value='Comic',
+						key='_FONT_')]]
+						
+	layout_oficina = [	[sg.Text('15')]]
+			
+	layout= [
 		[sg.Text('Ingrese palabras la lista para ser usadas por la sopa de letras:')],
-
 		[sg.Text('Instrucciones de configuración')],
-		[sg.Frame(title='Ingrese palabras',
-			layout = [	[sg.Input(key = '_IN_', do_not_clear = False, focus = True, background_color = '#DB91D6')],
-						[sg.Button('Agregar', bind_return_key = True, key = '_ADD_')],
-						[sg.Listbox(values = palabras_lista, enable_events = True, size = (15,6),
-									key = '_LISTA_', tooltip = 'Click para seleccionar', right_click_menu = menu),
-						 sg.Multiline('',size=(None, None), pad = None, font = None, right_click_menu=None,
-									auto_size_text=None, key = '_OUT_',do_not_clear = True)
-						 ]
-					])
-		],
-		## para implementar una lista por cada tipo
-		# ~ sg.Listbox(values=[], default_values=None, enable_events=True, size=(15,6),
-					# ~ key='_LISTA_V_', tooltip=None, right_click_menu= menu, visible=True),
-		# ~ sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(15,6),
-					# ~ key='_LISTA_A_', tooltip=None, right_click_menu= menu, visible=True)],
-		[sg.Frame(title = 'Cantidad máxima de cada tipo a utilizar en la Sopa:', 
-		## hago una lista de numeros de cero al minimo entre la cantidad de palabras existentes
-		## y la cantidad maxima para que no se haga muy grande la grilla.
-			layout = [	[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
-										[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))),
-							 				key = '_CANT_S_', default_value = config_dicc['max_sust'], size = (2,1), pad=((20,),1), enable_events = True)]
-						 			], pad=((0,),2) ),	
-				 		 sg.Column([	[sg.Text('Verbos:', pad=((0,),2) )],
-						  				[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['verb'])))),
-											key = '_CANT_V_', default_value = config_dicc['max_verb'], size = (2,1), enable_events = True, disabled = True)]
-				 					], pad=((0,),2) ),
-						 sg.Column([	[sg.Text('Adjetivos:', pad=((0,),2) )],
-										[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['adj'])))),
-					 						key = '_CANT_A_', default_value = config_dicc['max_adj'], size = (2,1), enable_events = True, disabled = True)]
-									], pad=((0,),2) ),
-				 		sg.Frame(title = 'Total:',
-				 			layout = [	[sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
-				 					 ], pad=((20,0),2) )
-						]
-					])
-		],
-		## frame de seleccion de color de pincel.
-		[sg.Frame( title = 'Seleccion de colores: ',
-				layout = [
-						[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
-										[sg.Combo(lista_Combo_colores,key = 'comboSust',default_value ='amarillo', enable_events = True)]
-						 			], pad=((0,),2) ),	
-				 		 sg.Column([	[sg.Text('Verbos:', pad=((0,),2) )],
-						  				[sg.Combo(lista_Combo_colores,key = 'comboVerb',default_value ='verde', enable_events = True)]
-				 					], pad=((0,),2) ),
-						 sg.Column([	[sg.Text('Adjetivos:', pad=((0,),2) )],
-										[sg.Combo(lista_Combo_colores,key = 'comboAdj',default_value ='violeta', enable_events = True)]
-									], pad=((0,),2) ),
-						],
-					])
-			],		
-		
-		
-		
-		
-		[sg.Frame(title= 'Ayudas',
-			layout = [	[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
-						 sg.Radio('Definiciones', "RADIOA", key='defin'),
-						 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')
-						]
-					])
-		],
-		[sg.Frame(title = 'Orientacion', 
-			layout = [	[sg.Button('', image_filename='dirs_'+str(i)+'.png', image_size=(60, 60), image_subsample=6, border_width=0,
-									key='dirs_'+str(i), button_color=color_sel if config_dicc['orientacion']=='dirs_'+str(i) else color_fondo)
-						 for i in (0,1,2,3,4,8)]
-			])
-		],		 
-		[sg.Frame(title = 'Mayúscula/Minúscula',
-			layout = [	[sg.Radio('Mayúscula', "RADIOn", key='mayus', default = True, size=(10,1)),
-						 sg.Radio('Minúscula', "RADIOn", key='minus')
-						]
-			]),
-		 sg.Frame(title = 'Fuente',
-			layout = [	[sg.Combo(	('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'),
-								default_value='Comic',
-								key='_FONT_')
-						]
-			])
-		],
-		[sg.Frame(title = 'Oficina',
-			layout = [	[sg.Text('15')]
-			]),
-		 sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((150,5),1), disabled = False),
-		 sg.Button('Cerrar')]
-	]
+		[sg.Frame('Ingrese palabras',agregar_palabra_layout)],
+		[sg.Frame('Cantidad máxima de cada tipo a utilizar en la Sopa:',palabras_layout)], 
+		[sg.Frame('Seleccion de colores: ',colores_layout)],
+		[sg.Frame('Ayudas',layout_ayudas)],
+		[sg.Frame('Orientacion',layout_orientacion)],
+		[sg.Frame('Mayúscula/Minúscula',layout_mayuscula),sg.Frame('Fuente',layout_fuente)],
+		[sg.Frame('Oficina',layout_oficina),sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((150,5),1), disabled = False),sg.Button('Cerrar')]
+		] 
 
 	window = sg.Window('CONFIGURACIÓN').Layout(layout)
 	window.Finalize()

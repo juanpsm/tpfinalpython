@@ -1,4 +1,4 @@
-python "sopa.py"
+python "run.py"
 
 pause
 del "%0"

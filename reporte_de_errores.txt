@@ -93,3 +93,5 @@
 [2019-07-07 16:55] El termino "petizo": no se encontró en ningun motor de busqueda.
 [2019-07-07 16:56] patalear: Wiktionario la clasificó como "MIXTA" y pattern como "_Ninguna_". 
 		El usuario la clasificó como "verb" y definió: "Agitar los pies contra el suelo en signo de disconformidad".
+[2019-07-13 19:04] Palabras: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust". 
+		El usuario la clasificó como "sust" y definió: "".

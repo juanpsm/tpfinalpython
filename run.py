@@ -60,11 +60,6 @@ while True:				 # Event Loop
 			# ~ print('?')
 		## no sirven las excepciones
 		config.configuracion()
-		
-		## por ahora lo solucionamos editando el menu para deshabilitar la opciond de config
-		# menu_princ = [	['&Opciones', ['!Configuracion::Menu', 'Exit::Menu'  ]],    
-		# 				['&Ayuda', '&Acerca de...::Menu']
-		# 			 ]
 		menu_princ[0][1][0] = '!Configuracion::Menu'
 		window.Element('Menu').Update(menu_princ)
 		
