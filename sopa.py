@@ -74,39 +74,9 @@ def dibujar():
 	
 	
 	## Crear la matriz de elementos y llenarla con las letras
-	
 	matriz = crear_grilla(palabras_lista)
 	
-	## En realidad es una lista de listas cuyos elementos son un diccionario con varias propiedades que 
-	## mas adelante utilizara el codigo pero la que muestra es la clave 'letra'.
 	
-	####   Matriz creada manualmente
-	# ~ elemento = {'tipo': None, 'marcada':False,'color':None, 'letra':'TE'}
-	# ~ matriz = [	[elemento,elemento,elemento],
-				# ~ [elemento,elemento,elemento],
-				# ~ [elemento,elemento,elemento],
-			 # ~ ]
-	# ~ from grilla import Grilla
-	# ~ matriz = Grilla()
-	# ~ for i in range(ANCHO):
-		# ~ for j in range(ALTO):
-			# ~ matriz.celdas[j][i]['letra'] = 'A'
-
-	
-	# def cantidad_pal(palabras_dicc): ## Este ahora que se cuentan las palabras en config es redundante
-	# 		"""Recibe diccionario con todos los datos de las palabras y devuelve la cantidad de palabras por cada tipo"""
-	# 		cantv = 0
-	# 		cantadj = 0
-	# 		cantsust = 0
-	# 		for x in palabras_dicc:
-	# 			if palabras_dicc[x]['tipo'] == 'verb':
-	# 				cantv = cantv+1
-	# 			elif palabras_dicc[x]['tipo'] == 'sust':
-	# 				cantsust = cantsust+1
-	# 			elif palabras_dicc[x]['tipo'] == 'adj':	
-	# 				cantadj = cantadj +1 
-	# 		return cantv,cantadj,cantsust
-			
 	def ayuda(palabras_lista,palabras_dicc,config_dicc):
 		"""depende de lo recibido en la configuracion de ayuda modifica el layout  para que informe lo correspondiente a cada caso"""
 		""" ayuda_layout lista creada para agregarlo al frame al layout de la sopa"""
@@ -137,7 +107,7 @@ def dibujar():
 		elif config_dicc['ayuda'] == 'palabras':
 			column1 = [                   ## agrego que el color aparezca en modo fácil, buscar el tipo en el dicc de colores, el segundo elemento porque es una tupla (texto, fondo)
 				[sg.T(palabras_lista[j], background_color = color_marca[ palabras_dicc[palabras_lista[j]]['tipo']][1]
-				)] for j in range(len(palabras_lista)) ## podrias poner pal in palabras lista en lugar de usar ese j
+				)] for j in range(len(palabras_lista))
 				]
 			ayuda_layout = [
 							[sg.T('Palabras a buscar :')],
@@ -145,17 +115,8 @@ def dibujar():
 		return ayuda_layout
 	
 	ayuda_layout = ayuda(palabras_lista,palabras_dicc,config_dicc)
-	
 	print('ANCHO:',ANCHO,'Alto:',ALTO)
-
-	
-	# ------ Menu Definition ------ #      
-# ~ menu_def = [['&File', ['&Open', '!&Save', '---', 'Properties', 'E&xit'  ]],      
-            # ~ ['!&Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],      
-            # ~ ['&Help', '&About...'],]    
-	#layout = [[sg.Menu(menu_def)]]
-	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', '!Configuracion::Menu', 'E&xit'  ]],
-					#['!&Edit', ['Paste', ['Special', 'Normal',], 'Undo'],],      
+	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', '!Configuracion::Menu', 'E&xit'  ]],    
 					['&Ayuda', ['Como jugar?::Menu','Acerca de...::Menu']]
 				 ]
 	sopa_layout = [	[sg.Button(matriz.celdas[j][i]['letra'],
@@ -164,9 +125,6 @@ def dibujar():
 					 font=fuente,
 					 key = str(j)+'_'+str(i)) for i in range(ANCHO)	] for j in range(ALTO)
 				 ]
-	# Botones para seleccionar que tipo de palabra marcar
-			 # ~ ,sg.Button('Verb',button_color='green3'),sg.Button('Sust',button_color='yellow2')
-			 # ~ flat, groove, raised, ridge, solid, or sunken
 	size_pincel=(7, 2)
 	pincel_layout = [
 				[sg.Text('Adj', size=size_pincel, auto_size_text=False, enable_events=True,
@@ -344,8 +302,7 @@ def dibujar():
 			for element in ('adj','verb','sust'):
 				window.FindElement(element).Update(value = element)
 			window.FindElement(event).Update(value ='* '+event.upper()+' *')
-		
-		#despues lo voy a juntar con "and" asi que con que haya uno falso me lo vuelve todo falso			
+					
 		win = True
 		win = Win_Condition(matriz,win)
 		if win == True and event == 'comprobar victoria':

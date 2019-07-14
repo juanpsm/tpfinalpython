@@ -21,7 +21,7 @@ char_vacío = '*'
 class Grilla:
 	def __init__(self):
 		self.n_intentos = 0
-		self.celdas = [[{'key':str(j)+'_'+str(i),'tipo': None, 'marcada':False,'color':None, 'letra':char_vacío, 'totalmarcas' : 0} for i in range(n_columnas)] for j in range(n_filas)]
+		self.celdas = [[{'key':str(j)+'_'+str(i),'tipo': None, 'marcada':False,'color':None, 'letra':char_vacío} for i in range(n_columnas)] for j in range(n_filas)]
 		self.soluciones = []
 
 def modifglob(palabras):
@@ -34,8 +34,6 @@ def modifglob(palabras):
 	if config_dicc['orientacion'] == 'dirs_0':
 		dirs = [[1,0]]
 	if config_dicc['orientacion'] == 'dirs_1':
-		#'dirs_2','dirs_3','dirs_4','dirs_8')
-		#dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
 		dirs = [[0,1]]
 	elif config_dicc['orientacion'] == 'dirs_2':
 		dirs = [[1, 0], [0, 1]]
@@ -86,7 +84,6 @@ def probar_pos(grilla, pal, direccion, pos):
 	c_ = c
 	i = 0
 	# si todo esto fue bien, quiere decir que puedo poner la palabra
-	# ~ config_dicc2,palabras_docente,palabras = config.cargar_configuracion()
 	while i < largo_pal:
 		if grilla.celdas[f_][c_]['letra'] == pal[i]: # Si la casilla donde voy a ubicarmetiene la letra que quiero ubicar
 			superp += 1  # cuento letras superpuestas
@@ -97,9 +94,6 @@ def probar_pos(grilla, pal, direccion, pos):
 			else:
 				grilla.celdas[f_][c_]['letra'] = pal[i]	
 			grilla.celdas[f_][c_]['tipo'] = clasificar_palabra(pal)
-		#grilla.celdas[f_][c_]['marcada'] = True ## no! marcada es despues para pintar!!
-		
-
 		if i < largo_pal - 1:
 			c_ += dirs[direccion][0]
 			f_ += dirs[direccion][1]
@@ -108,7 +102,6 @@ def probar_pos(grilla, pal, direccion, pos):
 
 	letras_puestas = largo_pal - superp
 	if letras_puestas > 0:
-		# ~ print('solucion ->',"{0:<10} ({1},{2})({3},{4})".format(pal, c, f, c_, f_))
 		grilla.soluciones.append("{0:<10} ({1},{2})({3},{4})".format(pal, c, f, c_, f_))
 
 	return letras_puestas
@@ -116,16 +109,12 @@ def probar_pos(grilla, pal, direccion, pos):
 def probar_palabra(grilla, pal):
 	rand_dir = randint(0, len(dirs))
 	rand_pos = randint(0, tam_grilla)
-	# ~ print('probar en :','dir',rand_dir,'pos',rand_pos)
 	for d in range(0, len(dirs)):
 		d = (d + rand_dir) % len(dirs)
-
 		for pos in range(0, tam_grilla):
 			pos = (pos + rand_pos) % tam_grilla
-
 			letras_puestas = probar_pos(grilla, pal, d, pos)
 			if letras_puestas > 0:
-				# ~ print('letraspuestas:',letras_puestas)
 				return letras_puestas
 
 	return 0
@@ -146,25 +135,20 @@ def crear_grilla(palabras):
 	while nun_intentos < 10000:
 		nun_intentos += 1
 		shuffle(palabras)
-		# ~ print('pal shufle',palabras)
-
 		grilla = Grilla()
-
 		celdas_llenas = 0
 		for pal in palabras:
-			# ~ print('probar_palabra',pal)
 			celdas_llenas += probar_palabra(grilla, pal)
-			# ~ print ('len sol >>>>>>>>>>>>>>',len(grilla.soluciones))
 		if len(grilla.soluciones) == len(palabras):
 			grilla.n_intentos = nun_intentos
 			
 			#por ultimo lleno los casilleros vacios
 			for i in range(n_columnas):
 				for j in range(n_filas):
-					################################################################################################## Comentar aqui para quitar el RELLENO 
+					
 					if grilla.celdas[j][i]['letra'] == char_vacío:
 						grilla.celdas[j][i]['letra'] = random.choice(string.ascii_lowercase)
-					##################################################################################################  
+						
 					if config_dicc['mayuscula']:
 						grilla.celdas[j][i]['letra'] = grilla.celdas[j][i]['letra'].upper()
 					else:
@@ -173,7 +157,6 @@ def crear_grilla(palabras):
 			return grilla
 		else:
 			print('No se pudo crear, reintentos =',nun_intentos)
-			# ~ break # grid is full but we didn't pack enough words, start over
 
 	return grilla
 

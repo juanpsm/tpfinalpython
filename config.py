@@ -45,8 +45,6 @@ def reporte( res, error, clas, defi ):
 	f.close()
 	
 def analizarpalabra(palabra,cat):
-	#recibo categoria pero en la consigna no la piden, tengo que extraerla de los motores.
-	#Si funciona esto bien, si no nos queadremos con nuestro metodo de ponerla manualmente.
 	resultado = buscar_en_wiktionary(palabra)
 	# resultado tiene los campos:
 	# 'palabra' [str] la que busqué
@@ -67,8 +65,6 @@ def analizarpalabra(palabra,cat):
 			or resultado['clasificacion_wiktionario'] == '_no_sabe_'	## existe, pero filtra mal las categorías por ej "ES:Sustantivos"
 			or resultado['definicion'] == ''):								## existe, pero parseó mal la definicion por no encontrar los <dt>1</dt>
 			# y como son distintas se supone que pattern dio distinto de _Ninguna_
-			# aca el problema es que pattern siempre da NN por DEFECTO, pero bueno si seguimos la consigna..
-			# EDIT: ahora anda!!
 			clasificacion_definitiva = resultado['clasificacion_pattern']
 			
 			ingreso = [	[sg.T('Falló la búsqueda de "'+palabra+'" en Wiktionario.\nDefínala:\n')],
@@ -116,8 +112,6 @@ def cargar_configuracion():
 	if existe:
 		with open(nombre_archivo_config, 'r', encoding = 'utf-8') as f:
 			config_dicc = json.load(f)
-		# ~ print('Configuracion cargada:')
-		# ~ print(json.dumps(config_dicc, sort_keys=True, indent=4, ensure_ascii = False))
 		palabras_dicc = config_dicc['palabras']
 		
 		palabras_clas = config_dicc['palabras_clas']
@@ -134,8 +128,6 @@ def cargar_configuracion():
 		config_dicc['max_adj'] = 0
 		
 		print('No existe archivo de configuración')
-	# ~ print( 'Carga config -> ')
-	# ~ pprint(config_dicc)
 	print('Cargo en cargar_configuracion()',config_dicc['orientacion'])
 	return config_dicc,palabras_dicc,palabras_clas
 	
@@ -162,7 +154,7 @@ def colores():
 	'''Setea parametros de Pysimplegui sobre todo colores de los elementos de las ventanas. Devuelve una tupla con un color de texto y fondo para usar luego en botones'''
 	## Esto habrá que setearlo luego con la raspberry
 	sg.ChangeLookAndFeel('Reddit')
-	## Puedo setear los Colores de la interfaz manualmente
+	
 	sg.SetOptions(
 	icon = 'bee.ico',
 	text_color='black',
@@ -175,15 +167,6 @@ def colores():
 	progress_meter_color = ('green', 'blue'),
 	button_color = ('#262730','#5adbff') # celeste
 	)
-	
-	## o automaticamente con 
-	# ~ sg.ListOfLookAndFeelValues()
-	#['SystemDefault', 'Reddit', 'Topanga', 'GreenTan', 'Dark', 'LightGreen', 'Dark2', 'Black', 'Tan', 'TanBlue',
-	# 'DarkTanBlue', 'DarkAmber', 'DarkBlue', 'Reds', 'Green', 'BluePurple', 'Purple', 'BlueMono', 'GreenMono',
-	# 'BrownBlue', 'BrightColors', 'NeutralBlue', 'Kayak', 'SandyBeach', 'TealMono']
-	#Temas "FRIOS":[]
-	
-	# ~ sg.ChangeLookAndFeel('TealMono')
 	
 	return ('#262730','#EFF0D1') #·negro y crema
 	
@@ -199,12 +182,10 @@ def configuracion():
 	
 	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
 	
-	palabras_lista = list(palabras_dicc.keys()) ## esto lo voy a usar apra popular el listbox
+	palabras_lista = list(palabras_dicc.keys()) ## lista para el listbox
 	
 	TOTAL_PALABRAS_A_USAR = config_dicc['max_sust']+config_dicc['max_verb']+config_dicc['max_adj']
 	
-	# ~ print('Configuración cargada en configuracion():')
-	# ~ pprint (config_dicc)
 	print('Cargo en configuracion()',config_dicc['orientacion'])
 
 	menu = ['Menu', [' ',
@@ -223,13 +204,7 @@ def configuracion():
 			 sg.Multiline('',size=(None, None), pad = None, font = None, right_click_menu=None,
 						auto_size_text=None, key = '_OUT_',do_not_clear = True)
 			 ]]
-	## para implementar una lista por cada tipo
-	# ~ sg.Listbox(values=[], default_values=None, enable_events=True, size=(15,6),
-		# ~ key='_LISTA_V_', tooltip=None, right_click_menu= menu, visible=True),
-	# ~ sg.Listbox(values=palabras_lista, default_values=None, enable_events=True, size=(15,6),
-		# ~ key='_LISTA_A_', tooltip=None, right_click_menu= menu, visible=True)],
-	## hago una lista de numeros de cero al minimo entre la cantidad de palabras existentes
-	## y la cantidad maxima para que no se haga muy grande la grilla.
+	
 	palabras_layout = [	[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
 							[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))),
 				 				key = '_CANT_S_', default_value = config_dicc['max_sust'], size = (2,1), pad=((20,),1), enable_events = True)]
@@ -291,10 +266,7 @@ def configuracion():
 	window = sg.Window('CONFIGURACIÓN').Layout(layout)
 	window.Finalize()
 	while True:                 # Event Loop  
-		# pprint (config_dicc)
 		event, val = window.Read()  
-		# ~ print('EVENTO :',event,'\n----\n VAL = ',val,'\n-----\n')
-		# print(window.FindElement('_LISTA_').GetListValues())
 		if event is None or event == 'Cerrar':  
 			break
 			
@@ -326,7 +298,7 @@ def configuracion():
 						palabras_lista.append(palabra)  # aca cargo y agrego a la lista, pordría agregar directamente porque ya definí la lista en la importacion.
 						window.FindElement('_LISTA_').Update(values = palabras_lista)
 		if event == '_LISTA_':
-			try: # aca hay problemas cuando no hay nada seleccionado, se puede resolver seteando un valor por defecto, aunque eso traeria problemas la primera vez que se carga, se puede resolver con exepciones
+			try: 
 				window.Element('_OUT_').Update(disabled = False)
 				texto = '--> "' + val['_LISTA_'][0] + '":\n'
 				texto += 'Clasificación : ' + palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
@@ -339,12 +311,11 @@ def configuracion():
 				print(val['_LISTA_'])
 				
 		if event == 'Definicion::_MENU_':
-			try: # aca hay problemas cuando no hay nada seleccionado, se puede resolver seteando un valor por defecto, aunque eso traeria problemas la primera vez que se carga, se puede resolver con exepciones
+			try: 
 				texto = '--> "' + val['_LISTA_'][0] + '":\n'
 				texto += 'Clasificación : ' + palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
 				texto += '\n  ' + palabras_dicc[ val['_LISTA_'][0] ]['def']
-				# ~ window.Disappear()
-				# ~ window.Disable() #anda mal, deshabilita el popup en lugar de la ventana
+			
 				window.SetAlpha(0.5)
 				sg.Popup(texto, keep_on_top=True)
 				window.Reappear() ##igual que poner el alpha en 1
@@ -354,7 +325,7 @@ def configuracion():
 				print(val['_LISTA_'])
 			
 		if event == 'Eliminar::_MENU_':
-			if val['_LISTA_'] != []: # otra forma de resolver el tema de la listbox sin seleccionar
+			if val['_LISTA_'] != []: 
 				palabra = val['_LISTA_'][0]# El Listbox guarda en val una lista con un unico elemento que es el que esta seleccionado en ese momento.
 				#elimino de ambdas estructuras:
 				palabras_clas[palabras_dicc[palabra]['tipo']].remove(palabra)

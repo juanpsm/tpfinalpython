@@ -22,7 +22,6 @@ def existe_archivo_de_configuracion():
 	''' Para ver si existe la configuracion me fijo si la funion devuelve el elemento vacío que es cuando lo inicializa'''
 	_,_,res = config.cargar_configuracion()
 	cond = res != []
-	# ~ print(cond)
 	return cond
 
 color_fondo = config.colores()
@@ -49,20 +48,10 @@ while True:				 # Event Loop
 		sg.Popup(CREDITS,font = 'System')
 
 	elif event == 'Configuracion::Menu':
-		window.Hide() ## Aca hay un error cuando llamo por segunda vez a configuracion(), un problema de tkinter parece...
-		# ~ try:
-			# ~ config.configuracion()
-		# ~ except _tkinter.TclError:
-			# ~ print('error duplicado')
-		# ~ except NameError:
-			# ~ print('error nombre',NameError)
-		# ~ except:
-			# ~ print('?')
-		## no sirven las excepciones
+		window.Hide() 
 		config.configuracion()
 		menu_princ[0][1][0] = '!Configuracion::Menu'
 		window.Element('Menu').Update(menu_princ)
-		
 		window.Refresh()
 		window.UnHide()
 	
