@@ -62,6 +62,5 @@ while True:				 # Event Loop
 			window.UnHide()
 		else:
 			sg.Popup('Primero debes configurar el juego!\n Ve a Opciones -> Configuración')
-#splash art, menues
 
 
