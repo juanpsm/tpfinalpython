@@ -26,28 +26,19 @@ def buscar_en_wiktionary(palabra):
 
 		pos_1 = sch.source.find('<dt>1</dt>')
 		if pos_1 == -1:
-			# ~ debug(pos_1)
 			pos_1 = sch.source.find('<dt>')
-			# ~ debug( pos_1 )
 			pos_cierre_1 = sch.source.find('</dt>',pos_1+1) #busca a partir de pos 1
-			# ~ debug( pos_cierre_1 )
 		else:
 			pos_cierre_1 = pos_1
 			
 		pos_2 = sch.source.find('<dt>2</dt>',pos_1+1)
 		if pos_2 == -1:
-			# ~ debug(pos_2)
 			pos_2 = sch.source.find('<dt>',pos_1+1)
-			# ~ debug(pos_2)
 			pos_cierre_2 = sch.source.find('</dt>',pos_2+1)
 		else:
 			pos_cierre_2 = pos_2
 		
 		print('\n  slice: ', pos_cierre_1, pos_2)
-		
-		# ~ print('\n  source: ',sch.source[pos_cierre_1: pos_2])
-
-		# ~ print('\n  plaintext: ',plaintext(sch.source[pos_cierre_1:pos_2]))
 		
 		pos_punto=plaintext(sch.source[pos_cierre_1:pos_2]).find('.')
 		

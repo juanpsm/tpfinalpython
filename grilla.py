@@ -10,6 +10,7 @@ import string
 import random
 
 config_dicc,palabras_dicc,_ = config.cargar_configuracion()
+#diccionario con direcciones para la orientacion de las palabras en sopa.
 dirs = [[1, 0], [0, 1], [1, 1], [1, -1], [-1, 0], [0, -1], [-1, -1], [-1, 1]]
 n_filas =  10
 n_columnas = n_filas
