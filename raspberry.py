@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import time
+import json
+import os
 
 from itertools import repeat
 from luma.core import legacy
@@ -16,6 +18,28 @@ from luma.core.legacy.font import proportional, CP437_FONT,TINY_FONT, SINCLAIR_F
 ####
 #para emular
 from demo_opts import get_device
+
+nombre_archivo_registro = 'registros_temp_hum.json'
+def guardar_datos(of, temp, hum):
+	existe = os.path.isfile(nombre_archivo_registro)
+	if existe:
+		with open(nombre_archivo_registro, 'r', encoding = 'utf-8') as f:
+			dicc = json.load(f)
+	else:
+		dicc = {}
+		print('Creado de registro')
+	
+	string_time = time.strftime("%Y/%m/%d - %H:%M:%S", time.gmtime(time.time()))
+
+	try: 
+		dicc[of].append({'time':of,'temp':temp,'hum':hum})
+	except KeyError:
+		dicc[of] = [{'time':of,'temp':temp,'hum':hum}]
+	print(dicc)
+	print(dicc[of][-1:])
+
+	with open(nombre_archivo_registro, 'w', encoding = 'utf-8') as f:
+		json.dump(dicc, f, ensure_ascii = False)
 
 class Matriz:
 	def __init__(self, numero_matrices = 1, orientacion = 0, rotacion = 0, ancho = 8, alto = 8):
@@ -98,18 +122,18 @@ def asd():
 	# draw.rectangle(device.bounding_box, outline="white", fill="black")
 	
 	#            for _ in repeat(None):
-#                time.sleep(1)
-#                msg = time.asctime()
-#                msg = time.strftime("%S")
-#                
-#                with canvas(device) as draw:
-#                    draw.rectangle(device.bounding_box, outline="white", fill="black")
-#                    text(draw, (1, 0), msg, fill="white")
-#            time.sleep(5)
-#    pass
+	#                time.sleep(1)
+	#                msg = time.asctime()
+	#                msg = time.strftime("%S")
+	#                
+	#                with canvas(device) as draw:
+	#                    draw.rectangle(device.bounding_box, outline="white", fill="black")
+	#                    text(draw, (1, 0), msg, fill="white")
+	#            time.sleep(5)
+	#    pass
 	v =0
 
-def show(emu = False):
+def show(emu = False, of):
 	if emu: #para emular pido el device
 		device = get_device()
 		datos = {'temperatura':34, 'humedad':89}
@@ -124,11 +148,10 @@ def show(emu = False):
 		datos = tmp.datos_sensor()
 		print('Temperatura = {0:0.1f°}C Humedad = {1:0.1f} %'.format(datos['temperatura'], datos['humedad']))
 	
-	##################   realizar las conversiones necesarias
+	##################  por si es necesario realizar conversiones
 	temp = datos['temperatura']
 	hum = datos['humedad']
 	
-	of = input('Ingrese Nº Oficina: ')
 	msg = "Oficina "+of
 	print(msg)
 	show_message(device, msg, fill='white', font=proportional(LCD_FONT), scroll_delay=0.05)
@@ -150,17 +173,20 @@ def show(emu = False):
 	msg = 'Bye!'
 	show_message(device, msg, fill='white', font=proportional(LCD_FONT), scroll_delay=0.05)
 
+	guardar_datos(of, temp, hum)
+
 def main():
 	emu = input('Está emulando? (y or n): ').lower() in ('s','y','si','yes')
 	#emu = True
+	of = input('Ingrese Nº Oficina: ')
 	if emu:
-		show(emu)
+		show(emu,of)
 	else:
 		iniciar_sensores()
 		sonido = Sonido()
 		while True:
 			time.sleep(0.0001)
-			sonido.evento_detectado(show)
+			sonido.evento_detectado(show,of)
 
 if __name__ == "__main__":
 	try:

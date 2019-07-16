@@ -1,3 +1,4 @@
 playsound==1.2.2
 PySimpleGUI==4.0.0
 pattern==3.6
+colormath == 3.0.0

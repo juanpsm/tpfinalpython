@@ -47,13 +47,13 @@ def dibujar():
 	config_dicc, palabras_dicc, _ = config.cargar_configuracion()
 	palabras_lista = config.obtener_lista_palabras(config_dicc)
 	fuente = config_dicc['fuente']
-	color_fondo = config.colores()
+	color_fondo = ('#EFF0D1','#854e0b')
 	#Colores marcas
 	color_celda_marcada = ('#EFF0D1','#854e0b') #blanco y marron
 	color_marca = {None:('#EFF0D1','#854e0b'), #blanco y marron
-					'adj':(config_dicc['color_pincel']['ADJ']),
-					'verb':(config_dicc['color_pincel']['VERB']),
-					'sust':(config_dicc['color_pincel']['SUST']),
+					'adj':(config_dicc['color_pincel']['adj']),
+					'verb':(config_dicc['color_pincel']['verb']),
+					'sust':(config_dicc['color_pincel']['sust']),
 					'Erroneas':('#262730','#f4f4f4'),
 					'MIXTO':('#262730','#3e8271')}
 	color_celda_default = ('#262730','#5adbff') #negro y celeste

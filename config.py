@@ -4,15 +4,20 @@ import random
 import string
 import json
 import os
+import time
 import datetime
+
 from pprint import pprint
 from collections import defaultdict
 from buscar_en_wiktionary import buscar_en_wiktionary
+from creador_registro_test import crear_registro
 
 
 listaColores= {'rojo': ('#EFF0D1','#f05959'),'violeta':('#262730','#c382ff'),'verde':('#262730','green3'),'amarillo':('#262730','yellow2'),'azul':('#262730','#1282cc')}
+
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
+nombre_archivo_registro = 'registros_temp_hum.json'
 ## con MAX seteamos el numero maximo de palabras a usar en total entre sust verb y adj.
 MAX = 10
 def reporte( res, error, clas, defi ):
@@ -126,9 +131,12 @@ def cargar_configuracion():
 		config_dicc['max_sust'] = 0
 		config_dicc['max_verb'] = 0
 		config_dicc['max_adj'] = 0
-		
+		config_dicc['color_pincel'] = { 'sust': '#69cfd8',
+		 								'verb': '#5ce4a0',
+										'adj':  '#e0619a'}
+		config_dicc['oficina'] = '8'
 		print('No existe archivo de configuración')
-	print('Cargo en cargar_configuracion()',config_dicc['orientacion'])
+	#print('Cargo en cargar_configuracion()',config_dicc['orientacion'])
 	return config_dicc,palabras_dicc,palabras_clas
 	
 def obtener_lista_palabras(config_dicc):
@@ -150,9 +158,27 @@ def obtener_lista_palabras(config_dicc):
 	
 	return palabras_rand
 	
-def colores():
-	'''Setea parametros de Pysimplegui sobre todo colores de los elementos de las ventanas. Devuelve una tupla con un color de texto y fondo para usar luego en botones'''
-	## Esto habrá que setearlo luego con la raspberry
+def cargar_json_registro(of):
+	existe = os.path.isfile(nombre_archivo_registro)
+	if not existe:
+		print('No existe archivo de registro, se usara uno de prueba')
+		crear_registro(16,5)
+	
+	with open(nombre_archivo_registro, 'r', encoding = 'utf-8') as f:
+		reg_dicc = json.load(f)
+	
+	try:
+		temp = reg_dicc[of][-1:][0]['temp'] #accede al ultimo registro de esa oficina
+		print(temp)
+	except KeyError:
+		print('No existe dato de esa oficina, se inventará')
+		return 34
+	
+	return int(temp)
+
+def colores(config_dicc):
+	'''Setea parametros de Pysimplegui sobre todo colores de los elementos de las ventanas. 
+	Devuelve una tupla con un color de texto y fondo para usar luego en botones'''
 	sg.ChangeLookAndFeel('Reddit')
 	
 	sg.SetOptions(
@@ -167,20 +193,64 @@ def colores():
 	progress_meter_color = ('green', 'blue'),
 	button_color = ('#262730','#5adbff') # celeste
 	)
+	## o automaticamente con 
+	# ~ sg.ListOfLookAndFeelValues()
+	#['SystemDefault', 'Reddit', 'Topanga', 'GreenTan', 'Dark', 'LightGreen', 'Dark2', 'Black', 'Tan', 'TanBlue',
+	# 'DarkTanBlue', 'DarkAmber', 'DarkBlue', 'Reds', 'Green', 'BluePurple', 'Purple', 'BlueMono', 'GreenMono',
+	# 'BrownBlue', 'BrightColors', 'NeutralBlue', 'Kayak', 'SandyBeach', 'TealMono']
+	temas_clima={	"Frio":['GreenTan','LightGreen','DarkBlue','BluePurple','BlueMono','BrownBlue','TealMono'],
+					"Neutro":['Reddit','Tan','TanBlue','Purple','GreenMono','NeutralBlue'],
+					"Calido":['DarkAmber','Reds','Green','BrightColors','Kayak','SandyBeach'],
+					"Oscuro":['Topanga','Dark','Dark2','Black','DarkTanBlue']
+				}
+	
+	temp = cargar_json_registro(config_dicc['oficina'])
+	hora = int(time.strftime("%H", time.localtime(time.time())))
+	if temp < 15 :
+		tema = random.choice(temas_clima['Frio'])
+		if hora > 18:
+			tema = random.choice(temas_clima['Oscuro'])
+	elif temp < 25:
+		tema = random.choice(temas_clima['Neutro'])
+		if hora > 20:
+			tema = random.choice(temas_clima['Oscuro'])
+	else:
+		tema = random.choice(temas_clima['Calido'])
+		if hora > 21:
+			tema = random.choice(temas_clima['Oscuro'])
+	
+	sg.ChangeLookAndFeel(tema)
 	
 	return ('#262730','#EFF0D1') #·negro y crema
 	
+def son_colores_parecidos(color1,color2):
+	'''Usa la librería colormath para determinar si un par de colores es parecido y devuelve verdadero en ese caso'''
+	from colormath.color_objects import AdobeRGBColor, LabColor, XYZColor
+	from colormath.color_conversions import convert_color
+	from colormath.color_diff import delta_e_cie1976
+
+	try:
+		color1 = AdobeRGBColor.new_from_rgb_hex(color1)
+		color2 = AdobeRGBColor.new_from_rgb_hex(color2)
+		delta_e = delta_e_cie1976(convert_color(color1,LabColor), convert_color(color2,LabColor))
+		print(delta_e)
+		#print(abs(delta_e)<50)
+		return abs(delta_e)<50
+
+	except ValueError:
+		print('Elige un color')
+		return False
+
 def configuracion():
 	# crea lista auxiliar de colores para los combo de seleccion de color de pincel.
 	lista_Combo_colores = list(listaColores.keys())
 	"""recibe de cargar_configuracion() la configuracion elegida por el usuario para la sopa de letras"""
 	
+	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
 	
-	color_fondo = colores()
+	color_fondo = colores(config_dicc)
 	color_sel = ('#EFF0D1', '#D33F49')
 	orientacion = 'dirs_0' #por defecto
-	
-	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
 	
 	palabras_lista = list(palabras_dicc.keys()) ## lista para el listbox
 	
@@ -204,35 +274,35 @@ def configuracion():
 			 sg.Multiline('',size=(None, None), pad = None, font = None, right_click_menu=None,
 						auto_size_text=None, key = '_OUT_',do_not_clear = True)
 			 ]]
+
 	
-	palabras_layout = [	[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
-							[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['sust']) ))),
-				 				key = '_CANT_S_', default_value = config_dicc['max_sust'], size = (2,1), pad=((20,),1), enable_events = True)]
-			 			], pad=((0,),2) ),	
-	 		 sg.Column([	[sg.Text('Verbos:', pad=((0,),2) )],
-			  				[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['verb'])))),
-								key = '_CANT_V_', default_value = config_dicc['max_verb'], size = (2,1), enable_events = True, disabled = True)]
-	 					], pad=((0,),2) ),
-			 sg.Column([	[sg.Text('Adjetivos:', pad=((0,),2) )],
-							[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas']['adj'])))),
-		 						key = '_CANT_A_', default_value = config_dicc['max_adj'], size = (2,1), enable_events = True, disabled = True)]
-						], pad=((0,),2) ),
-	 		sg.Frame(title = 'Total:',
-	 			layout = [	[sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
-	 					 ], pad=((20,0),2) )
-			]]
+	cantidad_palabras_layout = [
+		[sg.Column(	[	[sg.Text(k[0], pad=((0,),2) )],
+						[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas'][k[1]]) ))),
+				 			key = k[2], default_value = config_dicc['max_'+k[1]], size = (2,1), pad=((20,),1), enable_events = True)]
+			 		], pad=((0,),2) )
+					for k in (('Sustantivos','sust','_CANT_S_'),('Verbos','verb','_CANT_V_'),('Adjetivo','adj','_CANT_A_'))
+		]
+	]
+	cantidad_palabras_layout[0].append(sg.Frame(title = 'Total:',
+	 											layout = [	[sg.Text(TOTAL_PALABRAS_A_USAR, key='_TOTAL_')]
+	 		 				 					], pad=((20,0),2) )	)
+
 	## frame de seleccion de color de pincel.
-	colores_layout = [
-			[sg.Column([	[sg.Text('Sustantivos:', pad=((0,),2) )],
-							[sg.Combo(lista_Combo_colores,key = 'comboSust',default_value ='amarillo', enable_events = True)]
-			 			], pad=((0,),2) ),	
-	 		 sg.Column([	[sg.Text('Verbos:', pad=((0,),2) )],
-			  				[sg.Combo(lista_Combo_colores,key = 'comboVerb',default_value ='verde', enable_events = True)]
-	 					], pad=((0,),2) ),
-			 sg.Column([	[sg.Text('Adjetivos:', pad=((0,),2) )],
-							[sg.Combo(lista_Combo_colores,key = 'comboAdj',default_value ='violeta', enable_events = True)]
-						], pad=((0,),2) ),
-			]]
+	 
+	colores_layout = [	[sg.Column(	[	
+							[sg.Text(k[0]+':', pad=((0,),2) )],
+							[sg.Combo(lista_Combo_colores, key = '_combo_'+k[1], default_value = k[2], enable_events = True)],
+							
+							[sg.In(default_text='', key = 'color_'+k[1], size = (7, 1), enable_events = True, visible = False)], # este in tiene que ir si o si para que ande el evento del color chooser, como pasa con el FileBrowse
+							[sg.ColorChooserButton('', button_color=('red',config_dicc['color_pincel'][k[1]]), 
+														target='color_'+k[1], size=(4,1), border_width=2,
+														key='boton_color_'+k[1])]
+							]) for k in (('Sustantivos','sust','amarillo'),('Verbos','verb','rojo'),('Adjetivo','adj','verde'))
+						],
+						[sg.Text('', size = (50,1), font=('default', 10, 'bold'), text_color='#D33F49', 
+									 pad=((10,0),(5,10)), key = '_error_color_')]
+					 ]
 			
 	layout_ayudas = [	[sg.Radio('Sin ayuda', "RADIOA", key= 'sin', size=(10,1)),
 				 sg.Radio('Definiciones', "RADIOA", key='defin'),
@@ -249,13 +319,16 @@ def configuracion():
 						default_value='Comic',
 						key='_FONT_')]]
 						
-	layout_oficina = [	[sg.Text('15')]]
+	layout_oficina = [	[sg.Input(default_text=config_dicc['oficina'], size=(3,1), key = '_OF_', do_not_clear = True, background_color = '#DB91D6'),
+						 sg.Text('Temp = '+str(cargar_json_registro(config_dicc['oficina']))+'ºC')
+						 ]
+					 ]
 			
 	layout= [
 		[sg.Text('Ingrese palabras la lista para ser usadas por la sopa de letras:')],
 		[sg.Text('Instrucciones de configuración')],
 		[sg.Frame('Ingrese palabras',agregar_palabra_layout)],
-		[sg.Frame('Cantidad máxima de cada tipo a utilizar en la Sopa:',palabras_layout)], 
+		[sg.Frame('Cantidad máxima de cada tipo a utilizar en la Sopa:',cantidad_palabras_layout)], 
 		[sg.Frame('Seleccion de colores: ',colores_layout)],
 		[sg.Frame('Ayudas',layout_ayudas)],
 		[sg.Frame('Orientacion',layout_orientacion)],
@@ -265,8 +338,16 @@ def configuracion():
 
 	window = sg.Window('CONFIGURACIÓN').Layout(layout)
 	window.Finalize()
+
+	for x in ('V','A'):
+		window.FindElement('_CANT_'+x+'_').Update(disabled = True)
+	col = {}
+	for x in ('sust','verb','adj'):
+		window.FindElement('color_'+x).Update(value = config_dicc['color_pincel'][x])
+		col['color_'+x] = config_dicc['color_pincel'][x]
+	 
 	while True:                 # Event Loop  
-		event, val = window.Read()  
+		event, val = window.Read()
 		if event is None or event == 'Cerrar':  
 			break
 			
@@ -297,6 +378,7 @@ def configuracion():
 						palabras_lista = window.FindElement('_LISTA_').GetListValues()
 						palabras_lista.append(palabra)  # aca cargo y agrego a la lista, pordría agregar directamente porque ya definí la lista en la importacion.
 						window.FindElement('_LISTA_').Update(values = palabras_lista)
+		
 		if event == '_LISTA_':
 			try: 
 				window.Element('_OUT_').Update(disabled = False)
@@ -364,7 +446,40 @@ def configuracion():
 			if val['comboSust'] != val['comboVerb'] and val['comboVerb'] != val['comboAdj']:
 					window.FindElement('_ACEPTAR_').Update(disabled = False)
 		
-		
+		evento_colores = ['color_'+j for j in ('sust','verb','adj')]
+		if event in evento_colores:
+			window.FindElement('boton_'+event).Update(button_color = (color_fondo[0],val[event]))
+			print('Colores elegidos:',val['color_sust'],val['color_verb'],val['color_adj'])
+
+			if val[event]=="None":
+				
+				col[event] = config_dicc['color_pincel'][event[6:]]
+			else:
+				col[event] = val[event]
+				error_color = False
+				
+				if son_colores_parecidos(val['color_sust'],col['color_verb']):
+					error_color += True
+					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y verbo muy parecido')
+				
+				if son_colores_parecidos(col['color_sust'],col['color_adj']):
+					error_color += True
+					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y adjetivo muy parecido')
+				
+				if son_colores_parecidos(col['color_verb'],col['color_adj']):
+					error_color += True
+					window.Element('_error_color_').Update(value='¡Error! Color de verbo y adjetivo muy parecido')
+				
+				if error_color:
+					window.Element('_error_color_').Update(visible= True)
+					window.FindElement('_ACEPTAR_').Update(disabled = True)
+				
+				else:
+					window.Element('_error_color_').Update(value='')
+					window.Element('_error_color_').Update(visible= False)
+					window.FindElement('_ACEPTAR_').Update(disabled = False)
+
+
 		lista_cant = ['_CANT_S_','_CANT_V_','_CANT_A_']
 		if event in lista_cant:
 			if event == '_CANT_S_':  # voy seteando el tope del siguiente segun MAX - actual, lo habilito y lo seteo en cero.
@@ -385,9 +500,15 @@ def configuracion():
 			config_dicc['max_sust'] = int(val['_CANT_S_'])
 			config_dicc['max_verb'] = int(val['_CANT_V_'])
 			config_dicc['max_adj'] = int(val['_CANT_A_'])
-			config_dicc['color_pincel']= {'SUST': listaColores[val['comboSust']],'ADJ':listaColores[val['comboAdj']],'VERB': listaColores[val['comboVerb']]}
-			print('VALORES')
-			print(config_dicc)	 
+			config_dicc['oficina'] = val['_OF_']
+			#config_dicc['color_pincel'] = {'sust': listaColores[val['comboSust']],
+			# 								'verb': listaColores[val['comboVerb']],
+			# 								'adj':  listaColores[val['comboAdj']]}
+			
+			config_dicc['color_pincel'] = {x : val['color_'+x] for x in ('sust','verb','adj')}
+
+			#print('VALORES')
+			#print(config_dicc)	 
 		except ValueError:
 			window.SetAlpha(0.5)
 			sg.Popup('Debe seleccionar cantidades!!', keep_on_top=True)
@@ -397,9 +518,12 @@ def configuracion():
 		if event == '_ACEPTAR_':
 			if TOTAL_PALABRAS_A_USAR == 0:
 				window.SetAlpha(0.5)
-				sg.PopupError('La cantidad de palabras\n no puede ser cero', keep_on_top=True)
+				sg.PopupError('La cantidad de palabras\n no puede ser cero.', keep_on_top=True)
 				window.Reappear()
-
+			if val['_OF_'] == None or val['_OF_'] == '':
+				window.SetAlpha(0.5)
+				sg.PopupError('Debe ingresar el \n numero de oficina.', keep_on_top=True)
+				window.Reappear()
 			else:
 				with open(nombre_archivo_config, 'w', encoding = 'utf-8') as f:
 					json.dump(config_dicc, f, ensure_ascii = False)
@@ -408,7 +532,7 @@ def configuracion():
 		
 		if event == '_LISTA_':
 			print ('Seleccionado: ',val['_LISTA_'])
-			
+
 	window.Close()
 
 if __name__ == "__main__":

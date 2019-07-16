@@ -24,7 +24,7 @@ def existe_archivo_de_configuracion():
 	cond = res != []
 	return cond
 
-color_fondo = config.colores()
+color_fondo = config.colores(config.cargar_configuracion()[0])
 
 menu_princ = [	['&Opciones', ['Configuracion::Menu', 'Exit::Menu'  ]],    
 				['&Ayuda', '&Acerca de...::Menu']
