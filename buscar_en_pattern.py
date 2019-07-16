@@ -2,7 +2,6 @@
 from pattern.es import verbs, tag, spelling, lexicon
 import string
 def clasificar(palabra):
-	# tag(palabra, tokenize=True, encoding='utf-8',tagset = 'UNIVERSAL')
 	t = tag(palabra, tokenize=True, encoding='utf-8')[0][1] # si fueran varias palabras devuelve una lista de pares (palabra, tag)
 	print('  tag:',t)
 	return t
@@ -26,21 +25,6 @@ def buscar_en_pattern(palabra):
 		return clasificar(palabra)
 			
 	print('\n?\n')
-
-		
-	# ~ c = 0
-	# ~ for x in verbs:
-		# ~ if not x in spelling:
-			# ~ if not x in lexicon:
-				# ~ print (x, end=', ')
-				# ~ c+=1
-			
-	# ~ print(c)
-	# ~ for x in lexicon:
-		# ~ if x != x.lower():
-			# ~ if x != x.upper():
-				# ~ if x != x.capitalize():
-					# ~ print(x,end=', ')
 
 if __name__ == "__main__":
 	buscar_en_pattern('Camino')

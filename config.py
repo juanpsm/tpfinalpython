@@ -333,7 +333,7 @@ def configuracion():
 		[sg.Frame('Ayudas',layout_ayudas)],
 		[sg.Frame('Orientacion',layout_orientacion)],
 		[sg.Frame('Mayúscula/Minúscula',layout_mayuscula),sg.Frame('Fuente',layout_fuente)],
-		[sg.Frame('Oficina',layout_oficina),sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((150,5),1), disabled = False),sg.Button('Cerrar')]
+		[sg.Frame('Oficina',layout_oficina),sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((150,5),1), disabled = False),sg.Button('Cerrar' , key= '_CERRAR_',disabled = False)]
 		] 
 
 	window = sg.Window('CONFIGURACIÓN').Layout(layout)
@@ -347,8 +347,8 @@ def configuracion():
 		col['color_'+x] = config_dicc['color_pincel'][x]
 	 
 	while True:                 # Event Loop  
-		event, val = window.Read()
-		if event is None or event == 'Cerrar':  
+		event, val = window.Read()  
+		if event is None or event == '_CERRAR_': 
 			break
 			
 		if event == '_ADD_':
@@ -431,20 +431,13 @@ def configuracion():
 		#if hay colores repetidos para distintos tipos de palabras deshabilita la opcion de guardar.
 		# chekea en cada vuelta que sean distintas. cuando son todas distintas vuelve a habilitar la opcion de guardar.
 		if event in ['comboSust','comboAdj','comboVerb']:	
-			if event == 'comboSust':
-				if val['comboSust'] == val['comboVerb'] or val['comboSust'] == val['comboAdj']:
-					sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras. Seleccione otra opción para poder guardar configuración.')
-					window.FindElement('_ACEPTAR_').Update(disabled = True)	
-			if event == 'comboAdj':
-				if val['comboAdj'] == val['comboVerb'] or val['comboAdj'] == val['comboSust']:
-					sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras')
-					window.FindElement('_ACEPTAR_').Update(disabled = True)
-			if event == 'comboVerb':
-				if val['comboVerb'] == val['comboAdj'] or val['comboVerb'] == val['comboSust']:
-					sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras')
-					window.FindElement('_ACEPTAR_').Update(disabled = True)
-			if val['comboSust'] != val['comboVerb'] and val['comboVerb'] != val['comboAdj']:
+			if val['comboVerb'] == val['comboAdj'] or val['comboVerb'] == val['comboSust']or val['comboSust'] == val['comboAdj']:
+				sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras')
+				window.FindElement('_ACEPTAR_').Update(disabled = True)
+				window.FindElement('_CERRAR_').Update(disabled = True)
+			if val['comboSust'] != val['comboVerb'] and val['comboVerb'] != val['comboAdj'] and val['comboAdj'] != val['comboSust'] :
 					window.FindElement('_ACEPTAR_').Update(disabled = False)
+					window.FindElement('_CERRAR_').Update(disabled = False)
 		
 		evento_colores = ['color_'+j for j in ('sust','verb','adj')]
 		if event in evento_colores:

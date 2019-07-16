@@ -57,14 +57,6 @@ def dibujar():
 					'Erroneas':('#262730','#f4f4f4'),
 					'MIXTO':('#262730','#3e8271')}
 	color_celda_default = ('#262730','#5adbff') #negro y celeste
-
-	#celda mal marcada('#262730','#f4f4f4')
-	
-	
-	# ~ print('Cargo en dibujar()',config_dicc['orientacion'])
-	print('Creo lista de palabras random en dibujar()')
-	print('palabras_lista =',palabras_lista)
-	
 	## Defino el ancho de la grilla como el mayor entre la cantidad de palabras o la palabra mas larga
 	ANCHO = max(len(max(palabras_lista, key=len)),len(palabras_lista)) # key = len hace que sea por cantidad de char y no alfabeticamente
 	## O solo la palabra más larga
@@ -80,7 +72,6 @@ def dibujar():
 	def ayuda(palabras_lista,palabras_dicc,config_dicc):
 		"""depende de lo recibido en la configuracion de ayuda modifica el layout  para que informe lo correspondiente a cada caso"""
 		""" ayuda_layout lista creada para agregarlo al frame al layout de la sopa"""
-		# cantv, cantadj, cantsust = cantidad_pal(palabras_dicc)
 		ayuda_layout=[]
 		if config_dicc['ayuda'] == 'sin ayuda':
 			column1 = [
@@ -115,7 +106,6 @@ def dibujar():
 		return ayuda_layout
 	
 	ayuda_layout = ayuda(palabras_lista,palabras_dicc,config_dicc)
-	print('ANCHO:',ANCHO,'Alto:',ALTO)
 	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', '!Configuracion::Menu', 'E&xit'  ]],    
 					['&Ayuda', ['Como jugar?::Menu','Acerca de...::Menu']]
 				 ]
@@ -212,18 +202,17 @@ def dibujar():
 		return win	
 	
 	def Mensaje_Victoria():
+			"""Mensaje a mostrar en pantalla cuando se cumple la condicion de victoria"""
 			print('\nGanaste!')
 					
 			x_max,y_max = window.GetScreenDimensions()
 			for rep in range(5):
 				margen = 150
 				x_0, y_0 =  random.randrange(x_max-margen-50), random.randrange(y_max-margen-50)
-				# ~ x_0, y_0 = 555,450
 				sign = random.choice([-1,1])
 				v_x = sign*random.randrange(1,50)
 				
 				v_y = -1*random.randrange(10,30)
-				# ~ v_x, v_y = 10,10
 				g = 5
 				t = 0
 				rebote = 0
@@ -236,12 +225,10 @@ def dibujar():
 					
 					rand_col = ['#'+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
 									for i in range(4)]
-					# ~ print(rand_col)## ['#C7980A', '#F4651F', '#82D8A7', '#CC3A05', '#575E76', '#156943', '#0BD055', '#ACD338']
 					sg.Popup(' W I N N E R ',
 							button_color = (rand_col[0],rand_col[1]),					# Color of buttons (text_color, background_color)
 							background_color = rand_col[2],				# Color of background
 							text_color = rand_col[3], 					# Color of text
-							# ~ button_type = 'POPUP_BUTTONS_NO_BUTTONS',
 							auto_close = True,					# If True window will automatically close
 							auto_close_duration = 5,			# Number of seconds for autoclose
 							non_blocking = True,					# If True returns immediately
