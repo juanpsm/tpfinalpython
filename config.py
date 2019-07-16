@@ -170,7 +170,7 @@ def cargar_json_registro(of):
 	
 	try:
 		temp = reg_dicc[of][-1:][0]['temp'] #accede al ultimo registro de esa oficina
-		print(temp)
+		print('Oficina:',of,'T:',temp)
 	except KeyError:
 		print('No existe dato de esa oficina, se inventará')
 		return random.randint(-10,50)
@@ -262,7 +262,7 @@ def son_colores_parecidos(color1,color2):
 		color1 = AdobeRGBColor.new_from_rgb_hex(color1)
 		color2 = AdobeRGBColor.new_from_rgb_hex(color2)
 		delta_e = delta_e_cie1976(convert_color(color1,LabColor), convert_color(color2,LabColor))
-		print(delta_e)
+		print('delta color: ',delta_e)
 		#print(abs(delta_e)<50)
 		return abs(delta_e)<50
 
