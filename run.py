@@ -24,8 +24,11 @@ def existe_archivo_de_configuracion():
 	cond = res != []
 	return cond
 
-color_fondo = config.colores(config.cargar_configuracion()[0])
-
+color_fondo = config.colores(config.cargar_configuracion()[0])['splash']
+sg.SetOptions(background_color = color_fondo[1],
+			text_element_background_color=color_fondo[1],
+				element_background_color=color_fondo[1],
+				text_color=color_fondo[0],)
 menu_princ = [	['&Opciones', ['Configuracion::Menu', 'Exit::Menu'  ]],    
 				['&Ayuda', '&Acerca de...::Menu']
 			]

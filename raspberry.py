@@ -29,14 +29,14 @@ def guardar_datos(of, temp, hum):
 		dicc = {}
 		print('Creado de registro')
 	
-	string_time = time.strftime("%Y/%m/%d - %H:%M:%S", time.gmtime(time.time()))
+	string_time = time.strftime("%Y/%m/%d - %H:%M:%S", time.localtime(time.time()))
 
 	try: 
-		dicc[of].append({'time':of,'temp':temp,'hum':hum})
+		dicc[of].append({'time':string_time,'temp':temp,'hum':hum})
 	except KeyError:
-		dicc[of] = [{'time':of,'temp':temp,'hum':hum}]
-	print(dicc)
-	print(dicc[of][-1:])
+		dicc[of] = [{'time':string_time,'temp':temp,'hum':hum}]
+	#print(dicc)
+	#print(dicc[of][-1:])
 
 	with open(nombre_archivo_registro, 'w', encoding = 'utf-8') as f:
 		json.dump(dicc, f, ensure_ascii = False)
@@ -178,6 +178,7 @@ def show(emu = False, of):
 def main():
 	emu = input('Está emulando? (y or n): ').lower() in ('s','y','si','yes')
 	#emu = True
+	
 	of = input('Ingrese Nº Oficina: ')
 	if emu:
 		show(emu,of)
@@ -186,7 +187,7 @@ def main():
 		sonido = Sonido()
 		while True:
 			time.sleep(0.0001)
-			sonido.evento_detectado(show,of)
+			sonido.evento_detectado(show(emu,of))
 
 if __name__ == "__main__":
 	try:

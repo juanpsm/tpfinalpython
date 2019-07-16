@@ -31,6 +31,12 @@ con el color correspondiente.
 Si una letra pertenece a más de una 
 palabra (intersección), podrá marcarla
 con cualquier color.
+
+Al presionar boton COMPROBAR VICTORIA:
+Si las letras cambian a color blanco es que
+fueron marcadas con una categoria incorrecta,
+También pueden quedar letras por marcar.
+O puede haber una palabra marcadas incorrectamente.
 '''
 import PySimpleGUI as sg
 import random
@@ -47,16 +53,22 @@ def dibujar():
 	config_dicc, palabras_dicc, _ = config.cargar_configuracion()
 	palabras_lista = config.obtener_lista_palabras(config_dicc)
 	fuente = config_dicc['fuente']
-	color_fondo = ('#EFF0D1','#854e0b')
+	colores_celda = config.colores(config_dicc)
+	color_fondo = colores_celda['fondo']
 	#Colores marcas
-	color_celda_marcada = ('#EFF0D1','#854e0b') #blanco y marron
-	color_marca = {None:('#EFF0D1','#854e0b'), #blanco y marron
-					'adj':(config_dicc['color_pincel']['adj']),
-					'verb':(config_dicc['color_pincel']['verb']),
-					'sust':(config_dicc['color_pincel']['sust']),
-					'Erroneas':('#262730','#f4f4f4'),
-					'MIXTO':('#262730','#3e8271')}
-	color_celda_default = ('#262730','#5adbff') #negro y celeste
+	color_celda_marcada = colores_celda['marcada']
+	color_marca = {	None:	colores_celda[None],
+					'adj':	('#262730',config_dicc['color_pincel']['adj']),
+					'verb':	('#262730',config_dicc['color_pincel']['verb']),
+					'sust':	('#262730',config_dicc['color_pincel']['sust']),
+					'Erroneas':colores_celda['Erroneas'],
+					'MIXTO':colores_celda['MIXTO']}
+	color_celda_default = colores_celda['default']
+
+	# ~ print('Cargo en dibujar()',config_dicc['orientacion'])
+	print('Creo lista de palabras random en dibujar()')
+	print('palabras_lista =',palabras_lista)
+	
 	## Defino el ancho de la grilla como el mayor entre la cantidad de palabras o la palabra mas larga
 	ANCHO = max(len(max(palabras_lista, key=len)),len(palabras_lista)) # key = len hace que sea por cantidad de char y no alfabeticamente
 	## O solo la palabra más larga
@@ -72,6 +84,7 @@ def dibujar():
 	def ayuda(palabras_lista,palabras_dicc,config_dicc):
 		"""depende de lo recibido en la configuracion de ayuda modifica el layout  para que informe lo correspondiente a cada caso"""
 		""" ayuda_layout lista creada para agregarlo al frame al layout de la sopa"""
+		# cantv, cantadj, cantsust = cantidad_pal(palabras_dicc)
 		ayuda_layout=[]
 		if config_dicc['ayuda'] == 'sin ayuda':
 			column1 = [
@@ -106,10 +119,12 @@ def dibujar():
 		return ayuda_layout
 	
 	ayuda_layout = ayuda(palabras_lista,palabras_dicc,config_dicc)
+	print('ANCHO:',ANCHO,'Alto:',ALTO)
 	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', '!Configuracion::Menu', 'E&xit'  ]],    
 					['&Ayuda', ['Como jugar?::Menu','Acerca de...::Menu']]
 				 ]
 	sopa_layout = [	[sg.Button(matriz.celdas[j][i]['letra'],
+					 button_color=color_celda_default,
 					 size=(4,2),
 					 pad=(0,0),
 					 font=fuente,
@@ -125,31 +140,25 @@ def dibujar():
 				 relief='raised', text_color=color_marca['sust'][0], background_color=color_marca['sust'][1], justification='center', key='sust', tooltip='Elegir para marcar Sustantivos'),
 				 ]
 				]
-	Errores_layout =[ [sg.T('--------------------------------------------------')],
-					[ sg.T('Al presiona boton COMPROBAR VICTORIA:  ')],
-					[ sg.T('# Si las letras cambian a color blanco:\n'
-					'   °fueron marcadas con una categoria incorrecta')],
-					[ sg.T('# Si no muestra mensaje de victoria :\n '
-					'   °pueden quedar letras por marcar. \n'
-					'    °Hay una palabra marcada incorrectamente.')]]
+
 	#Layout principal.
 	layout = [
 				[sg.Menu(menu_princ)],
-				[sg.Frame('Seleccionar color: ', pincel_layout),sg.Button('  Comprobar Victoria', key = 'comprobar victoria',tooltip= 'Marca con blanco las marcadasz erroneamente.')],
-				[sg.Frame('', sopa_layout, font='System', title_color='blue'),
+				[sg.Frame('Seleccionar color: ', pincel_layout),sg.Button(' Comprobar Victoria', pad=((260,0),None), key = 'comprobar victoria',tooltip= 'Marca con blanco las marcadas erroneamente.')],
+				[sg.Frame('', sopa_layout, font=config_dicc['fuente'], pad=(0,0)),
 					sg.Frame('Ayudas: ',[	[sg.Text('Direcciones:', pad = ((20,0),0) )],
 											[sg.Button(image_filename = config_dicc['orientacion']+'.png', 
 														image_size=(80, 80), image_subsample=4, border_width=0,
-														pad = ((30,0),(10,30)), button_color = color_fondo),
-											sg.Column(ayuda_layout)],
-											[sg.Column(Errores_layout)]
+														pad = ((30,0),(10,30)), button_color = color_fondo)
+											],
+											[sg.Column(ayuda_layout)]
 											
 										]
 							)
 				]
 			]
 
-	layout.append([sg.Button('Cerrar')])
+	layout.append([sg.Button('Cerrar',pad=((580,10),(5,3)))])
 	window = sg.Window('Sopa de Letras').Layout(layout)
 	
 	start_time = time.time()
@@ -202,17 +211,18 @@ def dibujar():
 		return win	
 	
 	def Mensaje_Victoria():
-			"""Mensaje a mostrar en pantalla cuando se cumple la condicion de victoria"""
 			print('\nGanaste!')
 					
 			x_max,y_max = window.GetScreenDimensions()
 			for rep in range(5):
 				margen = 150
 				x_0, y_0 =  random.randrange(x_max-margen-50), random.randrange(y_max-margen-50)
+				# ~ x_0, y_0 = 555,450
 				sign = random.choice([-1,1])
 				v_x = sign*random.randrange(1,50)
 				
 				v_y = -1*random.randrange(10,30)
+				# ~ v_x, v_y = 10,10
 				g = 5
 				t = 0
 				rebote = 0
@@ -225,10 +235,12 @@ def dibujar():
 					
 					rand_col = ['#'+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
 									for i in range(4)]
+					# ~ print(rand_col)## ['#C7980A', '#F4651F', '#82D8A7', '#CC3A05', '#575E76', '#156943', '#0BD055', '#ACD338']
 					sg.Popup(' W I N N E R ',
 							button_color = (rand_col[0],rand_col[1]),					# Color of buttons (text_color, background_color)
 							background_color = rand_col[2],				# Color of background
 							text_color = rand_col[3], 					# Color of text
+							# ~ button_type = 'POPUP_BUTTONS_NO_BUTTONS',
 							auto_close = True,					# If True window will automatically close
 							auto_close_duration = 5,			# Number of seconds for autoclose
 							non_blocking = True,					# If True returns immediately

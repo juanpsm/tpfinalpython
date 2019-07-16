@@ -159,6 +159,7 @@ def obtener_lista_palabras(config_dicc):
 	return palabras_rand
 	
 def cargar_json_registro(of):
+	'''Carga los datos de temperatura y humedad de las , delvuelve la ultima temperatura registrada de la oficina que recibe como parametro'''
 	existe = os.path.isfile(nombre_archivo_registro)
 	if not existe:
 		print('No existe archivo de registro, se usara uno de prueba')
@@ -172,7 +173,7 @@ def cargar_json_registro(of):
 		print(temp)
 	except KeyError:
 		print('No existe dato de esa oficina, se inventará')
-		return 34
+		return random.randint(-10,50)
 	
 	return int(temp)
 
@@ -186,42 +187,70 @@ def colores(config_dicc):
 	text_color='black',
 	input_text_color='black',
 	background_color='#EFF0D1', #cremita
-	text_element_background_color='#EFF0D1',
-	element_background_color='#EFF0D1',
-	scrollbar_color=None,
-	input_elements_background_color='#EFF0D1', #lila
-	progress_meter_color = ('green', 'blue'),
-	button_color = ('#262730','#5adbff') # celeste
 	)
-	## o automaticamente con 
-	# ~ sg.ListOfLookAndFeelValues()
-	#['SystemDefault', 'Reddit', 'Topanga', 'GreenTan', 'Dark', 'LightGreen', 'Dark2', 'Black', 'Tan', 'TanBlue',
-	# 'DarkTanBlue', 'DarkAmber', 'DarkBlue', 'Reds', 'Green', 'BluePurple', 'Purple', 'BlueMono', 'GreenMono',
-	# 'BrownBlue', 'BrightColors', 'NeutralBlue', 'Kayak', 'SandyBeach', 'TealMono']
+#
+	BLUES = ("#082567", "#0A37A3", "#00345B")
+	PURPLES = ("#480656", "#4F2398", "#380474")
+	GREENS = ("#01826B", "#40A860", "#96D2AB", "#00A949", "#003532")
+	YELLOWS = ("#F3FB62", "#F0F595")
+	TANS = ("#FFF9D5", "#F4EFCF", "#DDD8BA")
+	NICE_BUTTON_COLORS = ((GREENS[3], TANS[0]),
+						('#000000', '#FFFFFF'),
+						('#FFFFFF', '#000000'),
+						(YELLOWS[0], PURPLES[1]),
+						(YELLOWS[0], GREENS[3]),
+						(YELLOWS[0], BLUES[2]))
+	DEFAULT_PROGRESS_BAR_COLOR= (GREENS[0], '#D0D0D0')
+	temas = {'Calido':	{'BACKGROUND': '#a7ad7f','TEXT': 'black','INPUT': '#e6d3a8','SCROLL': '#e6d3a8','TEXT_INPUT': 'black','BUTTON': ('white', '#5d907d')},
+			'Frio':		{'BACKGROUND': '#A5CADD','TEXT': '#6E266E','INPUT': '#E0F5FF','SCROLL': '#E0F5FF','TEXT_INPUT': 'black','BUTTON': ('white', '#303952')},
+			'Neutro':	{'BACKGROUND': '#92aa9d','TEXT': 'black', 'INPUT': '#fcfff6', 'SCROLL': '#fcfff6', 'TEXT_INPUT': 'black', 'BUTTON': ('black', '#d0dbbd')},
+			'Oscuro':	{'BACKGROUND': 'gray25','TEXT': 'white','INPUT': 'gray30','SCROLL': 'gray44','TEXT_INPUT': 'white','BUTTON': ('white', '#004F00')}
+			}
 	temas_clima={	"Frio":['GreenTan','LightGreen','DarkBlue','BluePurple','BlueMono','BrownBlue','TealMono'],
 					"Neutro":['Reddit','Tan','TanBlue','Purple','GreenMono','NeutralBlue'],
 					"Calido":['DarkAmber','Reds','Green','BrightColors','Kayak','SandyBeach'],
-					"Oscuro":['Topanga','Dark','Dark2','Black','DarkTanBlue']
-				}
+					"Oscuro":['Topanga','Dark','Dark2','Black','DarkTanBlue']}
 	
 	temp = cargar_json_registro(config_dicc['oficina'])
 	hora = int(time.strftime("%H", time.localtime(time.time())))
 	if temp < 15 :
-		tema = random.choice(temas_clima['Frio'])
+		tema = 'Frio'
 		if hora > 18:
-			tema = random.choice(temas_clima['Oscuro'])
+			tema = 'Oscuro'
 	elif temp < 25:
-		tema = random.choice(temas_clima['Neutro'])
+		tema = 'Neutro'
 		if hora > 20:
-			tema = random.choice(temas_clima['Oscuro'])
+			tema = 'Oscuro'
 	else:
-		tema = random.choice(temas_clima['Calido'])
+		tema = 'Calido'
 		if hora > 21:
-			tema = random.choice(temas_clima['Oscuro'])
+			tema = 'Oscuro'
+	sg.SetOptions(background_color=temas[tema]['BACKGROUND'],
+				text_element_background_color=temas[tema]['BACKGROUND'],
+				element_background_color=temas[tema]['BACKGROUND'],
+				text_color=temas[tema]['TEXT'],
+				input_elements_background_color=temas[tema]['INPUT'],
+				button_color=temas[tema]['BUTTON'],
+				progress_meter_color=DEFAULT_PROGRESS_BAR_COLOR,
+				border_width=1,
+				slider_border_width=0,
+				progress_meter_border_depth=0,
+				scrollbar_color=(temas[tema]['SCROLL']),
+				element_text_color=temas[tema]['TEXT'],
+				input_text_color=temas[tema]['TEXT_INPUT'])
+
+	colores_celdas = {	None:	('#EFF0D1','#854e0b'), #blanco y marron
+					'adj':	('#262730',config_dicc['color_pincel']['adj']),
+					'verb':	('#262730',config_dicc['color_pincel']['verb']),
+					'sust':	('#262730',config_dicc['color_pincel']['sust']),
+					'marcada': ('#EFF0D1',temas[tema]['INPUT']),
+					'Erroneas':('#262730','#f4f4f4'),
+					'MIXTO':('#262730','#3e8271'),
+					'default':temas[tema]['BUTTON'], #negro y celeste
+					'fondo':('#262730',temas[tema]['BACKGROUND']), #·negro y crema
+					'splash':('#262730','#EFF0D1')}
+	return colores_celdas
 	
-	sg.ChangeLookAndFeel(tema)
-	
-	return ('#262730','#EFF0D1') #·negro y crema
 	
 def son_colores_parecidos(color1,color2):
 	'''Usa la librería colormath para determinar si un par de colores es parecido y devuelve verdadero en ese caso'''
@@ -248,8 +277,7 @@ def configuracion():
 	
 	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
 	
-	color_fondo = colores(config_dicc)
-	color_sel = ('#EFF0D1', '#D33F49')
+	colores_celdas = colores(config_dicc)
 	orientacion = 'dirs_0' #por defecto
 	
 	palabras_lista = list(palabras_dicc.keys()) ## lista para el listbox
@@ -292,13 +320,13 @@ def configuracion():
 	 
 	colores_layout = [	[sg.Column(	[	
 							[sg.Text(k[0]+':', pad=((0,),2) )],
-							[sg.Combo(lista_Combo_colores, key = '_combo_'+k[1], default_value = k[2], enable_events = True)],
+							#[sg.Combo(lista_Combo_colores, key = '_combo_'+k[1], default_value = k[2], enable_events = True)],
 							
 							[sg.In(default_text='', key = 'color_'+k[1], size = (7, 1), enable_events = True, visible = False)], # este in tiene que ir si o si para que ande el evento del color chooser, como pasa con el FileBrowse
 							[sg.ColorChooserButton('', button_color=('red',config_dicc['color_pincel'][k[1]]), 
-														target='color_'+k[1], size=(4,1), border_width=2,
+														target='color_'+k[1], size=(4,2), border_width=3, pad=((10,10),(5,5)),
 														key='boton_color_'+k[1])]
-							]) for k in (('Sustantivos','sust','amarillo'),('Verbos','verb','rojo'),('Adjetivo','adj','verde'))
+							]) for k in (('Sustantivos','sust','amarillo'),('Verbos','verb','rojo'),('Adjetivos','adj','verde'))
 						],
 						[sg.Text('', size = (50,1), font=('default', 10, 'bold'), text_color='#D33F49', 
 									 pad=((10,0),(5,10)), key = '_error_color_')]
@@ -309,7 +337,7 @@ def configuracion():
 				 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')]]
 				  
 	layout_orientacion = [	[sg.Button('', image_filename='dirs_'+str(i)+'.png', image_size=(60, 60), image_subsample=6, border_width=0,
-							key='dirs_'+str(i), button_color=color_sel if config_dicc['orientacion']=='dirs_'+str(i) else color_fondo)
+							key='dirs_'+str(i), button_color=colores_celdas['marcada'] if config_dicc['orientacion']=='dirs_'+str(i) else colores_celdas['fondo'])
 				 for i in (0,1,2,3,4,8)]]
 				 
 	layout_mayuscula = [	[sg.Radio('Mayúscula', "RADIOn", key='mayus', default = True, size=(10,1)),
@@ -320,7 +348,7 @@ def configuracion():
 						key='_FONT_')]]
 						
 	layout_oficina = [	[sg.Input(default_text=config_dicc['oficina'], size=(3,1), key = '_OF_', do_not_clear = True, background_color = '#DB91D6'),
-						 sg.Text('Temp = '+str(cargar_json_registro(config_dicc['oficina']))+'ºC')
+						 sg.Text('Temp = '+str(cargar_json_registro(config_dicc['oficina']))+'ºC', key='_TEMP_')
 						 ]
 					 ]
 			
@@ -420,11 +448,11 @@ def configuracion():
 		
 		if event in ('dirs_0','dirs_1','dirs_2','dirs_3','dirs_4','dirs_8'):
 
-			window.Element(event).Update( button_color = color_sel ) # pinto este boton como seleccionado
+			window.Element(event).Update( button_color = colores_celdas['marcada'] ) # pinto este boton como seleccionado
 			lista_dirs = ['dirs_0','dirs_1','dirs_2','dirs_3','dirs_4','dirs_8']
 			lista_dirs.remove(event)
 			for x in lista_dirs:  # pinto todos menos el actual del color del fondo
-				window.Element(x).Update(button_color = color_fondo)
+				window.Element(x).Update(button_color = colores_celdas['fondo'])
 			
 			orientacion = event
 		##configuracion de colores de pinceles
@@ -441,7 +469,7 @@ def configuracion():
 		
 		evento_colores = ['color_'+j for j in ('sust','verb','adj')]
 		if event in evento_colores:
-			window.FindElement('boton_'+event).Update(button_color = (color_fondo[0],val[event]))
+			window.FindElement('boton_'+event).Update(button_color = (colores_celdas['fondo'][0],val[event]))
 			print('Colores elegidos:',val['color_sust'],val['color_verb'],val['color_adj'])
 
 			if val[event]=="None":
@@ -453,15 +481,15 @@ def configuracion():
 				
 				if son_colores_parecidos(val['color_sust'],col['color_verb']):
 					error_color += True
-					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y verbo muy parecido')
+					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y verbo muy parecido.')
 				
 				if son_colores_parecidos(col['color_sust'],col['color_adj']):
 					error_color += True
-					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y adjetivo muy parecido')
+					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y adjetivo muy parecido.')
 				
 				if son_colores_parecidos(col['color_verb'],col['color_adj']):
 					error_color += True
-					window.Element('_error_color_').Update(value='¡Error! Color de verbo y adjetivo muy parecido')
+					window.Element('_error_color_').Update(value='¡Error! Color de verbo y adjetivo muy parecido.')
 				
 				if error_color:
 					window.Element('_error_color_').Update(visible= True)
@@ -499,7 +527,7 @@ def configuracion():
 			# 								'adj':  listaColores[val['comboAdj']]}
 			
 			config_dicc['color_pincel'] = {x : val['color_'+x] for x in ('sust','verb','adj')}
-
+			window.Element('_TEMP_').Update(value = 'Temp = '+str(cargar_json_registro(val['_OF_']))+'ºC')
 			#print('VALORES')
 			#print(config_dicc)	 
 		except ValueError:
