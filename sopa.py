@@ -168,8 +168,8 @@ def dibujar():
 		for j in range(ANCHO):
 					for i in range(ALTO):
 						if matriz.celdas[j][i]['marcada'] == True:
-							if matriz.celdas[j][i]['tipo'] in ('adj','verb','sust'):
-								if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]:
+							if matriz.celdas[j][i]['tipo'] in ('adj','verb','sust','MIXTO'):
+								if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']] and matriz.celdas[j][i]['tipo'] != 'MIXTO':
 									window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
 									matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
 									window.Refresh()
@@ -301,12 +301,12 @@ def dibujar():
 			for element in ('adj','verb','sust'):
 				window.FindElement(element).Update(value = element)
 			window.FindElement(event).Update(value ='* '+event.upper()+' *')
-					
+
 		win = True
 		win = Win_Condition(matriz,win)
 		if win == True and event == 'comprobar victoria':
 			Mensaje_Victoria()
-
+		print(event)
 	window.Close()
 
 if __name__ == "__main__":

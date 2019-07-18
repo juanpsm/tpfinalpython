@@ -125,9 +125,10 @@ def cargar_configuracion():
 		config_dicc = {}
 		config_dicc['palabras'] = {}
 		config_dicc['palabras_clas'] = {'sust':[],'verb':[],'adj':[]}
-		config_dicc['orientacion'] = None
+		config_dicc['orientacion'] = 'dirs_0'
 		palabras_dicc = {}
 		palabras_clas = {'sust':[],'verb':[],'adj':[]}
+		config_dicc['fuente'] = 'Comic'
 		config_dicc['max_sust'] = 0
 		config_dicc['max_verb'] = 0
 		config_dicc['max_adj'] = 0
@@ -188,7 +189,6 @@ def colores(config_dicc):
 	input_text_color='black',
 	background_color='#EFF0D1', #cremita
 	)
-#
 	BLUES = ("#082567", "#0A37A3", "#00345B")
 	PURPLES = ("#480656", "#4F2398", "#380474")
 	GREENS = ("#01826B", "#40A860", "#96D2AB", "#00A949", "#003532")
@@ -251,7 +251,6 @@ def colores(config_dicc):
 					'splash':('#262730','#EFF0D1')}
 	return colores_celdas
 	
-	
 def son_colores_parecidos(color1,color2):
 	'''Usa la librería colormath para determinar si un par de colores es parecido y devuelve verdadero en ese caso'''
 	from colormath.color_objects import AdobeRGBColor, LabColor, XYZColor
@@ -278,7 +277,8 @@ def configuracion():
 	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
 	
 	colores_celdas = colores(config_dicc)
-	orientacion = 'dirs_0' #por defecto
+	
+	orientacion = config_dicc['orientacion'] #por defecto
 	
 	palabras_lista = list(palabras_dicc.keys()) ## lista para el listbox
 	
@@ -344,8 +344,8 @@ def configuracion():
 				 sg.Radio('Minúscula', "RADIOn", key='minus')]]
 				 
 	layout_fuente = [	[sg.Combo(	('Arial','Courier','Comic','Fixedsys','Times','Verdana','Helvetica'),
-						default_value='Comic',
-						key='_FONT_')]]
+						default_value = config_dicc['fuente'],
+						key = '_FONT_')]]
 						
 	layout_oficina = [	[sg.Input(default_text=config_dicc['oficina'], size=(3,1), key = '_OF_', do_not_clear = True, background_color = '#DB91D6'),
 						 sg.Text('Temp = '+str(cargar_json_registro(config_dicc['oficina']))+'ºC', key='_TEMP_')
@@ -469,17 +469,18 @@ def configuracion():
 		
 		evento_colores = ['color_'+j for j in ('sust','verb','adj')]
 		if event in evento_colores:
-			window.FindElement('boton_'+event).Update(button_color = (colores_celdas['fondo'][0],val[event]))
-			print('Colores elegidos:',val['color_sust'],val['color_verb'],val['color_adj'])
+			window.FindElement('boton_'+event).Update(button_color = ('red',val[event]))
+			print('Colores elegidos (val):',val['color_sust'],val['color_verb'],val['color_adj'])
 
 			if val[event]=="None":
 				
 				col[event] = config_dicc['color_pincel'][event[6:]]
+				print('Colores elegidos (col):',col['color_sust'],col['color_verb'],col['color_adj'])
 			else:
 				col[event] = val[event]
 				error_color = False
 				
-				if son_colores_parecidos(val['color_sust'],col['color_verb']):
+				if son_colores_parecidos(col['color_sust'],col['color_verb']):
 					error_color += True
 					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y verbo muy parecido.')
 				
@@ -526,7 +527,7 @@ def configuracion():
 			# 								'verb': listaColores[val['comboVerb']],
 			# 								'adj':  listaColores[val['comboAdj']]}
 			
-			config_dicc['color_pincel'] = {x : val['color_'+x] for x in ('sust','verb','adj')}
+			config_dicc['color_pincel'] = {x : col['color_'+x] for x in ('sust','verb','adj')}
 			window.Element('_TEMP_').Update(value = 'Temp = '+str(cargar_json_registro(val['_OF_']))+'ºC')
 			#print('VALORES')
 			#print(config_dicc)	 
@@ -555,6 +556,8 @@ def configuracion():
 			print ('Seleccionado: ',val['_LISTA_'])
 
 	window.Close()
+
+	return 0
 
 if __name__ == "__main__":
 	configuracion()
