@@ -101,6 +101,7 @@ Hubo unos errores en la re entrega
  
 ## Cosas que no llegamos a hacer:
 - Mejorar gráficos del "pincel".
+- Ordenar los archivos en carpetas (no sabíamos).
 - Deshabilitar ventana mientras se está eligiendo el color.
 - Mejorar rendimiento de sopa.py (revisa los casilleros demasiadas veces, anda pero es redundante)
 - Hay problemas con las cantidades de palabras en algunas ocasiones, puede quedar en cero si se manipula un poco.
