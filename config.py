@@ -6,15 +6,41 @@ import json
 import os
 import time
 import datetime
-
-
+import tkinter
+from tkinter.colorchooser import askcolor
 from pprint import pprint
 from collections import defaultdict
 from buscar_en_wiktionary import buscar_en_wiktionary
 from creador_registro_test import crear_registro
 
+CREDITS = '''
+Sopa de Letras
+v alpha.0.1
 
-listaColores= {'rojo': ('#EFF0D1','#f05959'),'violeta':('#262730','#c382ff'),'verde':('#262730','green3'),'amarillo':('#262730','yellow2'),'azul':('#262730','#1282cc')}
+Trabajo Final para Seminario Opción Python
+	Facultad de Informática
+		UNLP
+
+Alumnos:
+
+	Matías Agustin Cabral
+	Bruno Sbrancia
+	Juan Pablo Sanchez Magariños
+'''
+HOWTO = '''
+Instrucciones para la configuración:
+	Igrese palabras para ser usadas en la sopa de letra, en caso que  no se encuentre la misma en una busqueda en ciertas bases de datos, se le pedirá una definición.
+	Puede eliminar palabras de la lista haciendo primero click y luego click derecho.
+	Debe elegir la cantidad de palabras de cada tipo que quiere que se usen. El sistema eligirá palabras al azar de entre las que se encuentren en la lista, respetando las cantidades indicadas.
+	Puede cambiar los colores con los que el alumno marcará las palabras en la Sopa de Letras.
+	Para agregar dificultad puede elegir el tipo de Ayudas:
+	- Sin ayuda, solo indicara la cantidad de palabras que debe el alumno buscar.
+	- Definiciones, mostrará una lista con definiciones de las palabras que se encuentran en la Sopa.
+	- Mostrar palabras, muestra la lista directamente de todas las palabras que hay en la misma.
+	La Orientacion indica las distintas formas de disponer las palabras como indican las flechas. Poniendo el mouse sobre las mismas le dará una breve descripción al respecto.
+	Por último puede elegir la fuente y la capitalización de las letras.
+	El campo oficina podra elegirlo si se dispone de un archivo con las temperaturas de las aulas tomado por una raspberry Pi. A partir del mismo se designarán los colores de las ventanas sigueintes.
+'''
 
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
@@ -274,10 +300,16 @@ def son_colores_parecidos(color1,color2):
 		print('Elige un color')
 		return False
 
-def configuracion():
-	# crea lista auxiliar de colores para los combo de seleccion de color de pincel.
-	lista_Combo_colores = list(listaColores.keys())
-	"""recibe de cargar_configuracion() la configuracion elegida por el usuario para la sopa de letras"""
+def disable(window):
+	window.TKroot.attributes('-disabled', 1)
+	window.SetAlpha(0.75)
+
+def enable(window):
+	window.Reappear() ##igual que poner el alpha en 1
+	window.BringToFront()
+	window.TKroot.attributes('-disabled', 0)
+
+def main():
 	
 	config_dicc, palabras_dicc, palabras_clas = cargar_configuracion()
 	
@@ -322,12 +354,10 @@ def configuracion():
 	 
 	colores_layout = [	[sg.Column(	[	
 							[sg.Text(k[0]+':', pad=((0,),2) )],
-							#[sg.Combo(lista_Combo_colores, key = '_combo_'+k[1], default_value = k[2], enable_events = True)],
-							
-							[sg.In(default_text='', key = 'color_'+k[1], size = (7, 1), enable_events = True, visible = False)], # este in tiene que ir si o si para que ande el evento del color chooser, como pasa con el FileBrowse
-							[sg.ColorChooserButton('', button_color=('red',config_dicc['color_pincel'][k[1]]), 
-														target='color_'+k[1], size=(6,3), border_width=5, pad=((25,25),(5,0)),
-														key='boton_color_'+k[1])]
+
+							[sg.Button('', button_color=('red',config_dicc['color_pincel'][k[1]]), 
+														size=(6,3), border_width=5, pad=((25,25),(5,0)),
+														key='color_'+k[1])]
 							]) for k in (('Sustantivos','sust','amarillo'),('Verbos','verb','rojo'),('Adjetivos','adj','verde'))
 						],
 						[sg.Text('', size=(52,1), font=('default', 10, 'bold'), text_color='#D33F49', 
@@ -338,9 +368,18 @@ def configuracion():
 				 sg.Radio('Definiciones', "RADIOA", key='defin'),
 				 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')]]
 				  
-	layout_orientacion = [	[sg.Button('', image_filename='img/dirs_'+str(i)+'.png', image_size=(60, 60), image_subsample=6, border_width=0,
-							key='dirs_'+str(i), button_color=colores_celdas['marcada'] if config_dicc['orientacion']=='dirs_'+str(i) else colores_celdas['fondo'])
-				 for i in (0,1,2,3,4,8)]]
+	layout_orientacion = [	[sg.Button	('',	image_filename = 'img/dirs_'+str(i[0])+'.png', image_size = (60, 60), image_subsample = 6,
+												border_width=0, tooltip=i[1], key='dirs_'+str(i[0]), 
+												button_color=colores_celdas['marcada'] if config_dicc['orientacion']=='dirs_'+str(i) else colores_celdas['fondo']
+										) for i in (	(0,'Sólo horizontal de izquierda a derecha'),
+				 										(1,'Sólo vertical de arriba hacia abajo'),
+														(2,'Horizontal de izquierda a derecha y vertical de arriba hacia abajo'),
+														(3,'Horizontal de izquierda a derecha, vertical de arriba hacia abajo y diagonal hacia abajo y derecha'),
+														(4,'Horizontal y vertical en ambos sentidos cada uno'),
+														(8,'Horizontal, vertical y diagonal en ambos sentidos')
+													)
+								]
+							]
 				 
 	layout_mayuscula = [	[sg.Radio('Mayúscula', "RADIOn", key='mayus', default = True, size=(10,1)),
 				 sg.Radio('Minúscula', "RADIOn", key='minus')]]
@@ -359,10 +398,9 @@ def configuracion():
 	
 	menu_princ = [	['&Archivo',	['&Cargar...::Menu', 
 									'&Guardar...::Menu', 
-									'---', 
-									'Configuracion::Menu', 
-									'E&xit']],
-					['&Ayuda',		['Como jugar?::Menu',
+									'---',
+									'E&xit::Menu']],
+					['&Ayuda',		['Instrucciones::Menu',
 									'Acerca de...::Menu']]
 				]
 	
@@ -373,6 +411,7 @@ def configuracion():
 	window0.Close()
 	print('Resolución:',x_max,'x',y_max)
 	
+	# Control de layout según alto de pantalla
 	if y_max > 800:
 		layout_principal = [
 			[sg.Menu(menu_princ)],
@@ -382,7 +421,8 @@ def configuracion():
 			[sg.Frame('Ayudas',layout_ayudas)],
 			[sg.Frame('Orientacion',layout_orientacion)],
 			[sg.Frame('Mayúscula/Minúscula',layout_mayuscula),sg.Frame('Fuente',layout_fuente), sg.Frame('Oficina',layout_oficina)],
-			[sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((200,5),1), disabled = False),sg.Button('Cerrar' , key= '_CERRAR_',disabled = False)] 
+			[sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((350,5),(10,5)), disabled = False),
+			 sg.Button('Cerrar' , key= '_CERRAR_', pad = ((5,5),(10,5)), disabled = False)] 
 		]
 	else:
 		layout_principal = [
@@ -390,7 +430,8 @@ def configuracion():
 			[sg.Frame('Ingrese palabras: ',agregar_palabra_layout), sg.Frame('Seleccion de colores: ',colores_layout)],
 			[sg.Frame('Cantidad máxima de cada tipo de palabra:',cantidad_palabras_layout),sg.Frame('Orientacion',layout_orientacion)], 
 			[sg.Frame('Ayudas',layout_ayudas),sg.Frame('Mayúscula/Minúscula',layout_mayuscula),sg.Frame('Fuente',layout_fuente),sg.Frame('Oficina',layout_oficina)],
-			[sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((700,5),1), disabled = False),sg.Button('Cerrar' , key= '_CERRAR_',disabled = False)] 
+			[sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((750,5),(10,5)), disabled = False),
+			 sg.Button('Cerrar' , key= '_CERRAR_', pad = ((5,5),(10,5)), disabled = False)] 
 		]
 
 	window = sg.Window('CONFIGURACIÓN').Layout(layout_principal)
@@ -398,15 +439,24 @@ def configuracion():
 
 	for x in ('V','A'):
 		window.FindElement('_CANT_'+x+'_').Update(disabled = True)
+	
+	# Estructura auxiliar para guardar los colores de "pincel"
 	col = {}
 	for x in ('sust','verb','adj'):
-		window.FindElement('color_'+x).Update(value = config_dicc['color_pincel'][x])
 		col['color_'+x] = config_dicc['color_pincel'][x]
 	 
 	while True:                 # Event Loop  
 		event, val = window.Read()  
-		if event is None or event == '_CERRAR_': 
+		if event is None or event == '_CERRAR_' or event =='Exit::Menu':
 			break
+
+		if event in ('Instrucciones::Menu','Acerca de...::Menu'):
+			disable(window)
+			if event == 'Instrucciones::Menu':
+				sg.Popup(HOWTO,font = 'System', keep_on_top=True)
+			if event == 'Acerca de...::Menu':
+				sg.Popup(CREDITS,font = 'System', keep_on_top=True)
+			enable(window)
 		
 		if event == '_ADD_':
 			palabra = val['_IN_']  #Guardo lo que puso en el imput
@@ -424,10 +474,9 @@ def configuracion():
 					# cancela a la hora de agregar la definicion. Tambien puede no saber clasificarla por no encontrar 
 					# "ES:Sustantivo", etc, en las categorías, entonces devolverá '_no_sabe_' como categoría
 					if definicion == '_no_aceptada_': 
-						window.SetAlpha(0.5)
-						window.Disable()
+						disable(window)
 						sg.Popup('No consideramos que "'+palabra+'" sea una palabra', keep_on_top=True)
-						window.Reappear() 
+						enable(window)
 					
 					elif definicion != '_cancelada_' and categoria != '_no_sabe_' : # la agrego en las estructuras
 						palabras_dicc[palabra] = {'tipo': categoria,'def': definicion}
@@ -456,9 +505,10 @@ def configuracion():
 				texto += 'Clasificación : ' + palabras_dicc[ val['_LISTA_'][0] ]['tipo']+'.\n'
 				texto += '\n  ' + palabras_dicc[ val['_LISTA_'][0] ]['def']
 			
-				window.SetAlpha(0.5)
+				disable(window)
 				sg.Popup(texto, keep_on_top=True)
-				window.Reappear() ##igual que poner el alpha en 1
+				enable(window)
+
 			except(KeyError):
 				print(val['_LISTA_'][0])
 			except(IndexError):
@@ -485,47 +535,47 @@ def configuracion():
 				window.Element(x).Update(button_color = ( '#000', window.BackgroundColor) )
 			
 			orientacion = event
-		
-		if event=='boton_color_sust':
-			print('AYAHUASCA')
-
 
 		evento_colores = ['color_'+j for j in ('sust','verb','adj')]
 		if event in evento_colores:
-			
-			window.FindElement('boton_'+event).Update(button_color = ('red',val[event]))
-			print('Colores elegidos (val):',val['color_sust'],val['color_verb'],val['color_adj'])
 
-			if val[event]=="None":
+			disable(window)
+
+			color_elegido = tkinter.colorchooser.askcolor()  
+			print('color_elegido =',color_elegido)
+			color_elegido = color_elegido[1]
+
+			window.FindElement(event).Update(button_color = ('red',color_elegido))
+			#print('Colores elegidos (val):',val['color_sust'],val['color_verb'],val['color_adj'])
+
+			col[event] = color_elegido
+			print('Colores elegidos (col):',col['color_sust'],col['color_verb'],col['color_adj'])
+			error_color = False
 				
-				col[event] = config_dicc['color_pincel'][event[6:]]
-				print('Colores elegidos (col):',col['color_sust'],col['color_verb'],col['color_adj'])
+			print('Delta entre color_sust y color_verb:',end=' ')
+			if son_colores_parecidos(col['color_sust'],col['color_verb']):
+				error_color += True
+				window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y verbo muy parecido.')
+			print('Delta entre color_sust y color_adj:',end=' ')
+			if son_colores_parecidos(col['color_sust'],col['color_adj']):
+				error_color += True
+				window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y adjetivo muy parecido.')
+			print('Delta entre color_verb y color_adj:',end=' ')
+			if son_colores_parecidos(col['color_verb'],col['color_adj']):
+				error_color += True
+				window.Element('_error_color_').Update(value='¡Error! Color de verbo y adjetivo muy parecido.')
+			print()
+			if error_color:
+				window.Element('_error_color_').Update()
+				window.Element('_error_color_').Update(visible= True)
+				window.FindElement('_ACEPTAR_').Update(disabled = True)
+			
 			else:
-				col[event] = val[event]
-				error_color = False
-				
-				print('Delta entre color_sust y color_verb:',end=' ')
-				if son_colores_parecidos(col['color_sust'],col['color_verb']):
-					error_color += True
-					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y verbo muy parecido.')
-				print('Delta entre color_sust y color_adj:',end=' ')
-				if son_colores_parecidos(col['color_sust'],col['color_adj']):
-					error_color += True
-					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y adjetivo muy parecido.')
-				print('Delta entre color_verb y color_adj:',end=' ')
-				if son_colores_parecidos(col['color_verb'],col['color_adj']):
-					error_color += True
-					window.Element('_error_color_').Update(value='¡Error! Color de verbo y adjetivo muy parecido.')
-				print()
-				if error_color:
-					window.Element('_error_color_').Update()
-					window.Element('_error_color_').Update(visible= True)
-					window.FindElement('_ACEPTAR_').Update(disabled = True)
-				
-				else:
-					window.Element('_error_color_').Update(value='')
-					window.Element('_error_color_').Update(visible= False)
-					window.FindElement('_ACEPTAR_').Update(disabled = False)
+				window.Element('_error_color_').Update(value='')
+				window.Element('_error_color_').Update(visible= False)
+				window.FindElement('_ACEPTAR_').Update(disabled = False)
+			
+			enable(window)
 
 		lista_cant = ['_CANT_S_','_CANT_V_','_CANT_A_']
 		if event in lista_cant:
@@ -551,28 +601,21 @@ def configuracion():
 			config_dicc['max_verb'] = int(val['_CANT_V_'])
 			config_dicc['max_adj'] = int(val['_CANT_A_'])
 			config_dicc['oficina'] = val['_OF_']
-			#config_dicc['color_pincel'] = {'sust': listaColores[val['comboSust']],
-			# 								'verb': listaColores[val['comboVerb']],
-			# 								'adj':  listaColores[val['comboAdj']]}
-			
 			config_dicc['color_pincel'] = {x : col['color_'+x] for x in ('sust','verb','adj')}
 
 			#print('VALORES')
 			#print(config_dicc)	 
 		except ValueError:
-			window.SetAlpha(0.5)
+			disable(window)
 			sg.Popup('Debe seleccionar cantidades!!', keep_on_top=True)
-			window.Reappear()
+			enable(window)
 				
 		if event == '_ACEPTAR_':
+			
 			if TOTAL_PALABRAS_A_USAR == 0:
-				window.SetAlpha(0.5)
+				disable(window)
 				sg.PopupError('La cantidad de palabras\n no puede ser cero.', keep_on_top=True)
-				window.Reappear()
-			if val['_OF_'] == None or val['_OF_'] == '':
-				window.SetAlpha(0.5)
-				sg.PopupError('Debe ingresar el \n numero de oficina.', keep_on_top=True)
-				window.Reappear()
+				enable(window)
 			else:
 				with open(nombre_archivo_config, 'w', encoding = 'utf-8') as f:
 					json.dump(config_dicc, f, ensure_ascii = False)
@@ -585,6 +628,6 @@ def configuracion():
 	window.Close()
 
 if __name__ == "__main__":
-	configuracion()
+	main()
 
 

@@ -120,7 +120,7 @@ def dibujar():
 	
 	ayuda_layout = ayuda(palabras_lista,palabras_dicc,config_dicc)
 	print('ANCHO:',ANCHO,'Alto:',ALTO)
-	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', 'Configuracion::Menu', 'E&xit'  ]],    
+	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', 'Configuracion::Menu', 'E&xit::Menu'  ]],    
 					['&Ayuda', ['Como jugar?::Menu','Acerca de...::Menu']]
 				 ]
 	sopa_layout = [	[sg.Button(matriz.celdas[j][i]['letra'],
@@ -263,7 +263,7 @@ def dibujar():
 	while True:				 # Event Loop
 		event, val = window.Read()
 		
-		if event is None or event == 'Cerrar':
+		if event is None or event == 'Cerrar' or event == 'Exit::Menu':
 			break
 			
 		if event == 'Guardar...::Menu':
@@ -275,18 +275,22 @@ def dibujar():
 			filename = 'savegame.sav'
 			print('Cargar ',filename)
 			window.LoadFromDisk(filename)
-			
+		
+		if event == 'Configuracion::Menu':
+			window.TKroot.attributes('-disabled', 1)
+			config.main()
+			break
+
+
 		if event == 'Como jugar?::Menu':
-			window.Disable
-			window.SetAlpha(0.5)
+			config.disable(window)
 			sg.Popup(HOWTO,font = 'System', keep_on_top=True)
-			window.Reappear() 
+			config.enable(window)
 		
 		if event == 'Acerca de...::Menu':
-			window.Disable
-			window.SetAlpha(0.5)
+			config.disable(window)
 			sg.Popup(CREDITS,font = 'System', keep_on_top=True)
-			window.Reappear() 
+			config.enable(window)
 			
 		if event == 'comprobar victoria':
 			comprobar_victoria(window,matriz)

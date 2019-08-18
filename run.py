@@ -53,7 +53,7 @@ while True:				 # Event Loop
 
 	elif event == 'Configuracion::Menu':
 		window.Hide() 
-		config.configuracion()
+		config.main()
 		# menu_princ[0][1][0] = '!Configuracion::Menu' # esto era para desactivarlo y que se peuda abrir solo una vez
 		# window.Element('Menu').Update(menu_princ)
 		# window.Refresh()
