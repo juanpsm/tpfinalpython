@@ -29,8 +29,8 @@ Alumnos:
 '''
 HOWTO = '''
 Instrucciones para la configuración:
-	Ingrese palabras para ser usadas en la sopa de letra, en caso que  no se encuentre
-	 la misma en una busqueda en ciertas bases de datos, se le pedirá una definición.
+	Ingrese palabras para ser usadas en la sopa de letras, en caso que  no se encuentre
+	 la misma en ciertas bases de datos, se le pedirá una definición.
 	Puede eliminar palabras de la lista haciendo primero click y luego click derecho.
 	Debe elegir la cantidad de palabras de cada tipo que quiere que se usen. El sistema
 	 elegirá palabras al azar de entre las que se encuentren en la lista, respetando 
