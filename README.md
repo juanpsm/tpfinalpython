@@ -94,16 +94,9 @@ cd tpfinalpython
 ## Correr _run.py_ 
 `python3 run.py`
 
-## Consideraciones:
-Hubo unos errores en la re entrega
-- en las líneas 482 y 530 del archivo config.py se confunde la variable **col** con **val** lo que genera problemas.
-- en el módulo _comprobarvictoria_ del archivo sopa.py líneas 171 y 172 olvidamos preguntar por las casillas que pertenecen a más de una palabra.
- 
 ## Cosas que no llegamos a hacer:
 - Mejorar gráficos del "pincel".
-- Ordenar los archivos en carpetas (no sabíamos).
-- Deshabilitar ventana mientras se está eligiendo el color.
+- Ordenar los archivos en carpetas.
 - Mejorar rendimiento de sopa.py (revisa los casilleros demasiadas veces, anda pero es redundante)
 - Hay problemas con las cantidades de palabras en algunas ocasiones, puede quedar en cero si se manipula un poco.
 - Ajustar tamaño de celdas y letra según haya más palabras (más largas) para que entre mejor en la pantalla.
-- Hay un error (`_tkinter.TclError: Duplicate element _CANT_S_.TCombobox.field`) cuando se ejecuta dos veces la configuración. Esto no lo pudimos solucionar, hay que cerrar y volver a abrir el juego para poder volver a configurarlo. Esto lo resolvimos deshabilitando la opción de configuración la primera vez que se ejecuta la misma. Una solución más elegante sería, ya que  el problema parecen ser que los combox permanecen en memoria, usar unas keys que incorporen una variable que cambie con el tiempo, así no los tomaría como duplicados.
