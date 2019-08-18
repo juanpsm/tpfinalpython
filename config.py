@@ -373,7 +373,7 @@ def configuracion():
 	window0.Close()
 	print('Resolución:',x_max,'x',y_max)
 	
-	if y_max > 1800:
+	if y_max > 800:
 		layout_principal = [
 			[sg.Menu(menu_princ)],
 			[sg.Frame('Ingrese palabras: ',agregar_palabra_layout)],
