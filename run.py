@@ -25,17 +25,18 @@ def existe_archivo_de_configuracion():
 	return cond
 
 color_fondo = config.colores(config.cargar_configuracion()[0])['splash']
-sg.SetOptions(background_color = color_fondo[1],
-			text_element_background_color=color_fondo[1],
+sg.SetOptions(	background_color = color_fondo[1],
+				text_element_background_color=color_fondo[1],
 				element_background_color=color_fondo[1],
-				text_color=color_fondo[0],)
+				text_color=color_fondo[0]
+				)
 menu_princ = [	['&Opciones', ['Configuracion::Menu', 'Exit::Menu'  ]],    
 				['&Ayuda', '&Acerca de...::Menu']
 			]
 layout = [
 			[sg.Menu(menu_princ, key='Menu' )],
 			[sg.Text('Sopa de Letras', font = ('Fixedsys',25), pad = (90,8),justification = 'center')],
-			[sg.Button('',image_filename='jugar.png', image_size =(450, 210), image_subsample=1, border_width=0, 
+			[sg.Button('',image_filename='img/jugar.png', image_size =(450, 210), image_subsample=1, border_width=0, 
 				key='_jugar_', pad = (55,(8,55)), button_color = color_fondo)]
 		]
 
@@ -53,9 +54,9 @@ while True:				 # Event Loop
 	elif event == 'Configuracion::Menu':
 		window.Hide() 
 		config.configuracion()
-		menu_princ[0][1][0] = '!Configuracion::Menu'
-		window.Element('Menu').Update(menu_princ)
-		window.Refresh()
+		# menu_princ[0][1][0] = '!Configuracion::Menu' # esto era para desactivarlo y que se peuda abrir solo una vez
+		# window.Element('Menu').Update(menu_princ)
+		# window.Refresh()
 		window.UnHide()
 	
 	elif event == '_jugar_':

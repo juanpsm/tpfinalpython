@@ -95,3 +95,7 @@
 		El usuario la clasificó como "verb" y definió: "Agitar los pies contra el suelo en signo de disconformidad".
 [2019-07-13 19:04] Palabras: Wiktionario la clasificó como "_Ninguna_" y pattern como "sust". 
 		El usuario la clasificó como "sust" y definió: "".
+[2019-08-01 17:37] El termino "jdjdjfs": no se encontró en ningun motor de busqueda.
+[2019-08-01 17:39] El termino "spsapdp": no se encontró en ningun motor de busqueda.
+[2019-08-01 17:40] El termino "asdasd": no se encontró en ningun motor de busqueda.
+[2019-08-01 17:40] El termino "dfgdfg": no se encontró en ningun motor de busqueda.

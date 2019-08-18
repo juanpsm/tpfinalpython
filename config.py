@@ -7,6 +7,7 @@ import os
 import time
 import datetime
 
+
 from pprint import pprint
 from collections import defaultdict
 from buscar_en_wiktionary import buscar_en_wiktionary
@@ -104,17 +105,41 @@ def analizarpalabra(palabra,cat):
 	
 	return clasificacion_definitiva, definicion
 	
+def cargar_json_registro():
+	'''Carga los datos de temperatura y humedad de las oficinas en un diccionario que retorna'''
+	existe = os.path.isfile(nombre_archivo_registro)
+	if not existe:
+		print('No existe archivo de registro, se usara uno de prueba')
+		crear_registro(16,5) # crea un archivo en la ruta ante especificada, de 16 oficinas con 5 registros cada una.
+	
+	with open(nombre_archivo_registro, 'r', encoding = 'utf-8') as f:
+		reg_dicc = json.load(f)
+	
+	return reg_dicc
+	
+def temperatura_reciente(of):
+	'''Devuelve el dato de temperatura del último elemento de la lista de registros de la oficina especificada.'''
+	reg_dicc = cargar_json_registro()
+	
+	try:
+		temp = reg_dicc[of][-1:][0]['temp'] # accede al ultimo registro de esa oficina
+
+	except KeyError:
+		print('No existe dato de esa oficina, se inventará')
+		return random.randint(-10,50)
+	
+	return int(temp)
+	
 def cargar_configuracion():
 	"""Abre archivo json con la configuración cargada anteriormente.
-	si el archivo de configuracion no fue cargado previamente informa que no existe el mismo,
-	inicializa las estructuras vacías para poder cargarle nuevas en el futuro.
-
+	si no existe el mismo, inicializa las estructuras vacías para poder cargarlas en el futuro.
 
 	Retorna: (config_dicc, palabras_dicc, palabras_clas)
 	
 	"""
 	existe = os.path.isfile(nombre_archivo_config)
 	if existe:
+		print('Configuración cargada desde',os.path.abspath(nombre_archivo_config))
 		with open(nombre_archivo_config, 'r', encoding = 'utf-8') as f:
 			config_dicc = json.load(f)
 		palabras_dicc = config_dicc['palabras']
@@ -122,22 +147,21 @@ def cargar_configuracion():
 		palabras_clas = config_dicc['palabras_clas']
 		
 	else:
+		print('No existe archivo de configuración, se creará uno por defecto.')
 		config_dicc = {}
 		config_dicc['palabras'] = {}
 		config_dicc['palabras_clas'] = {'sust':[],'verb':[],'adj':[]}
 		config_dicc['orientacion'] = 'dirs_0'
 		palabras_dicc = {}
 		palabras_clas = {'sust':[],'verb':[],'adj':[]}
-		config_dicc['fuente'] = 'Comic'
+		config_dicc['fuente'] = 'Fixedsys'
 		config_dicc['max_sust'] = 0
 		config_dicc['max_verb'] = 0
 		config_dicc['max_adj'] = 0
 		config_dicc['color_pincel'] = { 'sust': '#69cfd8',
 		 								'verb': '#5ce4a0',
 										'adj':  '#e0619a'}
-		config_dicc['oficina'] = '8'
-		print('No existe archivo de configuración')
-	#print('Cargo en cargar_configuracion()',config_dicc['orientacion'])
+		config_dicc['oficina'] = random.choice(list(cargar_json_registro().keys()))
 	return config_dicc,palabras_dicc,palabras_clas
 	
 def obtener_lista_palabras(config_dicc):
@@ -158,25 +182,6 @@ def obtener_lista_palabras(config_dicc):
 	palabras_rand.extend(random.sample(lista_a, cant))
 	
 	return palabras_rand
-	
-def cargar_json_registro(of):
-	'''Carga los datos de temperatura y humedad de las , delvuelve la ultima temperatura registrada de la oficina que recibe como parametro'''
-	existe = os.path.isfile(nombre_archivo_registro)
-	if not existe:
-		print('No existe archivo de registro, se usara uno de prueba')
-		crear_registro(16,5)
-	
-	with open(nombre_archivo_registro, 'r', encoding = 'utf-8') as f:
-		reg_dicc = json.load(f)
-	
-	try:
-		temp = reg_dicc[of][-1:][0]['temp'] #accede al ultimo registro de esa oficina
-		print('Oficina:',of,'T:',temp)
-	except KeyError:
-		print('No existe dato de esa oficina, se inventará')
-		return random.randint(-10,50)
-	
-	return int(temp)
 
 def colores(config_dicc):
 	'''Setea parametros de Pysimplegui sobre todo colores de los elementos de las ventanas. 
@@ -184,7 +189,7 @@ def colores(config_dicc):
 	sg.ChangeLookAndFeel('Reddit')
 	
 	sg.SetOptions(
-	icon = 'bee.ico',
+	icon = 'img/bee.ico',
 	text_color='black',
 	input_text_color='black',
 	background_color='#EFF0D1', #cremita
@@ -211,7 +216,7 @@ def colores(config_dicc):
 					"Calido":['DarkAmber','Reds','Green','BrightColors','Kayak','SandyBeach'],
 					"Oscuro":['Topanga','Dark','Dark2','Black','DarkTanBlue']}
 	
-	temp = cargar_json_registro(config_dicc['oficina'])
+	temp = temperatura_reciente(config_dicc['oficina'])
 	hora = int(time.strftime("%H", time.localtime(time.time())))
 	if temp < 15 :
 		tema = 'Frio'
@@ -236,8 +241,8 @@ def colores(config_dicc):
 				slider_border_width=0,
 				progress_meter_border_depth=0,
 				scrollbar_color=(temas[tema]['SCROLL']),
-				element_text_color=temas[tema]['TEXT'],
-				input_text_color=temas[tema]['TEXT_INPUT'])
+				input_text_color=temas[tema]['TEXT_INPUT'],
+				element_text_color=temas[tema]['TEXT'])
 
 	colores_celdas = {	None:	('#EFF0D1','#854e0b'), #blanco y marron
 					'adj':	('#262730',config_dicc['color_pincel']['adj']),
@@ -261,7 +266,7 @@ def son_colores_parecidos(color1,color2):
 		color1 = AdobeRGBColor.new_from_rgb_hex(color1)
 		color2 = AdobeRGBColor.new_from_rgb_hex(color2)
 		delta_e = delta_e_cie1976(convert_color(color1,LabColor), convert_color(color2,LabColor))
-		print('delta color: ',delta_e)
+		print(delta_e)
 		#print(abs(delta_e)<50)
 		return abs(delta_e)<50
 
@@ -283,8 +288,6 @@ def configuracion():
 	palabras_lista = list(palabras_dicc.keys()) ## lista para el listbox
 	
 	TOTAL_PALABRAS_A_USAR = config_dicc['max_sust']+config_dicc['max_verb']+config_dicc['max_adj']
-	
-	print('Cargo en configuracion()',config_dicc['orientacion'])
 
 	menu = ['Menu', [' ',
 					 'Definicion::_MENU_',
@@ -295,21 +298,20 @@ def configuracion():
 					]
 			]
 			
-	agregar_palabra_layout = [	[sg.Input(key = '_IN_', do_not_clear = False, focus = True, background_color = '#DB91D6')],
-			[sg.Button('Agregar', bind_return_key = True, key = '_ADD_')],
-			[sg.Listbox(values = palabras_lista, enable_events = True, size = (15,6),
-						key = '_LISTA_', tooltip = 'Click para seleccionar', right_click_menu = menu),
-			 sg.Multiline('',size=(None, None), pad = None, font = None, right_click_menu=None,
-						auto_size_text=None, key = '_OUT_',do_not_clear = True)
-			 ]]
-
+	agregar_palabra_layout = [	[	sg.Input(key = '_IN_', do_not_clear = False, focus = True, background_color = '#DB91D6'),
+									sg.Button('Agregar', bind_return_key = True, key = '_ADD_')],
+								[	sg.Listbox(values = palabras_lista, enable_events = True, size = (15,6),
+												key = '_LISTA_', tooltip = 'Click para seleccionar', right_click_menu = menu),
+			 						sg.Multiline('',size=(40, 6), pad = None, font = None, right_click_menu=None,
+													auto_size_text=True, key = '_OUT_',do_not_clear = True)]
+							]
 	
 	cantidad_palabras_layout = [
 		[sg.Column(	[	[sg.Text(k[0], pad=((0,),2) )],
 						[sg.Combo( list( range( 0, 1 + min( MAX, len(config_dicc['palabras_clas'][k[1]]) ))),
 				 			key = k[2], default_value = config_dicc['max_'+k[1]], size = (2,1), pad=((20,),1), enable_events = True)]
 			 		], pad=((0,),2) )
-					for k in (('Sustantivos','sust','_CANT_S_'),('Verbos','verb','_CANT_V_'),('Adjetivo','adj','_CANT_A_'))
+					for k in (('Sustantivos','sust','_CANT_S_'),('Verbos','verb','_CANT_V_'),('Adjetivos','adj','_CANT_A_'))
 		]
 	]
 	cantidad_palabras_layout[0].append(sg.Frame(title = 'Total:',
@@ -324,11 +326,11 @@ def configuracion():
 							
 							[sg.In(default_text='', key = 'color_'+k[1], size = (7, 1), enable_events = True, visible = False)], # este in tiene que ir si o si para que ande el evento del color chooser, como pasa con el FileBrowse
 							[sg.ColorChooserButton('', button_color=('red',config_dicc['color_pincel'][k[1]]), 
-														target='color_'+k[1], size=(4,2), border_width=3, pad=((10,10),(5,5)),
+														target='color_'+k[1], size=(6,3), border_width=5, pad=((25,25),(5,0)),
 														key='boton_color_'+k[1])]
 							]) for k in (('Sustantivos','sust','amarillo'),('Verbos','verb','rojo'),('Adjetivos','adj','verde'))
 						],
-						[sg.Text('', size = (50,1), font=('default', 10, 'bold'), text_color='#D33F49', 
+						[sg.Text('', size=(52,1), font=('default', 10, 'bold'), text_color='#D33F49', 
 									 pad=((10,0),(5,10)), key = '_error_color_')]
 					 ]
 			
@@ -336,7 +338,7 @@ def configuracion():
 				 sg.Radio('Definiciones', "RADIOA", key='defin'),
 				 sg.Radio('Mostrar palabras', "RADIOA", default = True, key='pal')]]
 				  
-	layout_orientacion = [	[sg.Button('', image_filename='dirs_'+str(i)+'.png', image_size=(60, 60), image_subsample=6, border_width=0,
+	layout_orientacion = [	[sg.Button('', image_filename='img/dirs_'+str(i)+'.png', image_size=(60, 60), image_subsample=6, border_width=0,
 							key='dirs_'+str(i), button_color=colores_celdas['marcada'] if config_dicc['orientacion']=='dirs_'+str(i) else colores_celdas['fondo'])
 				 for i in (0,1,2,3,4,8)]]
 				 
@@ -347,24 +349,51 @@ def configuracion():
 						default_value = config_dicc['fuente'],
 						key = '_FONT_')]]
 						
-	layout_oficina = [	[sg.Input(default_text=config_dicc['oficina'], size=(3,1), key = '_OF_', do_not_clear = True, background_color = '#DB91D6'),
-						 sg.Text('Temp = '+str(cargar_json_registro(config_dicc['oficina']))+'ºC', key='_TEMP_')
+	layout_oficina = [	[
+						# La oficina la podemos agregar a mano o con un combo
+						#sg.Input(default_text=config_dicc['oficina'], size=(3,1), do_not_clear = True, background_color = '#DB91D6', key = '_OF_'),
+						 sg.Combo(values = list(cargar_json_registro().keys()), default_value = config_dicc['oficina'], enable_events = True, key = '_OF_'),
+						 sg.Text('Temp = '+str(temperatura_reciente(config_dicc['oficina']))+'ºC', key='_TEMP_')
 						 ]
 					 ]
-			
-	layout= [
-		[sg.Text('Ingrese palabras la lista para ser usadas por la sopa de letras:')],
-		[sg.Text('Instrucciones de configuración')],
-		[sg.Frame('Ingrese palabras',agregar_palabra_layout)],
-		[sg.Frame('Cantidad máxima de cada tipo a utilizar en la Sopa:',cantidad_palabras_layout)], 
-		[sg.Frame('Seleccion de colores: ',colores_layout)],
-		[sg.Frame('Ayudas',layout_ayudas)],
-		[sg.Frame('Orientacion',layout_orientacion)],
-		[sg.Frame('Mayúscula/Minúscula',layout_mayuscula),sg.Frame('Fuente',layout_fuente)],
-		[sg.Frame('Oficina',layout_oficina),sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((150,5),1), disabled = False),sg.Button('Cerrar' , key= '_CERRAR_',disabled = False)]
-		] 
+	
+	menu_princ = [	['&Archivo',	['&Cargar...::Menu', 
+									'&Guardar...::Menu', 
+									'---', 
+									'Configuracion::Menu', 
+									'E&xit']],
+					['&Ayuda',		['Como jugar?::Menu',
+									'Acerca de...::Menu']]
+				]
+	
+	# Para sacar la resolucion de pantalla hay que crear una ventana, se cierra rapido asi que practicamente no se ve.
+	window0 = sg.Window('dummy',alpha_channel=0).Layout([[sg.Text('prueba')]])
+	window0.ReadNonBlocking() #para que no se quee esperando interaccion
+	x_max,y_max = window0.GetScreenDimensions()
+	window0.Close()
+	print('Resolución:',x_max,'x',y_max)
+	
+	if y_max > 1800:
+		layout_principal = [
+			[sg.Menu(menu_princ)],
+			[sg.Frame('Ingrese palabras: ',agregar_palabra_layout)],
+			[sg.Frame('Cantidad máxima de cada tipo de palabra:',cantidad_palabras_layout)], 
+			[sg.Frame('Seleccion de colores: ',colores_layout)],
+			[sg.Frame('Ayudas',layout_ayudas)],
+			[sg.Frame('Orientacion',layout_orientacion)],
+			[sg.Frame('Mayúscula/Minúscula',layout_mayuscula),sg.Frame('Fuente',layout_fuente), sg.Frame('Oficina',layout_oficina)],
+			[sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((200,5),1), disabled = False),sg.Button('Cerrar' , key= '_CERRAR_',disabled = False)] 
+		]
+	else:
+		layout_principal = [
+			[sg.Menu(menu_princ)],
+			[sg.Frame('Ingrese palabras: ',agregar_palabra_layout), sg.Frame('Seleccion de colores: ',colores_layout)],
+			[sg.Frame('Cantidad máxima de cada tipo de palabra:',cantidad_palabras_layout),sg.Frame('Orientacion',layout_orientacion)], 
+			[sg.Frame('Ayudas',layout_ayudas),sg.Frame('Mayúscula/Minúscula',layout_mayuscula),sg.Frame('Fuente',layout_fuente),sg.Frame('Oficina',layout_oficina)],
+			[sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((700,5),1), disabled = False),sg.Button('Cerrar' , key= '_CERRAR_',disabled = False)] 
+		]
 
-	window = sg.Window('CONFIGURACIÓN').Layout(layout)
+	window = sg.Window('CONFIGURACIÓN').Layout(layout_principal)
 	window.Finalize()
 
 	for x in ('V','A'):
@@ -378,7 +407,7 @@ def configuracion():
 		event, val = window.Read()  
 		if event is None or event == '_CERRAR_': 
 			break
-			
+		
 		if event == '_ADD_':
 			palabra = val['_IN_']  #Guardo lo que puso en el imput
 			categoria = '' # inicializo
@@ -396,6 +425,7 @@ def configuracion():
 					# "ES:Sustantivo", etc, en las categorías, entonces devolverá '_no_sabe_' como categoría
 					if definicion == '_no_aceptada_': 
 						window.SetAlpha(0.5)
+						window.Disable()
 						sg.Popup('No consideramos que "'+palabra+'" sea una palabra', keep_on_top=True)
 						window.Reappear() 
 					
@@ -419,7 +449,7 @@ def configuracion():
 				print(val['_LISTA_'][0])
 			except(IndexError):
 				print(val['_LISTA_'])
-				
+		
 		if event == 'Definicion::_MENU_':
 			try: 
 				texto = '--> "' + val['_LISTA_'][0] + '":\n'
@@ -433,7 +463,7 @@ def configuracion():
 				print(val['_LISTA_'][0])
 			except(IndexError):
 				print(val['_LISTA_'])
-			
+		
 		if event == 'Eliminar::_MENU_':
 			if val['_LISTA_'] != []: 
 				palabra = val['_LISTA_'][0]# El Listbox guarda en val una lista con un unico elemento que es el que esta seleccionado en ese momento.
@@ -452,23 +482,17 @@ def configuracion():
 			lista_dirs = ['dirs_0','dirs_1','dirs_2','dirs_3','dirs_4','dirs_8']
 			lista_dirs.remove(event)
 			for x in lista_dirs:  # pinto todos menos el actual del color del fondo
-				window.Element(x).Update(button_color = colores_celdas['fondo'])
+				window.Element(x).Update(button_color = ( '#000', window.BackgroundColor) )
 			
 			orientacion = event
-		##configuracion de colores de pinceles
-		#if hay colores repetidos para distintos tipos de palabras deshabilita la opcion de guardar.
-		# chekea en cada vuelta que sean distintas. cuando son todas distintas vuelve a habilitar la opcion de guardar.
-		if event in ['comboSust','comboAdj','comboVerb']:	
-			if val['comboVerb'] == val['comboAdj'] or val['comboVerb'] == val['comboSust']or val['comboSust'] == val['comboAdj']:
-				sg.Popup('No se pueden elejir colores repetidos para distintos tipos de palabaras')
-				window.FindElement('_ACEPTAR_').Update(disabled = True)
-				window.FindElement('_CERRAR_').Update(disabled = True)
-			if val['comboSust'] != val['comboVerb'] and val['comboVerb'] != val['comboAdj'] and val['comboAdj'] != val['comboSust'] :
-					window.FindElement('_ACEPTAR_').Update(disabled = False)
-					window.FindElement('_CERRAR_').Update(disabled = False)
 		
+		if event=='boton_color_sust':
+			print('AYAHUASCA')
+
+
 		evento_colores = ['color_'+j for j in ('sust','verb','adj')]
 		if event in evento_colores:
+			
 			window.FindElement('boton_'+event).Update(button_color = ('red',val[event]))
 			print('Colores elegidos (val):',val['color_sust'],val['color_verb'],val['color_adj'])
 
@@ -480,19 +504,21 @@ def configuracion():
 				col[event] = val[event]
 				error_color = False
 				
+				print('Delta entre color_sust y color_verb:',end=' ')
 				if son_colores_parecidos(col['color_sust'],col['color_verb']):
 					error_color += True
 					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y verbo muy parecido.')
-				
+				print('Delta entre color_sust y color_adj:',end=' ')
 				if son_colores_parecidos(col['color_sust'],col['color_adj']):
 					error_color += True
 					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y adjetivo muy parecido.')
-				
+				print('Delta entre color_verb y color_adj:',end=' ')
 				if son_colores_parecidos(col['color_verb'],col['color_adj']):
 					error_color += True
 					window.Element('_error_color_').Update(value='¡Error! Color de verbo y adjetivo muy parecido.')
-				
+				print()
 				if error_color:
+					window.Element('_error_color_').Update()
 					window.Element('_error_color_').Update(visible= True)
 					window.FindElement('_ACEPTAR_').Update(disabled = True)
 				
@@ -500,7 +526,6 @@ def configuracion():
 					window.Element('_error_color_').Update(value='')
 					window.Element('_error_color_').Update(visible= False)
 					window.FindElement('_ACEPTAR_').Update(disabled = False)
-
 
 		lista_cant = ['_CANT_S_','_CANT_V_','_CANT_A_']
 		if event in lista_cant:
@@ -510,7 +535,10 @@ def configuracion():
 				window.Element('_CANT_A_').Update(values = list( range( 0, 1 + MAX - int(val[event]) - int(val['_CANT_S_']) ) ) , disabled = False, set_to_index = 0 )
 			TOTAL_PALABRAS_A_USAR = int(val['_CANT_S_']) + int(val['_CANT_V_']) + int(val['_CANT_A_'])
 			window.Element('_TOTAL_').Update(value = TOTAL_PALABRAS_A_USAR )
-				
+
+		if event == '_OF_':
+			window.Element('_TEMP_').Update(value = 'Temp = '+str(temperatura_reciente(val['_OF_']))+'ºC')
+		
 		##LLeno diccionario
 		try:
 			config_dicc['palabras'] = palabras_dicc
@@ -528,15 +556,14 @@ def configuracion():
 			# 								'adj':  listaColores[val['comboAdj']]}
 			
 			config_dicc['color_pincel'] = {x : col['color_'+x] for x in ('sust','verb','adj')}
-			window.Element('_TEMP_').Update(value = 'Temp = '+str(cargar_json_registro(val['_OF_']))+'ºC')
+
 			#print('VALORES')
 			#print(config_dicc)	 
 		except ValueError:
 			window.SetAlpha(0.5)
 			sg.Popup('Debe seleccionar cantidades!!', keep_on_top=True)
 			window.Reappear()
-			
-			
+				
 		if event == '_ACEPTAR_':
 			if TOTAL_PALABRAS_A_USAR == 0:
 				window.SetAlpha(0.5)
@@ -556,8 +583,6 @@ def configuracion():
 			print ('Seleccionado: ',val['_LISTA_'])
 
 	window.Close()
-
-	return 0
 
 if __name__ == "__main__":
 	configuracion()

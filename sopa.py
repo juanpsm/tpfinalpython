@@ -120,7 +120,7 @@ def dibujar():
 	
 	ayuda_layout = ayuda(palabras_lista,palabras_dicc,config_dicc)
 	print('ANCHO:',ANCHO,'Alto:',ALTO)
-	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', '!Configuracion::Menu', 'E&xit'  ]],    
+	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', 'Configuracion::Menu', 'E&xit'  ]],    
 					['&Ayuda', ['Como jugar?::Menu','Acerca de...::Menu']]
 				 ]
 	sopa_layout = [	[sg.Button(matriz.celdas[j][i]['letra'],
@@ -147,7 +147,7 @@ def dibujar():
 				[sg.Frame('Seleccionar color: ', pincel_layout),sg.Button(' Comprobar Victoria', pad=((260,0),None), key = 'comprobar victoria',tooltip= 'Marca con blanco las marcadas erroneamente.')],
 				[sg.Frame('', sopa_layout, font=config_dicc['fuente'], pad=(0,0)),
 					sg.Frame('Ayudas: ',[	[sg.Text('Direcciones:', pad = ((20,0),0) )],
-											[sg.Button(image_filename = config_dicc['orientacion']+'.png', 
+											[sg.Button(image_filename = 'img/'+config_dicc['orientacion']+'.png', 
 														image_size=(80, 80), image_subsample=4, border_width=0,
 														pad = ((30,0),(10,30)), button_color = color_fondo)
 											],
@@ -162,7 +162,7 @@ def dibujar():
 	window = sg.Window('Sopa de Letras').Layout(layout)
 	
 	start_time = time.time()
-	def comprobar_victoria(layout,matriz):
+	def comprobar_victoria(window,matriz):
 		"""si seleccionamos boton comprobar victorias marca en blanco todas las letras que hayan sido presionadas erroneamente."""
 		"""recorre toda la matriz comprobando que las celdas marcadas sean correctas"""
 		for j in range(ANCHO):
@@ -177,7 +177,7 @@ def dibujar():
 								window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
 								matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
 								
-	def Win_Condition(matriz,win):
+	def Win_Condition(matriz, win, event):
 		"""primera parte: si la celda presionada esta marcada la desmarca y le asigna color Default. Sino la marca y le asigna color de celda marcada."""
 		"""segunda parte: comprueba victoria atravez de un AND. si encuentra una celda que este marcada erroneamente arrastra el False."""
 		for i in range(ANCHO):
@@ -189,26 +189,19 @@ def dibujar():
 					else:
 						matriz.celdas[j][i]['marcada'] = True
 						color_celda = color_celda_marcada
+					
 					matriz.celdas[j][i]['color'] = color_celda
 					window.FindElement(event).Update(button_color = color_celda)
 				
 				if matriz.celdas[j][i]['tipo'] != None:
 					if matriz.celdas[j][i]['tipo'] == 'MIXTO':
-						if not(matriz.celdas[j][i]['marcada']):
-							win *= False
-						else:
-							win *= True
+						win *= matriz.celdas[j][i]['marcada']
 					else:
-						if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']]: #no pudimos extraer el color de pysimplegui por eso le agregamos una key 'color' a la matriz
-							win *= False
-						else:
-							win *= True
+						win *= matriz.celdas[j][i]['color'] == color_marca[matriz.celdas[j][i]['tipo']]
+						#no pudimos extraer el color de pysimplegui por eso le agregamos una key 'color' a la matriz
 				else:
-					if (matriz.celdas[j][i]['marcada']):
-						win *= False
-					else:
-						win *= True
-		return win	
+					win *= not (matriz.celdas[j][i]['marcada'])
+		return win
 	
 	def Mensaje_Victoria():
 			print('\nGanaste!')
@@ -284,17 +277,19 @@ def dibujar():
 			window.LoadFromDisk(filename)
 			
 		if event == 'Como jugar?::Menu':
+			window.Disable
 			window.SetAlpha(0.5)
 			sg.Popup(HOWTO,font = 'System', keep_on_top=True)
 			window.Reappear() 
 		
 		if event == 'Acerca de...::Menu':
+			window.Disable
 			window.SetAlpha(0.5)
 			sg.Popup(CREDITS,font = 'System', keep_on_top=True)
 			window.Reappear() 
 			
 		if event == 'comprobar victoria':
-			comprobar_victoria(layout,matriz)
+			comprobar_victoria(window,matriz)
 			
 		if event in ('adj','verb','sust'):  # Si toco el pincel
 			color_celda_marcada = color_marca[event]
@@ -303,8 +298,8 @@ def dibujar():
 			window.FindElement(event).Update(value ='* '+event.upper()+' *')
 
 		win = True
-		win = Win_Condition(matriz,win)
-		if win == True and event == 'comprobar victoria':
+		win = Win_Condition(matriz,win,event)
+		if win and event == 'comprobar victoria':
 			Mensaje_Victoria()
 		print(event)
 	window.Close()
