@@ -29,26 +29,36 @@ Alumnos:
 '''
 HOWTO = '''
 Instrucciones para la configuración:
-	Igrese palabras para ser usadas en la sopa de letra, en caso que  no se encuentre la misma en una busqueda en ciertas bases de datos, se le pedirá una definición.
+	Ingrese palabras para ser usadas en la sopa de letra, en caso que  no se encuentre
+	 la misma en una busqueda en ciertas bases de datos, se le pedirá una definición.
 	Puede eliminar palabras de la lista haciendo primero click y luego click derecho.
-	Debe elegir la cantidad de palabras de cada tipo que quiere que se usen. El sistema eligirá palabras al azar de entre las que se encuentren en la lista, respetando las cantidades indicadas.
-	Puede cambiar los colores con los que el alumno marcará las palabras en la Sopa de Letras.
+	Debe elegir la cantidad de palabras de cada tipo que quiere que se usen. El sistema
+	 elegirá palabras al azar de entre las que se encuentren en la lista, respetando 
+	 las cantidades indicadas.
+	Puede cambiar los colores con los que el alumno marcará las palabras en la Sopa de
+	 Letras.
 	Para agregar dificultad puede elegir el tipo de Ayudas:
-	- Sin ayuda, solo indicara la cantidad de palabras que debe el alumno buscar.
-	- Definiciones, mostrará una lista con definiciones de las palabras que se encuentran en la Sopa.
-	- Mostrar palabras, muestra la lista directamente de todas las palabras que hay en la misma.
-	La Orientacion indica las distintas formas de disponer las palabras como indican las flechas. Poniendo el mouse sobre las mismas le dará una breve descripción al respecto.
+		- Sin ayuda, solo indicara la cantidad de palabras que debe el alumno buscar.
+		- Definiciones, mostrará una lista con definiciones de las palabras que se
+		 encuentran en la Sopa.
+		- Mostrar palabras, muestra la lista directamente de todas las palabras que hay
+		 en la misma.
+	La Orientación indica las distintas formas de disponer las palabras como indican
+	 las flechas. Poniendo el mouse sobre las mismas le dará una breve descripción al
+	 respecto.
 	Por último puede elegir la fuente y la capitalización de las letras.
-	El campo oficina podra elegirlo si se dispone de un archivo con las temperaturas de las aulas tomado por una raspberry Pi. A partir del mismo se designarán los colores de las ventanas sigueintes.
+	El campo oficina podrá elegirlo si se dispone de un archivo con las temperaturas de
+	 las aulas tomado por una raspberry Pi. A partir del mismo se designarán los colores
+	 de las ventanas.
 '''
 
 nombre_archivo_config = 'configuracion.json'
 nombre_archivo_reporte = 'reporte_de_errores.txt'
 nombre_archivo_registro = 'registros_temp_hum.json'
-## con MAX seteamos el numero maximo de palabras a usar en total entre sust verb y adj.
+## con MAX seteamos el numero máximo de palabras a usar en total entre sust verb y adj.
 MAX = 10
 def reporte( res, error, clas, defi ):
-	"""pone en archivo de texto un reporte de los errores encontrados en la ejecucion de la sopa de letras"""
+	"""pone en archivo de texto un reporte de los errores encontrados en la ejecución de la sopa de letras"""
 	""" recibe un numero de error y en base a el informa que tipo de error es"""
 	hora = datetime.datetime.now()
 	hora = str(hora)[:-10]
@@ -63,7 +73,7 @@ def reporte( res, error, clas, defi ):
 		texto = texto.format(hora,res['palabra'],res['clasificacion_wiktionario'],res['clasificacion_pattern'])
 	
 	elif error ==2:
-		texto = '[{}] El termino "{}": no se encontró en ningun motor de busqueda.\n'.format(hora,res['palabra'])
+		texto = '[{}] El termino "{}": no se encontró en ningún motor de busqueda.\n'.format(hora,res['palabra'])
 
 	print('Error {}:{}'.format(error,texto))
 	
@@ -106,7 +116,7 @@ def analizarpalabra(palabra,cat):
 						[sg.Input(default_text = resultado['definicion'], key = 'def')],
 						[sg.Submit(key = 'submit'),sg.Cancel(key = 'cancel')]
 						]
-			window2 = sg.Window('Definicion ').Layout(ingreso)
+			window2 = sg.Window('Definición ').Layout(ingreso)
 			button,values2=window2.Read()
 			if button == 'cancel':
 				clasificacion_definitiva = '_cancelada_'
@@ -191,14 +201,14 @@ def cargar_configuracion():
 	return config_dicc,palabras_dicc,palabras_clas
 	
 def obtener_lista_palabras(config_dicc):
-	'''Este metodo es para elegir aleatoriamente palabras, respentando las cantidades 
+	'''Este método es para elegir aleatoriamente palabras, respetando las cantidades 
 	máximas definidas para cada tipo.'''
 
 	lista_s = config_dicc['palabras_clas']['sust']
 	lista_v = config_dicc['palabras_clas']['verb']
 	lista_a = config_dicc['palabras_clas']['adj']
 	
-	cant = min ( len(lista_s), config_dicc['max_sust'] ) # tambien puedo comprobarlo antes y que max nunca tenga algo mayor que el largo de la lista
+	cant = min ( len(lista_s), config_dicc['max_sust'] ) # también puedo comprobarlo antes y que max nunca tenga algo mayor que el largo de la lista
 	palabras_rand = random.sample(lista_s, cant)
 	
 	cant = min ( len(lista_v), config_dicc['max_verb'] )
@@ -417,9 +427,9 @@ def main():
 			[sg.Menu(menu_princ)],
 			[sg.Frame('Ingrese palabras: ',agregar_palabra_layout)],
 			[sg.Frame('Cantidad máxima de cada tipo de palabra:',cantidad_palabras_layout)], 
-			[sg.Frame('Seleccion de colores: ',colores_layout)],
+			[sg.Frame('Selección de colores: ',colores_layout)],
 			[sg.Frame('Ayudas',layout_ayudas)],
-			[sg.Frame('Orientacion',layout_orientacion)],
+			[sg.Frame('Orientación',layout_orientacion)],
 			[sg.Frame('Mayúscula/Minúscula',layout_mayuscula),sg.Frame('Fuente',layout_fuente), sg.Frame('Oficina',layout_oficina)],
 			[sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((350,5),(10,5)), disabled = False),
 			 sg.Button('Cerrar' , key= '_CERRAR_', pad = ((5,5),(10,5)), disabled = False)] 
@@ -427,7 +437,7 @@ def main():
 	else:
 		layout_principal = [
 			[sg.Menu(menu_princ)],
-			[sg.Frame('Ingrese palabras: ',agregar_palabra_layout), sg.Frame('Seleccion de colores: ',colores_layout)],
+			[sg.Frame('Ingrese palabras: ',agregar_palabra_layout), sg.Frame('Selección de colores: ',colores_layout)],
 			[sg.Frame('Cantidad máxima de cada tipo de palabra:',cantidad_palabras_layout),sg.Frame('Orientacion',layout_orientacion)], 
 			[sg.Frame('Ayudas',layout_ayudas),sg.Frame('Mayúscula/Minúscula',layout_mayuscula),sg.Frame('Fuente',layout_fuente),sg.Frame('Oficina',layout_oficina)],
 			[sg.Button('Guardar configuración', key='_ACEPTAR_', pad = ((750,5),(10,5)), disabled = False),
@@ -624,7 +634,6 @@ def main():
 		
 		if event == '_LISTA_':
 			print ('Seleccionado: ',val['_LISTA_'])
-
 	window.Close()
 
 if __name__ == "__main__":

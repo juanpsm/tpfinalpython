@@ -16,7 +16,7 @@ Alumnos:
 HOWTO = '''
 Sopa de Letras:
 
-Primero seleccionar color segun el tipo de
+Primero seleccionar color según el tipo de
 palabra que va a buscar.
 Marque los casilleros de la palabras, 
 clickeando las letras de la grilla.
@@ -25,16 +25,16 @@ Podrá seleccionar el tipo de ayuda en el
 apartado Configuración.
 
 El juego finaliza una vez que todas las 
-letras de todas las palabras esten marcadas
+letras de todas las palabras estén marcadas
 con el color correspondiente.
 
 Si una letra pertenece a más de una 
 palabra (intersección), podrá marcarla
 con cualquier color.
 
-Al presionar boton COMPROBAR VICTORIA:
+Al presionar botón COMPROBAR VICTORIA:
 Si las letras cambian a color blanco es que
-fueron marcadas con una categoria incorrecta,
+fueron marcadas con una categoría incorrecta,
 También pueden quedar letras por marcar.
 O puede haber una palabra marcadas incorrectamente.
 '''
@@ -70,10 +70,10 @@ def dibujar():
 	print('palabras_lista =',palabras_lista)
 	
 	## Defino el ancho de la grilla como el mayor entre la cantidad de palabras o la palabra mas larga
-	ANCHO = max(len(max(palabras_lista, key=len)),len(palabras_lista)) # key = len hace que sea por cantidad de char y no alfabeticamente
+	ANCHO = max(len(max(palabras_lista, key=len)),len(palabras_lista)) # key = len hace que sea por cantidad de char y no alfabéticamente
 	## O solo la palabra más larga
 	#ANCHO = len(max(palabras_lista, key=len))
-	## Y siquieropuede ser cuadrada
+	## Y si quiero puede ser cuadrada
 	ALTO = ANCHO
 	
 	
@@ -120,7 +120,7 @@ def dibujar():
 	
 	ayuda_layout = ayuda(palabras_lista,palabras_dicc,config_dicc)
 	print('ANCHO:',ANCHO,'Alto:',ALTO)
-	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', 'Configuracion::Menu', 'E&xit::Menu'  ]],    
+	menu_princ = [	['&Archivo', ['&Cargar...::Menu', '&Guardar...::Menu', '---', 'Configuración::Menu', 'E&xit::Menu'  ]],    
 					['&Ayuda', ['Como jugar?::Menu','Acerca de...::Menu']]
 				 ]
 	sopa_layout = [	[sg.Button(matriz.celdas[j][i]['letra'],
@@ -144,7 +144,7 @@ def dibujar():
 	#Layout principal.
 	layout = [
 				[sg.Menu(menu_princ)],
-				[sg.Frame('Seleccionar color: ', pincel_layout),sg.Button(' Comprobar Victoria', pad=((260,0),None), key = 'comprobar victoria',tooltip= 'Marca con blanco las marcadas erroneamente.')],
+				[sg.Frame('Seleccionar tipo de palabra: ', pincel_layout),sg.Button(' Comprobar Victoria', pad=((260,0),None), key = 'comprobar victoria',tooltip= 'Marca con blanco las marcadas erroneamente.')],
 				[sg.Frame('', sopa_layout, font=config_dicc['fuente'], pad=(0,0)),
 					sg.Frame('Ayudas: ',[	[sg.Text('Direcciones:', pad = ((20,0),0) )],
 											[sg.Button(image_filename = 'img/'+config_dicc['orientacion']+'.png', 
@@ -276,10 +276,13 @@ def dibujar():
 			print('Cargar ',filename)
 			window.LoadFromDisk(filename)
 		
-		if event == 'Configuracion::Menu':
-			window.TKroot.attributes('-disabled', 1)
-			config.main()
-			break
+		if event == 'Configuración::Menu':
+			config.disable(window)
+			if sg.PopupOKCancel('Perderá el progreso del juego, continuar?')=='OK': 
+				window.Hide()
+				config.main()
+				break
+			config.enable(window)
 
 
 		if event == 'Como jugar?::Menu':

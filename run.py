@@ -19,7 +19,7 @@ import sopa
 import PySimpleGUI as sg
 
 def existe_archivo_de_configuracion():
-	''' Para ver si existe la configuracion me fijo si la funion devuelve el elemento vacío que es cuando lo inicializa'''
+	''' Para ver si existe la configuración me fijo si la función devuelve el elemento vacío que es cuando lo inicializa'''
 	_,_,res = config.cargar_configuracion()
 	cond = res != []
 	return cond
@@ -30,7 +30,7 @@ sg.SetOptions(	background_color = color_fondo[1],
 				element_background_color=color_fondo[1],
 				text_color=color_fondo[0]
 				)
-menu_princ = [	['&Opciones', ['Configuracion::Menu', 'Exit::Menu'  ]],    
+menu_princ = [	['&Opciones', ['Configuración::Menu', 'Exit::Menu'  ]],    
 				['&Ayuda', '&Acerca de...::Menu']
 			]
 layout = [
@@ -51,10 +51,10 @@ while True:				 # Event Loop
 	elif event == 'Acerca de...::Menu':
 		sg.Popup(CREDITS,font = 'System')
 
-	elif event == 'Configuracion::Menu':
+	elif event == 'Configuración::Menu':
 		window.Hide() 
 		config.main()
-		# menu_princ[0][1][0] = '!Configuracion::Menu' # esto era para desactivarlo y que se peuda abrir solo una vez
+		# menu_princ[0][1][0] = '!Configuración::Menu' # esto era para desactivarlo y que se pueda abrir solo una vez
 		# window.Element('Menu').Update(menu_princ)
 		# window.Refresh()
 		window.UnHide()

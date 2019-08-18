@@ -13,7 +13,7 @@ def guardar_datos(of, temp, hum):
 			dicc = json.load(f)
 	else:
 		dicc = {}
-		print('Creado de registro')
+		print('Registro creado')
 	
 	string_time = time.strftime("%Y/%m/%d - %H:%M:%S", time.localtime(time.time()))
 
@@ -28,7 +28,7 @@ def guardar_datos(of, temp, hum):
 		json.dump(dicc, f, ensure_ascii = False)
 
 def crear_registro(n,m):
-	'''Crea m regisrtros aleatorios de n oficinas'''
+	'''Crea m registros aleatorios de n oficinas'''
 	for of in range(1,n+1):
 		for _ in range(m):
 			guardar_datos(str(of), random.randint(-10,50), random.randint(0,100))
