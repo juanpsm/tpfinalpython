@@ -144,7 +144,7 @@ def dibujar():
 	#Layout principal.
 	layout = [
 				[sg.Menu(menu_princ)],
-				[sg.Frame('Seleccionar tipo de palabra: ', pincel_layout),sg.Button(' Comprobar Victoria', pad=((260,0),None), key = 'comprobar victoria',tooltip= 'Marca con blanco las marcadas erroneamente.')],
+				[sg.Frame('Seleccionar tipo de palabra: ', pincel_layout),sg.Button(' Comprobar Errores', pad=((260,0),None), key = 'comprobar errores',tooltip= 'Marca con blanco las marcadas erroneamente.')],
 				[sg.Frame('', sopa_layout, font=config_dicc['fuente'], pad=(0,0)),
 					sg.Frame('Ayudas: ',[	[sg.Text('Direcciones:', pad = ((20,0),0) )],
 											[sg.Button(image_filename = 'img/'+config_dicc['orientacion']+'.png', 
@@ -162,12 +162,28 @@ def dibujar():
 	window = sg.Window('Sopa de Letras').Layout(layout)
 	
 	start_time = time.time()
-	def comprobar_victoria(window,matriz):
-		"""si seleccionamos boton comprobar victorias marca en blanco todas las letras que hayan sido presionadas erroneamente."""
-		"""recorre toda la matriz comprobando que las celdas marcadas sean correctas"""
-		for j in range(ANCHO):
-					for i in range(ALTO):
-						if matriz.celdas[j][i]['marcada'] == True:
+	# ~ def comprobar_victoria(matriz):
+		# ~ """si seleccionamos boton comprobar victorias marca en blanco todas las letras que hayan sido presionadas erroneamente."""
+		# ~ """recorre toda la matriz comprobando que las celdas marcadas sean correctas"""
+		# ~ for j in range(ANCHO):
+					# ~ for i in range(ALTO):
+						# ~ if matriz.celdas[j][i]['marcada'] == True:
+							# ~ if matriz.celdas[j][i]['tipo'] in ('adj','verb','sust','MIXTO'):
+								# ~ if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']] and matriz.celdas[j][i]['tipo'] != 'MIXTO':
+									# ~ window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
+									# ~ matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
+									# ~ window.Refresh()
+							# ~ else:
+								# ~ window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
+								# ~ matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
+								
+	def Win_Condition(matriz, win, event):
+		"""primera parte: si seleccionamos boton "comprobar errores" marca en blanco todas las letras que hayan sido presionadas erroneamente."""
+		"""segunfa parte: si la celda presionada esta marcada la desmarca y le asigna color Default. Sino la marca y le asigna color de celda marcada."""
+		"""tercera parte: comprueba victoria atravez de un AND. si encuentra una celda que este marcada erroneamente arrastra el False."""
+		for i in range(ANCHO):
+			for j in range(ALTO):
+				if matriz.celdas[j][i]['marcada']:	#primera parte
 							if matriz.celdas[j][i]['tipo'] in ('adj','verb','sust','MIXTO'):
 								if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']] and matriz.celdas[j][i]['tipo'] != 'MIXTO':
 									window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
@@ -177,12 +193,7 @@ def dibujar():
 								window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
 								matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
 								
-	def Win_Condition(matriz, win, event):
-		"""primera parte: si la celda presionada esta marcada la desmarca y le asigna color Default. Sino la marca y le asigna color de celda marcada."""
-		"""segunda parte: comprueba victoria atravez de un AND. si encuentra una celda que este marcada erroneamente arrastra el False."""
-		for i in range(ANCHO):
-			for j in range(ALTO):
-				if (matriz.celdas[j][i]['key'] == event ):
+				if (matriz.celdas[j][i]['key'] == event ):	#segunda parte
 					if matriz.celdas[j][i]['marcada']:
 						matriz.celdas[j][i]['marcada'] = False
 						color_celda = color_celda_default
@@ -193,7 +204,7 @@ def dibujar():
 					matriz.celdas[j][i]['color'] = color_celda
 					window.FindElement(event).Update(button_color = color_celda)
 				
-				if matriz.celdas[j][i]['tipo'] != None:
+				if matriz.celdas[j][i]['tipo'] != None:		#tercera parte
 					if matriz.celdas[j][i]['tipo'] == 'MIXTO':
 						win *= matriz.celdas[j][i]['marcada']
 					else:
@@ -295,8 +306,8 @@ def dibujar():
 			sg.Popup(CREDITS,font = 'System', keep_on_top=True)
 			config.enable(window)
 			
-		if event == 'comprobar victoria':
-			comprobar_victoria(window,matriz)
+		if event == 'comprobar errores':
+			Win_Condition(matriz, win, event)
 			
 		if event in ('adj','verb','sust'):  # Si toco el pincel
 			color_celda_marcada = color_marca[event]
@@ -306,7 +317,8 @@ def dibujar():
 
 		win = True
 		win = Win_Condition(matriz,win,event)
-		if win and event == 'comprobar victoria':
+		if win:
+			#sg.Popup('¡¡GANASTE!!')
 			Mensaje_Victoria()
 		print(event)
 	window.Close()
