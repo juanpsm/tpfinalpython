@@ -183,15 +183,16 @@ def dibujar():
 		"""tercera parte: comprueba victoria atravez de un AND. si encuentra una celda que este marcada erroneamente arrastra el False."""
 		for i in range(ANCHO):
 			for j in range(ALTO):
-				if matriz.celdas[j][i]['marcada']:	#primera parte
-							if matriz.celdas[j][i]['tipo'] in ('adj','verb','sust','MIXTO'):
-								if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']] and matriz.celdas[j][i]['tipo'] != 'MIXTO':
+				if event == "comprobar errores":
+					if matriz.celdas[j][i]['marcada']:	#primera parte
+								if matriz.celdas[j][i]['tipo'] in ('adj','verb','sust','MIXTO'):
+									if matriz.celdas[j][i]['color'] != color_marca[matriz.celdas[j][i]['tipo']] and matriz.celdas[j][i]['tipo'] != 'MIXTO':
+										window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
+										matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
+										window.Refresh()
+								else:
 									window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
 									matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
-									window.Refresh()
-							else:
-								window.FindElement(str(j)+'_'+str(i)).Update(button_color = color_marca['Erroneas'])
-								matriz.celdas[j][i]['color']= (color_marca['Erroneas'])
 								
 				if (matriz.celdas[j][i]['key'] == event ):	#segunda parte
 					if matriz.celdas[j][i]['marcada']:
@@ -305,7 +306,7 @@ def dibujar():
 			config.disable(window)
 			sg.Popup(CREDITS,font = 'System', keep_on_top=True)
 			config.enable(window)
-			
+		win = True	
 		if event == 'comprobar errores':
 			Win_Condition(matriz, win, event)
 			
@@ -314,8 +315,6 @@ def dibujar():
 			for element in ('adj','verb','sust'):
 				window.FindElement(element).Update(value = element)
 			window.FindElement(event).Update(value ='* '+event.upper()+' *')
-
-		win = True
 		win = Win_Condition(matriz,win,event)
 		if win:
 			#sg.Popup('¡¡GANASTE!!')
