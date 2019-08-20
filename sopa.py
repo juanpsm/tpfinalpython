@@ -274,7 +274,7 @@ def dibujar():
 	
 	while True:				 # Event Loop
 		event, val = window.Read()
-		
+		win = True
 		if event is None or event == 'Cerrar' or event == 'Exit::Menu':
 			break
 			
@@ -306,7 +306,7 @@ def dibujar():
 			config.disable(window)
 			sg.Popup(CREDITS,font = 'System', keep_on_top=True)
 			config.enable(window)
-		win = True	
+			
 		if event == 'comprobar errores':
 			Win_Condition(matriz, win, event)
 			
