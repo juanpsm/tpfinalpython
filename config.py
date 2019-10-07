@@ -551,42 +551,44 @@ def main():
 
 			disable(window)
 
-			color_elegido = tkinter.colorchooser.askcolor()  
+			color_elegido = tkinter.colorchooser.askcolor() 
 			print('color_elegido =',color_elegido)
 			color_elegido = color_elegido[1]
+			try:
+				window.FindElement(event).Update(button_color = ('red',color_elegido))
+				#print('Colores elegidos (val):',val['color_sust'],val['color_verb'],val['color_adj'])
 
-			window.FindElement(event).Update(button_color = ('red',color_elegido))
-			#print('Colores elegidos (val):',val['color_sust'],val['color_verb'],val['color_adj'])
-
-			col[event] = color_elegido
-			print('Colores elegidos (col):',col['color_sust'],col['color_verb'],col['color_adj'])
-			error_color = False
+				col[event] = color_elegido
+				print('Colores elegidos (col):',col['color_sust'],col['color_verb'],col['color_adj'])
+				error_color = False
+					
+				print('Delta entre color_sust y color_verb:',end=' ')
+				if son_colores_parecidos(col['color_sust'],col['color_verb']):
+					error_color += True
+					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y verbo muy parecido.')
+				print('Delta entre color_sust y color_adj:',end=' ')
+				if son_colores_parecidos(col['color_sust'],col['color_adj']):
+					error_color += True
+					window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y adjetivo muy parecido.')
+				print('Delta entre color_verb y color_adj:',end=' ')
+				if son_colores_parecidos(col['color_verb'],col['color_adj']):
+					error_color += True
+					window.Element('_error_color_').Update(value='¡Error! Color de verbo y adjetivo muy parecido.')
+				print()
+				if error_color:
+					window.Element('_error_color_').Update()
+					window.Element('_error_color_').Update(visible= True)
+					window.FindElement('_ACEPTAR_').Update(disabled = True)
 				
-			print('Delta entre color_sust y color_verb:',end=' ')
-			if son_colores_parecidos(col['color_sust'],col['color_verb']):
-				error_color += True
-				window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y verbo muy parecido.')
-			print('Delta entre color_sust y color_adj:',end=' ')
-			if son_colores_parecidos(col['color_sust'],col['color_adj']):
-				error_color += True
-				window.Element('_error_color_').Update(value='¡Error! Color de sustantivo y adjetivo muy parecido.')
-			print('Delta entre color_verb y color_adj:',end=' ')
-			if son_colores_parecidos(col['color_verb'],col['color_adj']):
-				error_color += True
-				window.Element('_error_color_').Update(value='¡Error! Color de verbo y adjetivo muy parecido.')
-			print()
-			if error_color:
-				window.Element('_error_color_').Update()
-				window.Element('_error_color_').Update(visible= True)
-				window.FindElement('_ACEPTAR_').Update(disabled = True)
-			
-			else:
-				window.Element('_error_color_').Update(value='')
-				window.Element('_error_color_').Update(visible= False)
-				window.FindElement('_ACEPTAR_').Update(disabled = False)
+				else:
+					window.Element('_error_color_').Update(value='')
+					window.Element('_error_color_').Update(visible= False)
+					window.FindElement('_ACEPTAR_').Update(disabled = False)
+			except:
+				col[event] = config_dicc['color_pincel'][event[6:]] #Si se cancela la ventana, quedaba (none,none) y daba error, por eso cargo el color que estaba en config.
 			
 			enable(window)
-
+		
 		lista_cant = ['_CANT_S_','_CANT_V_','_CANT_A_']
 		if event in lista_cant:
 			if event == '_CANT_S_':  # voy seteando el tope del siguiente segun MAX - actual, lo habilito y lo seteo en cero.
@@ -595,7 +597,7 @@ def main():
 				window.Element('_CANT_A_').Update(values = list( range( 0, 1 + MAX - int(val[event]) - int(val['_CANT_S_']) ) ) , disabled = False, set_to_index = 0 )
 			TOTAL_PALABRAS_A_USAR = int(val['_CANT_S_']) + int(val['_CANT_V_']) + int(val['_CANT_A_'])
 			window.Element('_TOTAL_').Update(value = TOTAL_PALABRAS_A_USAR )
-
+		
 		if event == '_OF_':
 			window.Element('_TEMP_').Update(value = 'Temp = '+str(temperatura_reciente(val['_OF_']))+'ºC')
 		

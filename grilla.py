@@ -125,9 +125,9 @@ def crear_grilla(palabras):
 	config_dicc, _, _ = config.cargar_configuracion()
 	if config_dicc != {}:
 		print('Cargo en crear_grilla()',config_dicc['orientacion'])
-	print('antes de modifglob(), dirs =',dirs)
+	#print('antes de modifglob(), dirs =',dirs)
 	modifglob(palabras)
-	print('luego de modifglob(), dirs =',dirs)
+	#print('luego de modifglob(), dirs =',dirs)
 	grilla = None
 	nun_intentos = 0
 
