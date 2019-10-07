@@ -4,14 +4,13 @@ import string
 # ~ print(dir(pattern.es))
 
 #problem:
-event = 'color_sust'
-print(event, event[6:])
-# ~ x= "danzar amigable barrilete asdfg"
-# ~ print(pattern.es.tag(x, tokenize=True, encoding='utf-8'))
+
+x= "danzar amigable barrilete asdfg"
+print(pattern.es.tag(x, tokenize=True, encoding='utf-8'))
 
 
-# ~ x = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])
-# ~ print(pattern.es.tag(x, tokenize=True, encoding='utf-8'))
+x = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])
+print(pattern.es.tag(x, tokenize=True, encoding='utf-8'))
 # ~ c = 0
 # ~ for x in pattern.es.lexicon.keys():
 	# ~ if not (x in pattern.es.spelling.keys()):

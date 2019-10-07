@@ -27,4 +27,7 @@ def buscar_en_pattern(palabra):
 	print('\n?\n')
 
 if __name__ == "__main__":
-	buscar_en_pattern('Camino')
+	palabra = 'Camino'
+	while(palabra!='q'):
+		buscar_en_pattern(palabra)
+		palabra = input('\n--------------------------------------------------------------------------\nPalabra: ')
